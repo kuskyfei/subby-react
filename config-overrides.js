@@ -26,7 +26,6 @@ const uglifyOptions = {
 
 module.exports = function override (config, env) {
   if (env === 'production') {
-    
     // replace UglifyJsPlugin because it causes problems
     // with node modules not transpiled to ES5
     config.plugins.splice(3, 1)
@@ -67,8 +66,6 @@ module.exports = function override (config, env) {
 
     /* end debugging */
   }
-
-  
 
   // replace default create-react-app ESLint with Standard.js
   config.module.rules[0] = {

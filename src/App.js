@@ -3,26 +3,61 @@
 import React, { Component } from 'react'
 import {Switch, Route, withRouter} from 'react-router-dom'
 import {events, init, getBlockNumber} from './ethereum'
-import ipfs from './ipfs'
+import * as ipfs from './ipfs'
 import {getTorrent} from './torrent'
+
+ipfs.setProvider(window.SUBBY_GLOBAL_SETTINGS.IPFS_PROVIDER)
 
 // css
 import './css/main.css'
 
 class App extends Component {
-  state = {events: []}
+  state = {events: [], videoSrc: null}
 
   componentDidMount () {
-    if (5 === 4) {}
+    // require('./ipfs/test')
 
-    // (async () => {
-    //   console.log('torrent')
-    //   const torrent = await getTorrent('magnet:?xt=urn:btih:01248a3918e25462e9d1730809384027e8820275&dn=test-file.txt&tr=wss%3A%2F%2Ftracker.btorrent.xyz')
-    //   console.log('torrent2')
-    //   console.log(torrent)
-    // })()
-    // startIpfs()
-    // startEvents(this)
+    const mimecodec = 'video/mp4; codecs="avc1.42E01E,mp4a.40.2"'
+    //const mimecodec = 'video/webm; codecs="vorbis,vp8"'
+    if (!MediaSource.isTypeSupported(mimecodec)) alert('mimecodec not supported')
+
+    const mediaSource = new MediaSource()
+
+    this.setState({...this.state, videoSrc: URL.createObjectURL(mediaSource)})
+
+    mediaSource.addEventListener("sourceopen", async () => {
+
+      const sourceBuffer = mediaSource.addSourceBuffer(mimecodec)
+      //sourceBuffer.mode = "sequence";
+    
+      const stream = await ipfs.stream('QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV')
+      let fileType
+      stream.on('data', (buffer) => {
+        if (!fileType) fileType = ipfs.getFileType(buffer)
+
+        console.log(buffer)
+
+        console.log(sourceBuffer.updating)
+        sourceBuffer.appendBuffer(buffer)
+        console.log(sourceBuffer.updating)
+
+        stream.pause()
+
+        sourceBuffer.addEventListener("updateend", () => {
+          stream.resume()
+          //mediaSource.endOfStream()
+        })
+
+        console.log(sourceBuffer.buffered)
+        
+      })
+
+      stream.on('close', () => {
+        console.log('CLOSING!')
+      })
+
+    })
+    
   }
 
   render () {
@@ -36,6 +71,14 @@ class App extends Component {
     return (
       <div>
         <p className='App'>Awesome App!</p>
+
+        <video controls
+          muted
+          src={this.state.videoSrc}
+          width="300"
+          height="200">
+        </video>
+
         <Switch>
 
           {/*
@@ -57,7 +100,7 @@ const startIpfs = async () => {
     content: `This is my content yo!!!!`
   }
 
-  const file = await ipfs.upload(object)
+  const file = await ipfs.uploadObject(object)
 
   console.log(file)
 

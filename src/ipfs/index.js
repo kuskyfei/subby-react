@@ -1,24 +1,39 @@
 const IPFS = require('ipfs-api')
-const ipfs = new IPFS({host: 'ipfs.infura.io', port: 5001, protocol: 'https'})
-const Buffer = require('buffer/').Buffer
+const getFileType = require('file-type')
 
-const toIpfsBuffer = (object) => {
-  const string = JSON.stringify(object)
+let ipfs
 
-  const utf8Encode = new window.TextEncoder('utf-8')
-  const arrayBuffer = utf8Encode.encode(string)
+const {urlToProviderObject, objectToIpfsBuffer, noProvider, fileToIpfsBuffer} = require('./util')
 
-  const buffer = Buffer.from(arrayBuffer)
-
-  return buffer
+const setProvider = (provider) => {
+  provider = urlToProviderObject(provider)
+  ipfs = new IPFS(provider)
 }
 
-const upload = async (object) => {
-  const buffer = toIpfsBuffer(object)
+const uploadObject = async (object) => {
+  if (!ipfs) noProvider()
+
+  const buffer = objectToIpfsBuffer(object)
+  return ipfs.add(buffer)
+}
+
+const uploadBuffer = async (buffer) => {
+  if (!ipfs) noProvider()
+
+  return ipfs.add(buffer)
+}
+
+const uploadFilePath = (path) => {
+  if (!ipfs) noProvider()
+
+  const buffer = fileToIpfsBuffer(path)
+
   return ipfs.add(buffer)
 }
 
 const get = async (ipfsHash) => {
+  if (!ipfs) noProvider()
+
   const res = await ipfs.get(ipfsHash)
 
   const buffer = res[0].content
@@ -31,4 +46,21 @@ const get = async (ipfsHash) => {
   return object
 }
 
-export default {upload, get: get}
+const stream = async (ipfsHash) => {
+  const stream = await getReadableFileContentStream(ipfsHash)
+  return stream
+}
+
+const getReadableFileContentStream = (ipfsHash) => {
+  return new Promise((resolve, reject) => {
+    const stream = ipfs.files.getReadableStream(ipfsHash)
+
+    stream.on('data', (file) => {
+      if (file.type === 'dir') return reject(Error(`IPFS hash (${ipfsHash}) is a directory`))
+
+      resolve(file.content)
+    })
+  })
+}
+
+export {uploadObject, uploadBuffer, uploadFilePath, get, setProvider, stream, getFileType}

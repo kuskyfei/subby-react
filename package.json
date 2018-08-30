@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "file-type": "^9.0.0",
     "ipfs-api": "^24.0.1",
     "ms": "^2.1.1",
     "react": "^16.4.2",
@@ -62,6 +63,9 @@
     "setupFiles": [
       "<rootDir>/test/setup/mocks/localStorage.js",
       "<rootDir>/test/setup/setupTests.js"
-    ]
+    ],
+    "globals": {
+       "SUBBY_GLOBAL_SETTINGS": {}
+     }
   }
 }
