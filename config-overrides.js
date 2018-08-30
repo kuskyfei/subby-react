@@ -2,6 +2,7 @@ const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const DelWebpackPlugin = require('del-webpack-plugin')
+const {version} = require('./package.json')
 
 // debug
 const util = require('util') // eslint-disable-line
@@ -37,7 +38,8 @@ module.exports = function override (config, env) {
       inlineSource: '.(js|css)$',
       inject: 'body',
       template: 'public/index.html',
-      filename: 'subby.html'
+      filename: 'subby.html',
+      version: version
     }))
     config.plugins.push(new HtmlWebpackInlineSourcePlugin())
     // delete the extra files created and only keep index.html

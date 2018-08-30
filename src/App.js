@@ -31,7 +31,7 @@ class App extends Component {
       //sourceBuffer.mode = "sequence";
     
       const stream = await ipfs.stream('QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV')
-      let fileType
+      let fileType, streamClosed
       stream.on('data', (buffer) => {
         if (!fileType) fileType = ipfs.getFileType(buffer)
 
@@ -43,17 +43,23 @@ class App extends Component {
 
         stream.pause()
 
-        sourceBuffer.addEventListener("updateend", () => {
-          stream.resume()
-          //mediaSource.endOfStream()
-        })
-
-        console.log(sourceBuffer.buffered)
+        console.log(sourceBuffer)
         
       })
 
-      stream.on('close', () => {
+      sourceBuffer.addEventListener("updateend", () => {
+        console.log(mediaSource.readyState)
+        if (streamClosed && mediaSource.readyState === 'open') {
+          mediaSource.endOfStream()
+        }
+        else {
+          stream.resume()
+        }
+      })
+
+      stream.on('end', () => {
         console.log('CLOSING!')
+        streamClosed = true
       })
 
     })
