@@ -1,6 +1,5 @@
 ##todo
 
-- taxes
 - set up twitter account
 - compile to single file
 - set up mock API
