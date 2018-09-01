@@ -1,8 +1,8 @@
-const {init} = require('./init')
+const {init, setWeb3} = require('./init')
 const {events} = require('./events')
 const {getBlockNumber} = require('./util')
 
-export {init, getBlockNumber, events}
+export {init, setWeb3, getBlockNumber, events}
 
 export {
   getProfileFromUsername,

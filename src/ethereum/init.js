@@ -3,27 +3,20 @@ const Web3 = require('web3')
 const Promise = require('bluebird')
 
 // abis
-// const SubbyABI = require("./abis/SubbyABI.json")
+// const SubbyABI = require('./abis/SubbyABI.json')
 
 // files
 const HDWalletProvider = require('truffle-hdwallet-provider')
 const state = require('./state')
 
-const init = async () => {
-  // Rinkeby settings:
-  // const mnemonic = "test"
-  // const provider = new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/uaNKEkpjsyvArG0sHifx") // Rinkeby
-  // const subbyContractAddress = ""
+const init = async ({provider = '', mnemonic = ''} = {}) => {
+  const web3Provider = new HDWalletProvider(mnemonic, provider)
+  // const subbyContractAddress = 'not on mainnet yet'
 
-  // Mainnet settings:
-  const mnemonic = 'test'
-  const provider = new HDWalletProvider(mnemonic, 'https://mainnet.infura.io/uaNKEkpjsyvArG0sHifx') // Mainnet
-  // const subbyContractAddress = "not on mainnet yet"
-
-  const web3 = new Web3(provider)
+  const web3 = new Web3(web3Provider)
   Promise.promisifyAll(web3.eth)
 
-  // // subby contract
+  // subby contract
   // const Subby = web3.eth.contract(SubbyABI)
   // subby = Subby.at(subbyContractAddress)
   // Promise.promisifyAll(subby)
@@ -40,4 +33,9 @@ const init = async () => {
   state.account = account
 }
 
-export {init}
+// useful for mocking
+const setWeb3 = (web3) => {
+  state.web3 = {...state.web3, ...web3}
+}
+
+export {init, setWeb3}

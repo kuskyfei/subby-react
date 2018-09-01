@@ -14,8 +14,16 @@ const {
 } = require('./util')
 
 const setProvider = (provider) => {
+  if (!provider) throw Error(`No provider argument passed to ipfs.setProvider. Try something like 'https://infura.io:5001'.`)
+
   provider = urlToProviderObject(provider)
   ipfs = new IPFS(provider)
+}
+
+// useful for mocking
+const setIpfsApi = (ipfsApi) => {
+  if (!ipfs) noProvider()
+  ipfs = {...ipfs, ...ipfsApi}
 }
 
 const uploadObject = async (object) => {
@@ -60,9 +68,7 @@ const uploadFilePathWrappedWithDirectory = (fileName, path) => {
     content: buffer
   }]
 
-  console.log(files)
-
-  return ipfs.files.add(files, {wrapWithDirectory: true})
+  return ipfs.add(files, {wrapWithDirectory: true})
 }
 
 const getReadableStream = async (ipfsHash) => {
@@ -201,6 +207,7 @@ const getJson = async (ipfsHash) => {
 const getIpfs = () => ipfs
 
 export {
+  setIpfsApi,
   setProvider,
 
   uploadObject,

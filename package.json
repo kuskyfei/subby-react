@@ -12,6 +12,7 @@
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",
     "react-scripts": "^1.1.5",
+    "readable-stream": "^3.0.2",
     "redux": "^4.0.0",
     "redux-actions": "^2.6.1",
     "truffle-hdwallet-provider": "0.0.6",
@@ -57,15 +58,12 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/mocks/media.js",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/mocks/emptyFile.js",
       "\\.(css|less)$": "identity-obj-proxy"
     },
     "setupFiles": [
-      "<rootDir>/test/setup/mocks/localStorage.js",
-      "<rootDir>/test/setup/setupTests.js"
-    ],
-    "globals": {
-       "SUBBY_GLOBAL_SETTINGS": {}
-     }
+      "<rootDir>/test/mocks/localStorage.js",
+      "<rootDir>/test/setupTests.js"
+    ]
   }
 }

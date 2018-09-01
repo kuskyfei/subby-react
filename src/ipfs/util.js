@@ -51,7 +51,7 @@ const fileToIpfsBuffer = (path) => {
 }
 
 const noProvider = () => {
-  throw Error(`No IPFS provider! Set provider using ipfs.setProvider('https://infura.io:5001')`)
+  throw Error(`No IPFS provider! Set provider using ipfs.setProvider('https://infura.io:5001').`)
 }
 
 const typedArrayToArrayBuffer = (typedArray) => {
