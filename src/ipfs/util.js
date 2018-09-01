@@ -28,6 +28,23 @@ const objectToIpfsBuffer = (object) => {
   return buffer
 }
 
+const arrayBufferToBase64 = (buffer) => {
+  var binary = ''
+  var bytes = new Uint8Array(buffer)
+  var len = bytes.byteLength
+  for (var i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return window.btoa(binary)
+}
+
+const concatTypedArrays = (a, b) => {
+  var c = new (a.constructor)(a.length + b.length)
+  c.set(a, 0)
+  c.set(b, a.length)
+  return c
+}
+
 const fileToIpfsBuffer = (path) => {
   const nodeBuffer = fs.readFileSync(path)
   return nodeBuffer
@@ -37,4 +54,16 @@ const noProvider = () => {
   throw Error(`No IPFS provider! Set provider using ipfs.setProvider('https://infura.io:5001')`)
 }
 
-export {urlToProviderObject, objectToIpfsBuffer, fileToIpfsBuffer, noProvider}
+const typedArrayToArrayBuffer = (typedArray) => {
+  return [typedArray]
+}
+
+export {
+  urlToProviderObject,
+  objectToIpfsBuffer,
+  fileToIpfsBuffer,
+  noProvider,
+  arrayBufferToBase64,
+  concatTypedArrays,
+  typedArrayToArrayBuffer
+}

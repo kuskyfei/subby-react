@@ -18,6 +18,7 @@
   - set/view your profile ----> /profile
   - manage/import/export your subscribtions ----> /manage
   - new post
+- disable service worker
 
 ##supported embedded websites
 

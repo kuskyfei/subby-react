@@ -12,57 +12,113 @@ ipfs.setProvider(window.SUBBY_GLOBAL_SETTINGS.IPFS_PROVIDER)
 import './css/main.css'
 
 class App extends Component {
-  state = {events: [], videoSrc: null}
+  state = {events: [], imgSrc: null, videoSrc: null}
 
   componentDidMount () {
-    // require('./ipfs/test')
-
-    const mimecodec = 'video/mp4; codecs="avc1.42E01E,mp4a.40.2"'
-    //const mimecodec = 'video/webm; codecs="vorbis,vp8"'
-    if (!MediaSource.isTypeSupported(mimecodec)) alert('mimecodec not supported')
-
-    const mediaSource = new MediaSource()
-
-    this.setState({...this.state, videoSrc: URL.createObjectURL(mediaSource)})
-
-    mediaSource.addEventListener("sourceopen", async () => {
-
-      const sourceBuffer = mediaSource.addSourceBuffer(mimecodec)
-      //sourceBuffer.mode = "sequence";
     
-      const stream = await ipfs.stream('QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV')
-      let fileType, streamClosed
+    (async() => {
+      //const image = await ipfs.getBase64Image('QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo')
+      //const image = await ipfs.getFileTypeFromHash('QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo')
+      //console.log(image)
+      //this.setState({...this.state, imgSrc: image})
+
+      // const video = await ipfs.getVideo('QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV')
+
+      // console.log(video)
+
+      // const blob = new Blob([video])
+      // console.log(blob)
+
+      const blob = await ipfs.getBlobFromStream('QmQ747r7eLfsVtBFBSRwfXsPK6tADJpQzJxz4uFdoZb9XJ')
+
+      const url = URL.createObjectURL(blob)
+      this.setState({...this.state, videoSrc: url})
+
+      // const image = await ipfs.getVideo('QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo')
+      // console.log([image])
+
+      // const blob = new Blob([image])
+      // console.log(blob)
+
+      // const url = URL.createObjectURL(blob)
+      // this.setState({...this.state, imgSrc: url})
+
+      // var inputElement = document.querySelector('input');
+      // var imgElement = document.querySelector('img');
+      // var videoElement = document.querySelector('video');
+
+      // inputElement.addEventListener('change', function() {
+
+      //   console.log(inputElement.files[0])
+
+      //   var reader = new FileReader();
+
+      //   reader.onload = function(e) {
+      //     var res = reader.result;
+      //     console.log(res)
+          
+      //     const blob = new Blob([res])
+
+      //     console.log(blob)
+
+      //     var url = URL.createObjectURL(blob)
+      //     videoElement.src = url;
+      //   }
+
+      //   reader.readAsArrayBuffer(inputElement.files[0]);
+
+      // });
+
+    })()
+
+    // (async() => {
+    //   const buffer = await ipfs.get('QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo')
+    //   console.log(buffer)
+    // })()
+    /*
+    (async () => {
+      const stream = await ipfs.stream('QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo')
+    
+      let fileType, streamClosed, fileBuffer
+      
       stream.on('data', (buffer) => {
+
         if (!fileType) fileType = ipfs.getFileType(buffer)
 
-        console.log(buffer)
-
-        console.log(sourceBuffer.updating)
-        sourceBuffer.appendBuffer(buffer)
-        console.log(sourceBuffer.updating)
-
-        stream.pause()
-
-        console.log(sourceBuffer)
+        if (!fileBuffer) {
+          stream.pause()
+          fileBuffer = buffer
+          stream.resume()
+        }
+        else {
+          stream.pause()
+          fileBuffer = concatTypedArrays(fileBuffer, buffer)
+          stream.resume()
+        }
         
       })
 
-      sourceBuffer.addEventListener("updateend", () => {
-        console.log(mediaSource.readyState)
-        if (streamClosed && mediaSource.readyState === 'open') {
-          mediaSource.endOfStream()
-        }
-        else {
-          stream.resume()
-        }
-      })
-
       stream.on('end', () => {
-        console.log('CLOSING!')
         streamClosed = true
+
+        const blob = new Blob(fileBuffer)
+        const url = URL.createObjectURL(blob)
+        console.log(fileBuffer)
+        console.log(blob)
+
+        this.setState({...this.state, videoSrc: url})
+
+        //browser.downloads.download({url: URL.createObjectURL(blob), filename: 'test.mp4'})
+
+        var a = document.createElement('a');
+        a.download = "test.jpg";
+        a.href = url;
+        a.textContent = "Download backup.txt";
+        a.click();
       })
 
-    })
+    })()
+*/
     
   }
 
@@ -78,12 +134,11 @@ class App extends Component {
       <div>
         <p className='App'>Awesome App!</p>
 
-        <video controls
-          muted
-          src={this.state.videoSrc}
-          width="300"
-          height="200">
-        </video>
+        <video controls src={this.state.videoSrc} />
+
+        <img src={this.state.imgSrc} />
+
+        <input type="file" />
 
         <Switch>
 
@@ -100,20 +155,7 @@ class App extends Component {
   }
 }
 
-const startIpfs = async () => {
-  const object = {
-    title: `I'm doing well!`,
-    content: `This is my content yo!!!!`
-  }
 
-  const file = await ipfs.uploadObject(object)
-
-  console.log(file)
-
-  const content = await ipfs.get('QmRhkA5WautUcDYm2FSSPnRd9S3jnJmrLGbT9dKCN7rgpt')
-
-  console.log(content)
-}
 
 const startEvents = async (app) => {
   let counter = 10

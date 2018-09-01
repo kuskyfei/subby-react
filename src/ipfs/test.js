@@ -1,22 +1,36 @@
+// this CLI is useful for testing ipfs
+// use "babel-node cli" from the ipfs folder
+// to start. Then use ipfs.method in the
+// cli.
+
 const ipfs = require('./index')
 ipfs.setProvider('https://ipfs.infura.io:5001')
-const fileType = require('file-type')
 
-// var Magic = require('mmmagic').Magic;
-// var magic = new Magic()
+// init CLI
+;(async () => {
+  // const res = await ipfs.uploadFilePathWrappedWithDirectory('dog-in-fence.jpg', '/Users/dave/Documents/git/subby-react/test/setup/mocks/ipfs/media/images/dog-in-fence.jpg')
+  // console.log(res)
 
-// const stream = ipfs.getReadableStream()('QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo') // image
-const stream = ipfs.getReadableStream()('QmdbaL9CpPoJXHTSx9BxxkHAv9k1wcyzbdRLdKHPsPVfYs') // video
+  ipfs.getIpfs().files.cat('/ipfs/QmYx4j9q9qgj2LHgqwPwePJHad5g8tuALTufvpNAdfSpxS/dog-in-fence.jpg', {}, console.log)
+})()
 
-stream.on('data', (file) => {
-  if (file.type !== 'dir') {
-    file.content.on('data', (data) => {
-      // magic.detect(data, function(err, result) {
-      //   if (err) throw err
-      //   console.log(result)
-      // })
-      console.log(fileType(data))
-    })
-    // file.content.resume()
-  }
-})
+/*
+
+some valid ipfs images
+
+dog-in-fence.jpg QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo
+dog-on-bus.jpg QmPqJfAyLbWrqPPVqNrBJ8UiSgh5oypUJez4SAUEW31qNX
+dogs-in-car.jpg QmXYSUjeuWGmAFarASTwRHfCtHho3uGdo1mdbSGusARZ3T
+happy-dog.jpg QmVg7o8qBvVuXZhDAgTkGreX2hFXAMjdQ88WTCsry7say9
+mister-dog.jpg QmSxRVy8xK98bmZuq1cGnn2YQbDkiFQaepCrAZy2viGutg
+officer-puppy.jpg QmYvjVtP9R1NXBnxyx89mcj72XXELyXa2JFLnUjQnkv9dE
+pirate-dog.jpg QmScyMudhhZAAovRvMoHmFkaEiw4Tdxoecy1pEKppSE8PQ
+puppies.jpg QmbZaLVhaj7tRjqQtrAZ8d5eDNQ35RPJE5A4P8zpTvC2ZB
+
+some valid ipfs videos
+
+dog-loves-baby.mp4 QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV
+sleeping-dogs.mp4 QmWK3hDK8wDRgcTTiedXkWzEtj5aZpkqnYLWqXUMv6VhN9
+sleepy-dog.mp4 QmdbaL9CpPoJXHTSx9BxxkHAv9k1wcyzbdRLdKHPsPVfYs
+
+*/
