@@ -55,32 +55,44 @@ const styles = theme => ({
 
 const reddit = {
   comment: 'hey this is my comment',
-  link: <div className="card__white-border-3px"><blockquote className="reddit-card"><a href="https://www.reddit.com/r/mildlyinteresting/comments/9b3f7r/in_canada_because_certain_dyes_are_banned_orange/"></a></blockquote></div>
+  link: "https://www.reddit.com/r/mildlyinteresting/comments/9b3f7r/in_canada_because_certain_dyes_are_banned_orange/",
+  username: "MyUsername",
+  timestamp: "December 3rd 2018"
 }
 
 const instagram = {
   comment: 'This is my other comment!',
-  link: <div className="card__white-border-1px"><blockquote style={{width: "100%"}} className="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/p/Bm_wQfVBu1w/?utm_source=ig_embed"></blockquote></div>
+  link: "https://www.instagram.com/p/Bm_wQfVBu1w/",
+  username: "MyUsername",
+  timestamp: "December 3rd 2018"
 }
 
 const youtube = {
   comment: 'Awesome!',
-  link: <div className='embed-container'><iframe src='https://www.youtube.com/embed/mjs3_Kkn05w' frameborder='0' allowfullscreen></iframe></div>
+  link: 'https://www.youtube.com/watch?v=EMiYqvGzvkI',
+  username: "MyUsername",
+  timestamp: "December 3rd 2018"
 }
 
 const vimeo = {
   comment: 'YEEEEEEE',
-  link: <div className='embed-container'><iframe src='https://player.vimeo.com/video/257056050' frameborder='0' allowfullscreen></iframe></div>
+  link: 'https://vimeo.com/video/257056050',
+  username: "MyUsername",
+  timestamp: "December 3rd 2018"
 }
 
 const facebook = {
   comment: 'cool',
-  link: <div className='card__white-border-1px'><div className='embed-container'><iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fafterafterparty%2Fvideos%2F2258644881026208%2F" scrolling="no" frameborder="0" allowTransparency="true" allow="encrypted-media" allowFullScreen="true"></iframe></div></div>
+  link: "https://www.facebook.com/thementionlive/videos/vb.608219979558854/867753370088312/?type=2&theater",
+  username: "MyUsername",
+  timestamp: "December 3rd 2018"
 }
 
 const twitter = {
   comment: 'cool',
-  link: <div className='card__white-border-1px'><blockquote class="twitter-tweet" data-lang="en"><a href="https://twitter.com/ethereum/status/1035526464135942145?ref_src=twsrc%5Etfw"></a></blockquote></div>
+  link: "https://twitter.com/ethereum/status/1035526464135942145?ref_src=twsrc%5Etfw",
+  username: "MyUsername",
+  timestamp: "December 3rd 2018"
 }
 
 class Checkout extends React.Component {
@@ -103,14 +115,15 @@ class Checkout extends React.Component {
 
         <main className={classes.layout}>
 
-          {/*
-          <Card post={reddit}/>
-          <Card post={instagram}/>
           <Card post={youtube}/>
           <Card post={vimeo}/>
-          <Card post={facebook}/>
-          */}
+
+          {/* 
           <Card post={twitter}/>
+          <Card post={facebook}/>
+          <Card post={reddit}/>
+          <Card post={instagram}/>
+          */}
 
         </main>
 

@@ -17,6 +17,8 @@ import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
+import EmbedWidget from './EmbedWidget'
+
 const styles = theme => ({
   card: {
     marginTop: theme.spacing.unit * 3,
@@ -67,7 +69,7 @@ class RecipeReviewCard extends React.Component {
       <Card className={classes.card}>
         <CardHeader
           avatar={
-            <Avatar aria-label="Recipe" className={classes.avatar}>
+            <Avatar className={classes.avatar}>
               R
             </Avatar>
           }
@@ -76,8 +78,8 @@ class RecipeReviewCard extends React.Component {
               <MoreVertIcon />
             </IconButton>
           }
-          title="Shrimp and Chorizo Paella"
-          subheader="September 14, 2016"
+          title={post.username}
+          subheader={post.timestamp}
         />
         {/*
         <CardMedia
@@ -87,7 +89,7 @@ class RecipeReviewCard extends React.Component {
         />
         */}
 
-        {post.link}
+        <EmbedWidget url={post.link} />
         <CardContent>
           <Typography component="p">
             {post.comment}
@@ -120,7 +122,7 @@ class RecipeReviewCard extends React.Component {
   }
 }
 
-RecipeReviewCard.propTypes = {
+EmbedWidget.propTypes = {
   classes: PropTypes.object.isRequired,
   post: PropTypes.object.isRequired,
 };
