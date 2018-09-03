@@ -10,7 +10,8 @@ const {
   fileToIpfsBuffer,
   arrayBufferToBase64,
   concatTypedArrays,
-  typedArrayToArrayBuffer
+  typedArrayToArrayBuffer,
+  stringToIpfsBuffer
 } = require('./util')
 
 const setProvider = (provider) => {
@@ -30,6 +31,13 @@ const uploadObject = async (object) => {
   if (!ipfs) noProvider()
 
   const buffer = objectToIpfsBuffer(object)
+  return ipfs.add(buffer)
+}
+
+const uploadString = async (string) => {
+  if (!ipfs) noProvider()
+
+  const buffer = stringToIpfsBuffer(string)
   return ipfs.add(buffer)
 }
 
@@ -211,6 +219,7 @@ export {
   setProvider,
 
   uploadObject,
+  uploadString,
   uploadBuffer,
   uploadFilePath,
   uploadBufferWrappedWithDirectory,

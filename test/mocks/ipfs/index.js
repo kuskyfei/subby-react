@@ -6,17 +6,16 @@ const getReadableStreamMock = (source) => {
   const stream = new events.EventEmitter()
 
   // create the data to be passed on "data" event
-  createReadStream = () => fs.createReadStream(source)
+  const createReadStream = () => fs.createReadStream(source)
   const file = {
     content: createReadStream
   }
-  
+
   // emit data event
   stream.emit('data', file)
 
   return stream
 }
-
 
 const get = () => [{content: Buffer.from('test')}]
 const add = () => 'test hash'

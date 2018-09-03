@@ -6,25 +6,27 @@ import Reddit from './Reddit'
 import Twitter from './Twitter'
 import Vimeo from './Vimeo'
 import Youtube from './Youtube'
+import Image from './Image'
 import Default from './Default'
 
 const {extractRootDomain} = require('./util')
 
 const EmbedWidget = (props) => {
-
   console.log('props')
   console.log(props)
 
   const Widget = getWidgetFromUrl(props.url)
-
-  console.log(Widget)
 
   return <Widget url={props.url} />
 }
 
 const getWidgetFromUrl = (url) => {
 
-  const type = getWidgetTypeFromUrl(url)  
+  if (isImage(url)) {
+    return Image
+  }
+
+  const type = getWidgetTypeFromUrl(url)
 
   switch (type) {
     case 'facebook':
@@ -45,16 +47,28 @@ const getWidgetFromUrl = (url) => {
     case 'youtube':
       return Youtube
 
-    default: 
+    default:
       return Default
   }
-
 }
 
 const getWidgetTypeFromUrl = (url) => {
   const domain = extractRootDomain(url)
   const type = domain.split('.')[0]
   return type
+}
+
+const isImage = (url) => {
+  // this is a base64 encoded image
+  if (url.match(/^data:image/)) {
+    return true
+  }
+
+  // this is a link to a normal external image
+  const cleanUrl = url.replace(/\?.+$/g, '')
+  if (cleanUrl.match(/\.(jpg|jpeg|png|gif)$/)) {
+    return true
+  }
 }
 
 export default EmbedWidget

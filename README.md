@@ -146,11 +146,8 @@ post('category').on( (post) => {
 
 ##link ipfs structure
 
-linkIpfs: {
-	comment:
-	media:
-}
+linkIpfs: "string" // point to the media file directly
 
 ##comment ipfs structure
 
-commentIpfs: "string"
+commentIpfs: "string" // point to the string directly

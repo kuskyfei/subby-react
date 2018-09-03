@@ -30,7 +30,7 @@ module.exports = function override (config, env) {
     // replace UglifyJsPlugin because it causes problems
     // with node modules not transpiled to ES5
     config.plugins.splice(3, 1)
-    // config.plugins.push(new UglifyJsPlugin({uglifyOptions}))
+    config.plugins.push(new UglifyJsPlugin({uglifyOptions}))
 
     // compile the entire app to a single html file
     config.plugins.splice(1, 1)
@@ -69,8 +69,7 @@ module.exports = function override (config, env) {
     // process.kill()
 
     /* end debugging */
-  }
-  else {
+  } else {
     config.plugins.push(new HtmlWebpackPlugin({
       inlineSource: '.(js|css)$',
       inject: 'body',

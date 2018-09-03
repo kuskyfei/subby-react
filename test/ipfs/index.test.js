@@ -5,26 +5,29 @@ import {
   setProvider,
 
   uploadObject,
+  uploadString,
   uploadBuffer,
   uploadFilePath,
   uploadBufferWrappedWithDirectory,
   uploadFilePathWrappedWithDirectory,
 
   getFileTypeFromBuffer,
-  getFileTypeFromHash,
+  getFileTypeFromHash, // eslint-disable-line
 
-  getJson,
-  getBase64Image,
-  getBase64ImageFromStream,
-  getTypedArray,
-  getBlob,
-  getBlobFromStream,
+  getJson, // eslint-disable-line
+  getBase64Image, // eslint-disable-line
+  getBase64ImageFromStream, // eslint-disable-line
+  getTypedArray, // eslint-disable-line
+  getBlob, // eslint-disable-line
+  getBlobFromStream, // eslint-disable-line
 
-  getReadableStream,
-  getIpfs
+  getReadableStream, // eslint-disable-line
+  getIpfs // eslint-disable-line
 } from '../../src/ipfs'
 
 import ipfsApiMock from '../mocks/ipfs'
+
+const path = require('path')
 
 const fs = require('fs')
 
@@ -40,6 +43,11 @@ describe('ipfs', () => {
 
   test('uploadObject', async () => {
     const res = await uploadObject({test: 'test'})
+    expect(res).toEqual('test hash')
+  })
+
+  test('uploadString', async () => {
+    const res = await uploadString('test')
     expect(res).toEqual('test hash')
   })
 
@@ -66,9 +74,9 @@ describe('ipfs', () => {
   })
 
   test('getFileTypeFromBuffer', async () => {
-    const buffer = fs.readFileSync(__dirname + '/../mocks/ipfs/media/images/dog-in-fence.jpg')
+    const mediaPath = path.join(__dirname, '/../mocks/ipfs/media/images/dog-in-fence.jpg')
+    const buffer = fs.readFileSync(mediaPath)
     const res = await getFileTypeFromBuffer(buffer)
     expect(res).toEqual({ ext: 'jpg', mime: 'image/jpeg' })
   })
-
 })

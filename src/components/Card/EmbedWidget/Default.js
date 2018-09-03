@@ -1,11 +1,10 @@
 import React from 'react'
 
 const Default = (props) => {
-
   const url = formatUrl(props.url)
 
   return (
-    <a target="_blank" href={url}>{props.url}</a>
+    <a target='_blank' href={url}>{props.url}</a>
   )
 }
 

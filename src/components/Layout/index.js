@@ -95,7 +95,14 @@ const twitter = {
   timestamp: "December 3rd 2018"
 }
 
-class Checkout extends React.Component {
+const image = {
+  comment: 'cool',
+  link: "https://i.redditmedia.com/KvKXQkAuBvZOaNAwh7bJbE4WnQELy94-7UmUR6VgPqU.jpg?fit=crop&crop=faces%2Centropy&arh=2&w=960&s=825840bdf4581af9f7d9aca36a3d29f6",
+  username: "MyUsername",
+  timestamp: "December 3rd 2018"
+}
+
+class Layout extends React.Component {
 
   render() {
     const { classes } = this.props
@@ -114,11 +121,12 @@ class Checkout extends React.Component {
         </AppBar>
 
         <main className={classes.layout}>
-
-          <Card post={youtube}/>
-          <Card post={vimeo}/>
+          
+          <Card post={image}/>
 
           {/* 
+          <Card post={youtube}/>
+          <Card post={vimeo}/>
           <Card post={twitter}/>
           <Card post={facebook}/>
           <Card post={reddit}/>
@@ -141,8 +149,8 @@ class Checkout extends React.Component {
   }
 }
 
-Checkout.propTypes = {
+Layout.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Checkout);
+export default withStyles(styles)(Layout);

@@ -19,12 +19,14 @@ const urlToProviderObject = (url) => {
 
 const objectToIpfsBuffer = (object) => {
   const string = JSON.stringify(object)
+  const buffer = stringToIpfsBuffer(string)
+  return buffer
+}
 
+const stringToIpfsBuffer = (string) => {
   const utf8Encode = new window.TextEncoder('utf-8')
   const arrayBuffer = utf8Encode.encode(string)
-
   const buffer = ipfsBuffer.from(arrayBuffer)
-
   return buffer
 }
 
@@ -61,6 +63,7 @@ const typedArrayToArrayBuffer = (typedArray) => {
 export {
   urlToProviderObject,
   objectToIpfsBuffer,
+  stringToIpfsBuffer,
   fileToIpfsBuffer,
   noProvider,
   arrayBufferToBase64,

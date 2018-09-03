@@ -91,6 +91,14 @@ twitterwidget::before {
   height: 100%;
 }
 
+.card__image {
+  max-height: 600px;
+  max-width: 100%;
+  transform: translateX(-50%);
+  margin-left: 50%;
+  border-radius: 2px;
+}
+
 /*************
  * MODIFIERS *
  *************/
