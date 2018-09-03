@@ -12,7 +12,7 @@ const store = configureStore(initialState)
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
-      <Route path='/:param1?/:param2?/:param3?/' component={App} />
+      <Route component={App} />
     </BrowserRouter>
   </Provider>
   , document.getElementById('root')

@@ -81,14 +81,8 @@ class Post extends React.Component {
           subheader={post.timestamp}
         />
 
-        {/*
-        <CardMedia
-          className={classes.media}
-          image="https://i.redditmedia.com/KvKXQkAuBvZOaNAwh7bJbE4WnQELy94-7UmUR6VgPqU.jpg?fit=crop&crop=faces%2Centropy&arh=2&w=960&s=825840bdf4581af9f7d9aca36a3d29f6"
-        />
-        */}
-
         <EmbedWidget url={post.link} />
+
         <CardContent>
           <Typography component='p'>
             {post.comment}

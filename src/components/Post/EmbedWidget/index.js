@@ -12,16 +12,12 @@ import Default from './Default'
 const {extractRootDomain} = require('./util')
 
 const EmbedWidget = (props) => {
-  console.log('props')
-  console.log(props)
-
   const Widget = getWidgetFromUrl(props.url)
 
   return <Widget url={props.url} />
 }
 
 const getWidgetFromUrl = (url) => {
-
   if (isImage(url)) {
     return Image
   }

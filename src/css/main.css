@@ -17,7 +17,13 @@ body {
 /* HEADER */
 
 
+/* MAIN */
+main {
+  min-height: 60vh;
+}
+
 /* FOOTER */
+
 
 /* SOCIAL MEDIA CARDS */
 
@@ -102,9 +108,6 @@ twitterwidget::before {
 /*************
  * MODIFIERS *
  *************/
-
-/* FLEX MODIFIERS */
-
 
 /* MARGIN MODIFIERS */
 
