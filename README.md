@@ -1,5 +1,7 @@
 ##todo
 
+- add torrent card
+- add video and audio card (direct link to file)
 - finish navigation
 - add tests for navigation and footer
 - set up mock API
@@ -18,7 +20,6 @@
   - set/view your profile ----> /profile
   - manage/import/export your subscribtions ----> /manage
   - new post
-- disable service worker
 
 ##code for db
 
@@ -56,14 +57,17 @@ console.log(allObjs)
 ##versions
 tested on node v10.9.0 and npm v6.2.0
 
-##supported embedded websites
+##Supported content:
 
-vimeo.com
-youtube.com
-twitter.com
-facebook.com
-reddit.com
-instagram.com
+-Youtube embeds
+-Vimeo embeds
+-Reddit embeds
+-Twitter embeds
+-Facebook embeds
+-Instagram embeds
+-IPFS
+-Torrents
+-Direct links to jpg, jpeg, png, gif, webm, mp4, ogg, wav, mp3, flac
 
 ##supported p2p protocols
 

@@ -1,28 +1,44 @@
+// react
 import React from 'react'
 import PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
+
+// material
 import { withStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
-import IconButton from '@material-ui/core/IconButton'
-import MenuIcon from '@material-ui/icons/Menu'
-import AccountCircle from '@material-ui/icons/AccountCircle'
-import Switch from '@material-ui/core/Switch'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import FormGroup from '@material-ui/core/FormGroup'
-import MenuItem from '@material-ui/core/MenuItem'
-import Menu from '@material-ui/core/Menu'
+import Grid from '@material-ui/core/Grid'
+
+// buttons
 import Button from '@material-ui/core/Button'
-import CloudUploadIcon from '@material-ui/icons/CloudUpload'
-import SearchIcon from '@material-ui/icons/Search'
+import IconButton from '@material-ui/core/IconButton'
+
+// menu
+import MenuItem from '@material-ui/core/MenuItem'
+import MenuList from '@material-ui/core/MenuList'
+import Menu from '@material-ui/core/Menu'
+
+// inputs
 import Input from '@material-ui/core/Input'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import TextField from '@material-ui/core/TextField'
-import MenuList from '@material-ui/core/MenuList'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
-import Grid from '@material-ui/core/Grid'
-import {Link} from 'react-router-dom'
+
+// icons
+import CloudUploadIcon from '@material-ui/icons/CloudUpload'
+import SearchIcon from '@material-ui/icons/Search'
+import MenuIcon from '@material-ui/icons/Menu'
+import AccountCircleIcon from '@material-ui/icons/AccountCircle'
+import ContactSupportIcon from '@material-ui/icons/ContactSupport'
+import SettingsIcon from '@material-ui/icons/Settings'
+import ListIcon from '@material-ui/icons/List'
+
+// debug
+import Switch from '@material-ui/core/Switch'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import FormGroup from '@material-ui/core/FormGroup'
 
 const styles = theme => ({
 
@@ -56,10 +72,18 @@ const styles = theme => ({
   },
   searchIcon: {
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
+    [theme.breakpoints.down(325)]: {
+      marginLeft: 10,
+      marginRight: 10,
+    }
   },
   searchInput: {
-    color: 'white'
+    color: 'white',
+    marginRight: 20,
+    [theme.breakpoints.down(325)]: {
+      marginRight: 10,
+    }
   },
 
   middleContainer: {
@@ -77,6 +101,12 @@ const styles = theme => ({
     flex: 1,
     [theme.breakpoints.down(600 + theme.spacing.unit * 2 * 2)]: {
       display: 'none'
+    }
+  },
+
+  menuLink: {
+    '&:focus': {
+      outline: 'none'
     }
   }
 })
@@ -125,11 +155,11 @@ class Header extends React.Component {
 
             <div className={classes.leftContainer}>
               <Typography variant='title' color='inherit'>
-                <Link to='?p=feed'>
                   <div className='header__logo'>
-                    Subby
+                    <Link to='?p=feed'>
+                      Subby
+                    </Link>
                   </div>
-                </Link>
               </Typography>
             </div>
 
@@ -168,7 +198,7 @@ class Header extends React.Component {
                   onClick={this.handleMenu}
                   color='inherit'
                 >
-                  <AccountCircle />
+                  <AccountCircleIcon />
                 </IconButton>
 
                 <Menu
@@ -185,8 +215,41 @@ class Header extends React.Component {
                   open={open}
                   onClose={this.handleClose}
                 >
-                  <MenuItem onClick={this.handleClose}>Profile</MenuItem>
-                  <MenuItem onClick={this.handleClose}>My account</MenuItem>
+                  <Link className={classes.menuLink} to="?p=profile">
+                    <MenuItem onClick={this.handleClose}>
+                      <ListItemIcon className={classes.icon}>
+                        <AccountCircleIcon />
+                      </ListItemIcon>
+                      <ListItemText classes={{ primary: classes.primary }} inset primary="Profile" />
+                    </MenuItem>
+                  </Link>
+
+                  <Link to="?p=subscriptions">
+                    <MenuItem onClick={this.handleClose}>
+                      <ListItemIcon className={classes.icon}>
+                        <ListIcon />
+                      </ListItemIcon>
+                      <ListItemText classes={{ primary: classes.primary }} inset primary="Subscriptions" />
+                    </MenuItem>
+                  </Link>
+
+                  <Link to="?p=settings">
+                    <MenuItem onClick={this.handleClose}>
+                      <ListItemIcon className={classes.icon}>
+                        <SettingsIcon />
+                      </ListItemIcon>
+                      <ListItemText classes={{ primary: classes.primary }} inset primary="Settings" />
+                    </MenuItem>
+                  </Link>
+                  
+                  <a href="https://subby.io/help" target="_blank">
+                    <MenuItem onClick={this.handleClose}>
+                      <ListItemIcon className={classes.icon}>
+                        <ContactSupportIcon />
+                      </ListItemIcon>
+                      <ListItemText classes={{ primary: classes.primary }} inset primary="Help" />
+                    </MenuItem>
+                  </a>
 
                 </Menu>
 
