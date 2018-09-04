@@ -1,7 +1,7 @@
 ##todo
 
-- set up twitter account
-- compile to single file
+- finish navigation
+- add tests for navigation and footer
 - set up mock API
 - set up mock API for ipfs
 - add global options like provider, no google analytics, etc.
