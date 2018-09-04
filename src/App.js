@@ -20,10 +20,11 @@ import Feed from './components/Feed'
 import idb from 'idb'
 import {events, init, getBlockNumber} from './ethereum'
 import * as ipfs from './ipfs'
-import {getTorrent} from './torrent'
+//import {getTorrent} from './torrent'
 
 // util
 const queryString = require('query-string')
+const {isRouteChange} = require('./util')
 
 // init
 ipfs.setProvider(window.SUBBY_GLOBAL_SETTINGS.IPFS_PROVIDER)
@@ -33,24 +34,51 @@ import './css/main.css'
 
 class App extends Component {
   
-  state = {}
+  state = {route: Home}
 
-  componentDidMount () {
-    (async() => {
+  componentDidMount() {
+
+    console.log('mounted')
+
+    this.handleRouteChange()
+
+
+
+    //this.feedActions.setFeed()
+
+    ;(async() => {
 
     })()
-    const parsed = queryString.parse(this.props.location.search)
-    console.log('parsed')
-    console.log(parsed)
+
+    const urlParams = queryString.parse(this.props.location.search)
+    console.log('url params')
+    console.log(urlParams)
   }
 
-  componentDidUpdate () {
-    const parsed = queryString.parse(this.props.location.search)
-    console.log('parsed')
-    console.log(parsed)
+  componentDidUpdate(prevProps) {
+
+    console.log('updated')
+
+    this.handleRouteChange(prevProps)
+
+    const urlParams = queryString.parse(this.props.location.search)
+    console.log('url params')
+    console.log(urlParams)
+  }
+
+  handleRouteChange(prevProps) {
+    
+    if (!isRouteChange(this.props, prevProps)) {
+      return
+    }
+    const urlParams = queryString.parse(this.props.location.search)
+    const Route = getRouteFromUrlParams(urlParams)
+    this.setState({...this.state, route: Route})
   }
 
   render () {
+
+    const Route = this.state.route
 
     return (
       <div>
@@ -61,29 +89,31 @@ class App extends Component {
 
         <main>
 
-          <Switch>
-            
-            {/*
-            <Route path='/' component={Feed} />
-            */}
-
-            {/*
-            <Route path='/blocks/' component={Blocks} />
-            <Route path='/block/:height/:tab?/' component={Block} />
-            <Route path='/txs/' component={Transactions} />
-            <Route path='/tx/:hash/:tab?/' component={Transaction} />
-            */}
-
-          </Switch>
+          <Route />
 
         </main>
-
-        <a className="mycoolthing">sup</a>
 
         <Footer />
 
       </div>
     )
+  }
+}
+
+
+
+const Home = () => ''
+
+const getRouteFromUrlParams = (urlParams) => {
+
+  const page = urlParams.p
+
+  switch (page) {
+    case 'feed':
+      return Feed
+
+    default:
+      return Home
   }
 }
 

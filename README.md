@@ -121,6 +121,17 @@ publishLinkCategory(postStruct)
 publishComment(postStruct)
 publishCommentCategory(postStruct)
 
+##url structure
+
+p=page (example: feed, about, profile, settings, etc. Not the page number)
+u=username
+a=address
+id=id
+startAt=start at what number in request (used for pagination of feeds)
+count=how many posts in request (used for pagination of feeds)
+before=beforeTimstamp (used for pagination of feeds)
+after=afterTimestamp (used for pagination of feeds)
+
 ##function/listenners to get posts
 
 getPosts({

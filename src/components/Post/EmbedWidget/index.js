@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import Facebook from './Facebook'
 import Instagram from './Instagram'
@@ -46,6 +47,10 @@ const getWidgetFromUrl = (url) => {
     default:
       return Default
   }
+}
+
+EmbedWidget.propTypes = {
+  url: PropTypes.string.isRequired
 }
 
 const getWidgetTypeFromUrl = (url) => {

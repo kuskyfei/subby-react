@@ -15,11 +15,10 @@ import {createShallow, createMount} from '@material-ui/core/test-utils' // eslin
 
 let wrapper, store
 
-describe('Root header', () => {
+describe('Routes: Home', () => {
   // let mount
 
   beforeAll(() => {
-
     // mount = createMount()
 
     store = configureStore({})
@@ -39,9 +38,8 @@ describe('Root header', () => {
 
   test('Logo is in header', () => {
     expect(wrapper.find('.header__logo').text()).toContain('Subby')
-    
-    // console.log(wrapper.html())
 
+    // console.log(wrapper.html())
   })
 })
 

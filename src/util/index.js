@@ -1,3 +1,4 @@
+const queryString = require('query-string')
 
 const sortBy = (array, property, {order = 'ascending'} = {order: 'ascending'}) => {
   if (typeof array === 'object') array = Object.values(array)
@@ -24,4 +25,23 @@ const countdown = (secsRemaining) => {
   }, 1000)
 }
 
-export {sortBy, timeout}
+const isRouteChange = (props, prevProps) => {
+  // if there is no previous props, it
+  // automatically means this is a new page
+  if (!prevProps) {
+    return true
+  }
+
+  // if the p param has changed, then the
+  // route has changed
+  const prevUrlParams = queryString.parse(prevProps.location.search)
+  const urlParams = queryString.parse(props.location.search)
+
+  if (urlParams.p === prevUrlParams.p) {
+    return false
+  }
+
+  return true
+}
+
+export {sortBy, timeout, isRouteChange}

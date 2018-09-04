@@ -114,8 +114,7 @@ class Post extends React.Component {
   }
 }
 
-EmbedWidget.propTypes = {
-  classes: PropTypes.object.isRequired,
+Post.propTypes = {
   post: PropTypes.object.isRequired
 }
 

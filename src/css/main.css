@@ -22,6 +22,10 @@ main {
   min-height: 60vh;
 }
 
+input[placeholder]{
+  text-overflow:ellipsis;
+}
+
 /* FOOTER */
 
 
