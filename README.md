@@ -2,7 +2,10 @@
 
 - add torrent card
 - add video and audio card (direct link to file)
-- finish navigation
+- do redux stuff
+- make profile page
+- make subscribtions page
+- make settings page
 - add tests for navigation and footer
 - set up mock API
 - set up mock API for ipfs
@@ -166,3 +169,8 @@ linkIpfs: "string" // point to the media file directly
 ##comment ipfs structure
 
 commentIpfs: "string" // point to the string directly
+
+ideas for new methods
+
+tip(username, address, amount) // use address if username is undefined
+terminateAccount() // if your account gets hacked you can terminate it so your followers don't get spammed. Terminated accounts don't show in any feeds.

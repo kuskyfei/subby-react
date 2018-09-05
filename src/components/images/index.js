@@ -127,4 +127,4 @@ const Youtube = (props) =>
     </g>
   </svg>
 
-export {Github, Medium, Reddit, Twitter}
+export {Github, Medium, Reddit, Twitter, Youtube}

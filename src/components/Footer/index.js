@@ -41,7 +41,7 @@ class Footer extends React.Component {
 
         <div className={classes.section}>
           <Typography className={classes.p} align='center' component='p'>
-            Subby is a <a href='https://en.wikipedia.org/wiki/Decentralized_application' target='_blank'>decentralized application</a> that protects content creators against censorship and algorithmic bullying. All content is hosted on <a href='https://en.wikipedia.org/wiki/Ethereum' target='_blank'>Ethereum</a>, <a href='https://en.wikipedia.org/wiki/InterPlanetary_File_System'>IPFS</a>, and <a href='https://en.wikipedia.org/wiki/BitTorrent' target='_blank'>torrents</a>.
+            Subby is a <a href='https://en.wikipedia.org/wiki/Decentralized_application' target='_blank'>decentralized application</a> that protects content creators against censorship and <a href='https://en.wikipedia.org/wiki/Algorithmic_bias' target='_blank'>algorithmic bias</a>. All content is hosted on <a href='https://en.wikipedia.org/wiki/Ethereum' target='_blank'>Ethereum</a>, <a href='https://en.wikipedia.org/wiki/InterPlanetary_File_System'>IPFS</a>, and <a href='https://en.wikipedia.org/wiki/BitTorrent' target='_blank'>torrents</a>.
           </Typography>
         </div>
 

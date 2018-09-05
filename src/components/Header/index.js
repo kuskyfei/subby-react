@@ -1,7 +1,9 @@
 // react
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Link} from 'react-router-dom'
+import {withRouter, Link} from 'react-router-dom'
+import {connect} from 'react-redux'
+// import {bindActionCreators} from 'redux'
 
 // material
 import { withStyles } from '@material-ui/core/styles'
@@ -16,29 +18,23 @@ import IconButton from '@material-ui/core/IconButton'
 
 // menu
 import MenuItem from '@material-ui/core/MenuItem'
-import MenuList from '@material-ui/core/MenuList'
 import Menu from '@material-ui/core/Menu'
 
 // inputs
 import Input from '@material-ui/core/Input'
-import InputAdornment from '@material-ui/core/InputAdornment'
-import TextField from '@material-ui/core/TextField'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 
 // icons
 import CloudUploadIcon from '@material-ui/icons/CloudUpload'
 import SearchIcon from '@material-ui/icons/Search'
-import MenuIcon from '@material-ui/icons/Menu'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle'
 import ContactSupportIcon from '@material-ui/icons/ContactSupport'
 import SettingsIcon from '@material-ui/icons/Settings'
 import ListIcon from '@material-ui/icons/List'
 
-// debug
-import Switch from '@material-ui/core/Switch'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import FormGroup from '@material-ui/core/FormGroup'
+// util
+const queryString = require('query-string')
 
 const styles = theme => ({
 
@@ -75,19 +71,18 @@ const styles = theme => ({
     marginRight: 20,
     [theme.breakpoints.down(325)]: {
       marginLeft: 10,
-      marginRight: 10,
+      marginRight: 10
     }
   },
   searchInput: {
     color: 'white',
     marginRight: 20,
     [theme.breakpoints.down(325)]: {
-      marginRight: 10,
+      marginRight: 10
     }
   },
 
   middleContainer: {
-    width: 'auto',
     marginLeft: theme.spacing.unit * 2,
     marginRight: theme.spacing.unit * 2,
     width: 600
@@ -114,22 +109,28 @@ const styles = theme => ({
 class Header extends React.Component {
   state = {
     auth: true,
-    anchorEl: null
-  };
+    anchorEl: null,
+    searchBarValue: ''
+  }
 
   handleChange = event => {
     this.setState({ auth: event.target.checked })
-  };
+  }
 
   handleMenu = event => {
     this.setState({ anchorEl: event.currentTarget })
-  };
+  }
 
   handleClose = () => {
     this.setState({ anchorEl: null })
-  };
+  }
 
-  componentDidMount () {
+  handleSearchBarChange = (e) => {
+    this.props.history.push(`?u=${e.target.value}`)
+  }
+
+  componentDidMount = () => {
+
   }
 
   render () {
@@ -137,33 +138,28 @@ class Header extends React.Component {
     const { auth, anchorEl } = this.state
     const open = Boolean(anchorEl)
 
+    // router stuff
+    const urlParams = queryString.parse(this.props.location.search)
+    const urlUsername = urlParams.u
+
     return (
       <div className={classes.root}>
 
-        {/*
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Switch checked={auth} onChange={this.handleChange} aria-label="LoginSwitch" />
-            }
-            label={auth ? 'Logout' : 'Login'}
-          />
-        </FormGroup>
-        */}
         <AppBar position='static'>
           <Toolbar>
 
             <div className={classes.leftContainer}>
               <Typography variant='title' color='inherit'>
-                  <div className='header__logo'>
-                    <Link to='?p=feed'>
+                <div id='header__logo'>
+                  <Link to='?p=feed'>
                       Subby
-                    </Link>
-                  </div>
+                  </Link>
+                </div>
               </Typography>
             </div>
 
             <div className={classes.middleContainer}>
+
               <div className={classes.searchBar}>
                 <Grid container alignItems='flex-end' wrap='nowrap'>
                   <Grid item>
@@ -171,17 +167,19 @@ class Header extends React.Component {
                   </Grid>
 
                   <Input
+                    onChange={this.handleSearchBarChange.bind(this)}
                     inputProps={{size: 1}}
                     id='header__search-bar'
                     fullWidth
                     placeholder='Address or Username...'
                     disableUnderline
-                    defaultValue=''
+                    value={urlUsername}
                     className={classes.searchInput}
                   />
 
                 </Grid>
               </div>
+
             </div>
 
             {auth && (
@@ -215,39 +213,39 @@ class Header extends React.Component {
                   open={open}
                   onClose={this.handleClose}
                 >
-                  <Link className={classes.menuLink} to="?p=profile">
+                  <Link className={classes.menuLink} to='?p=profile'>
                     <MenuItem onClick={this.handleClose}>
                       <ListItemIcon className={classes.icon}>
                         <AccountCircleIcon />
                       </ListItemIcon>
-                      <ListItemText classes={{ primary: classes.primary }} inset primary="Profile" />
+                      <ListItemText classes={{ primary: classes.primary }} inset primary='Profile' />
                     </MenuItem>
                   </Link>
 
-                  <Link to="?p=subscriptions">
+                  <Link to='?p=subscriptions'>
                     <MenuItem onClick={this.handleClose}>
                       <ListItemIcon className={classes.icon}>
                         <ListIcon />
                       </ListItemIcon>
-                      <ListItemText classes={{ primary: classes.primary }} inset primary="Subscriptions" />
+                      <ListItemText classes={{ primary: classes.primary }} inset primary='Subscriptions' />
                     </MenuItem>
                   </Link>
 
-                  <Link to="?p=settings">
+                  <Link to='?p=settings'>
                     <MenuItem onClick={this.handleClose}>
                       <ListItemIcon className={classes.icon}>
                         <SettingsIcon />
                       </ListItemIcon>
-                      <ListItemText classes={{ primary: classes.primary }} inset primary="Settings" />
+                      <ListItemText classes={{ primary: classes.primary }} inset primary='Settings' />
                     </MenuItem>
                   </Link>
-                  
-                  <a href="https://subby.io/help" target="_blank">
+
+                  <a href='https://subby.io/help' target='_blank'>
                     <MenuItem onClick={this.handleClose}>
                       <ListItemIcon className={classes.icon}>
                         <ContactSupportIcon />
                       </ListItemIcon>
-                      <ListItemText classes={{ primary: classes.primary }} inset primary="Help" />
+                      <ListItemText classes={{ primary: classes.primary }} inset primary='Help' />
                     </MenuItem>
                   </a>
 
@@ -267,4 +265,7 @@ Header.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(Header)
+const mapStateToProps = state => ({})
+const mapDispatchToProps = dispatch => ({})
+
+export default withRouter( connect(mapStateToProps, mapDispatchToProps)( withStyles(styles)(Header) ) ) // eslint-disable-line
