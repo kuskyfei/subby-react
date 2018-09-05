@@ -38,11 +38,14 @@ describe('routes: home', () => {
 
   describe('header', () => {
 
-    test('logo is in header', () => {
-      expect(wrapper.find('#header__logo').text()).toContain('Subby')
+    test('logo link change url on click', () => {
+      const Logo = wrapper.find('#header__logo Link')
+
+      Logo.simulate('click', { button: 0 })
+      expect(getUrlQueries()).toEqual('?p=feed')
     })
 
-    test.only('search bar changes url', () => {
+    test('search bar changes url on search', () => {
 
       const searchTerm = 'my-search-term'
 
@@ -63,31 +66,48 @@ describe('routes: home', () => {
         .find('Header')
       expect(Header.props().location.search).toEqual(`?u=${searchTerm}`)
     })
-    
+
+    test('profile icon menu links change url on click', () => {
+
+      // profile link
+      let ProfileIconMenu = getProfileIconMenu()
+      ProfileIconMenu.at(0).simulate('click', { button: 0 })
+      expect(getUrlQueries()).toEqual('?p=profile')
+
+      // subscriptions link
+      ProfileIconMenu = getProfileIconMenu()
+      ProfileIconMenu.at(1).simulate('click', { button: 0 })
+      expect(getUrlQueries()).toEqual('?p=subscriptions')
+
+      // settings link
+      ProfileIconMenu = getProfileIconMenu()
+      ProfileIconMenu.at(2).simulate('click', { button: 0 })
+      expect(getUrlQueries()).toEqual('?p=settings')
+
+    })
+
   })
 })
 
-/*
-it('cancels changes when user presses esc', done => {
-  const wrapper = mount(<EditableText defaultValue="Hello" />);
-  const input = wrapper.find('input');
+const clickOnProfileIcon = () => {
+  const ProfileIcon = wrapper
+    .find('#header__profile-icon')
+    .filter('button')
+  ProfileIcon.simulate('click', { button: 0 })  
+}
 
-  input.simulate('focus');
-  input.simulate('change', { target: { value: 'Changed' } });
-  input.simulate('keyDown', {
-    which: 27,
-    target: {
-      blur() {
-        // Needed since <EditableText /> calls target.blur()
-        input.simulate('blur');
-      },
-    },
-  });
-  expect(input.get(0).value).to.equal('Hello');
+const getProfileIconMenu = () => {
+  clickOnProfileIcon()
+  const ProfileIconMenu = wrapper
+    .find('#header__profile-icon__menu MenuItem')
+  return ProfileIconMenu
+}
 
-  done();
-});
-*/
+const getUrlQueries = () => {
+  const Header = wrapper
+    .find('Header')
+  return Header.props().location.search
+}
 
 function testCommons () {
 

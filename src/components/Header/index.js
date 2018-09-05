@@ -122,6 +122,7 @@ class Header extends React.Component {
   }
 
   handleClose = () => {
+    console.log('closing!')
     this.setState({ anchorEl: null })
   }
 
@@ -152,7 +153,7 @@ class Header extends React.Component {
               <Typography variant='title' color='inherit'>
                 <div id='header__logo'>
                   <Link to='?p=feed'>
-                      Subby
+                    Subby
                   </Link>
                 </div>
               </Typography>
@@ -191,6 +192,7 @@ class Header extends React.Component {
                 </Button>
 
                 <IconButton
+                  id="header__profile-icon"
                   aria-owns={open ? 'menu-appbar' : null}
                   aria-haspopup='true'
                   onClick={this.handleMenu}
@@ -200,7 +202,7 @@ class Header extends React.Component {
                 </IconButton>
 
                 <Menu
-                  id='menu-appbar'
+                  id='header__profile-icon__menu'
                   anchorEl={anchorEl}
                   anchorOrigin={{
                     vertical: 'top',
