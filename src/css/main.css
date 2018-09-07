@@ -16,7 +16,7 @@ a {
 /* FOOTER */
 
 .footer__icon-link:hover path {
-  transform: translateY(5px);
+  /* fill: rgba(0, 0, 0, 0.15)!important; */
 }
 
 /* SOCIAL MEDIA CARDS */

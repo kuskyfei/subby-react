@@ -1,8 +1,7 @@
 export {
-  getProfileFromUsername,
-  getProfileFromAddress,
-  getSubscriptionsFromAddress,
-  getSubscriptionsFromUsername,
+	getAddress,
+  getProfile,
+  getSubscriptions,
   getPosts,
-  post
+  onCategoryPost
 } from './read'

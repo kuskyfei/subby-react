@@ -1,5 +1,12 @@
 ##todo
 
+- add translations
+- react-helmet for SEO and social media shares
+- optimize queuing for ethereum requests
+- make profile page
+- make forever scroll
+- set up optional embeds
+- set up analytics events
 - add torrent card
 - add video and audio card (direct link to file)
 - do redux stuff
@@ -26,36 +33,7 @@
 
 ##code for db
 
-const db = await idb.open('keyval-store', 2, upgradeDB => {
-  // Note: we don't use 'break' in this switch statement,
-  // the fall-through behaviour is what we want.
-  switch (upgradeDB.oldVersion) {
-    case 0:
-      upgradeDB.createObjectStore('keyval');
-    case 1:
-      upgradeDB.createObjectStore('objs', {keyPath: 'id'});
-  }
-})
 
-window.myIdb = db
-console.log(db)
-
-const tx = await db
-  .transaction('objs', 'readwrite')
-  .objectStore('objs')
-  .put({
-    id: 123456,
-    data: {foo: "bar"}
-  })
-
-console.log(tx)
-
-const allObjs = await db
-  .transaction('objs')
-  .objectStore('objs')
-  .getAll()
-
-console.log(allObjs)
 
 ##versions
 tested on node v10.9.0 and npm v6.2.0
@@ -82,7 +60,7 @@ ipfs
 getProfileFromUsername(username)
 getProfileFromAddress(address)
 
-returns (username, thumbail, bio, subscriberCount, subscribtionCount)
+returns (username, thumbail, bio, subscriberCount, subscribtionCount, tipCount)
 
 getSubscriptionsFromAddress(address)
 getSubscriptionsFromUsername(username)
@@ -174,3 +152,45 @@ ideas for new methods
 
 tip(username, address, amount) // use address if username is undefined
 terminateAccount() // if your account gets hacked you can terminate it so your followers don't get spammed. Terminated accounts don't show in any feeds.
+
+new subscriptions methods:
+
+getSubscriptions(username, address) returns (categories<array>, subscriptions<arrayOfArraysOfArrays>)
+
+example of return: 
+
+[ 
+  [music, youtubers, gaming], 
+  [  
+    [ [musicUser1, musicUser2, musicUser3], [musicAddress1, musicAddress2, musicAddress3] ],
+    [ [youtubeUser1, youtubeUser2, youtubeUser3], [youtubeAddress1, youtubeAddress2, youtubeAddress3] ],
+    [ [gamingUser1, gamingUser2, gamingUser3], [gamingAddress1, gamingAddress2, gamingAddress3] ]
+  ]
+]
+
+subscribe(username, address, category='default')
+
+// when you subscribe, it stores the subscriptions into an array of array like
+
+[  
+  [ [musicUser1, musicUser2, musicUser3], [musicAddress1, musicAddress2, musicAddress3] ],
+  [ [youtubeUser1, youtubeUser2, youtubeUser3], [youtubeAddress1, youtubeAddress2, youtubeAddress3] ],
+  [ [gamingUser1, gamingUser2, gamingUser3], [gamingAddress1, gamingAddress2, gamingAddress3] ]
+]
+
+// and it stores the category into an array that matches the index of the array above
+
+[
+  music, 
+  youtubers, 
+  gaming
+]
+
+// if the category doesn't exist, it creates it.
+
+Other possibility:
+
+getSubscriptions(username, address) return [ [name, address, category], [name, address, category], [name, address, category], [name, address, category] ]
+
+
+

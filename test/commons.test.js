@@ -7,18 +7,18 @@ import {BrowserRouter, MemoryRouter, Route, Switch} from 'react-router-dom'  // 
 import {Provider} from 'react-redux'
 
 // files
-import configureStore from '../../src/store'
-import App from '../../src/App'
+import configureStore from '../src/store'
+import App from '../src/App'
 
 // material
 import {createShallow, createMount} from '@material-ui/core/test-utils' // eslint-disable-line
 
 let wrapper, store
 
-describe('routes: home', () => {
+describe('commons', () => {
   // let mount
 
-  beforeAll(() => {
+  beforeEach(() => {
     // mount = createMount()
 
     store = configureStore({})
@@ -31,13 +31,11 @@ describe('routes: home', () => {
     )
   })
 
-  afterAll(() => {
+  afterEach(() => {
+
   })
 
-  testCommons()
-
   describe('header', () => {
-
     test('logo link change url on click', () => {
       const Logo = wrapper.find('#header__logo Link')
 
@@ -46,7 +44,6 @@ describe('routes: home', () => {
     })
 
     test('search bar changes url on search', () => {
-
       const searchTerm = 'my-search-term'
 
       const SearchBarInput = wrapper
@@ -68,7 +65,6 @@ describe('routes: home', () => {
     })
 
     test('profile icon menu links change url on click', () => {
-
       // profile link
       let ProfileIconMenu = getProfileIconMenu()
       ProfileIconMenu.at(0).simulate('click', { button: 0 })
@@ -83,9 +79,30 @@ describe('routes: home', () => {
       ProfileIconMenu = getProfileIconMenu()
       ProfileIconMenu.at(2).simulate('click', { button: 0 })
       expect(getUrlQueries()).toEqual('?p=settings')
-
     })
 
+    test('publish icon publishes new post', () => {
+      // TODO
+    })
+  })
+
+  describe('footer', () => {
+    test('contains text', () => {
+      const Footer = wrapper
+        .find('Footer')
+
+      expect(Footer.text()).toContain('Subby is a decentralized application that protects content creators against censorship and algorithmic bias. All content is hosted on Ethereum, IPFS, and torrents.')
+    })
+
+    test('contains social icons', () => {
+      const Footer = wrapper
+        .find('Footer')
+
+      expect(Footer.exists('Twitter')).toEqual(true)
+      expect(Footer.exists('Github')).toEqual(true)
+      expect(Footer.exists('Medium')).toEqual(true)
+      expect(Footer.exists('Reddit')).toEqual(true)
+    })
   })
 })
 
@@ -93,7 +110,7 @@ const clickOnProfileIcon = () => {
   const ProfileIcon = wrapper
     .find('#header__profile-icon')
     .filter('button')
-  ProfileIcon.simulate('click', { button: 0 })  
+  ProfileIcon.simulate('click', { button: 0 })
 }
 
 const getProfileIconMenu = () => {
@@ -107,8 +124,4 @@ const getUrlQueries = () => {
   const Header = wrapper
     .find('Header')
   return Header.props().location.search
-}
-
-function testCommons () {
-
 }

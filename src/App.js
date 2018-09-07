@@ -17,7 +17,6 @@ import Footer from './components/Footer'
 import Feed from './components/Feed'
 
 // apis
-import idb from 'idb'
 import {events, init, getBlockNumber} from './ethereum'
 import * as ipfs from './ipfs'
 //import {getTorrent} from './torrent'
@@ -38,13 +37,18 @@ class App extends Component {
 
   componentDidMount() {
 
+    const username = await ethereum.getUsername(address)
+    const setUsername = this.props.appActions.setEthereumAddress
+
+    const ethereumAddress = await ethereum.getAddress()
+    const setEthereumAddress = this.props.appActions.setEthereumAddress
+
+    const subscriptions = await ethereum.getSubscriptions(username, address)
+    const setSubscriptions = this.props.appActions.setSubscriptions
+
     console.log('mounted')
 
     this.handleRouteChange()
-
-
-
-    //this.feedActions.setFeed()
 
     ;(async() => {
 

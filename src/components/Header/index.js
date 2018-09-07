@@ -122,7 +122,6 @@ class Header extends React.Component {
   }
 
   handleClose = () => {
-    console.log('closing!')
     this.setState({ anchorEl: null })
   }
 
@@ -192,7 +191,7 @@ class Header extends React.Component {
                 </Button>
 
                 <IconButton
-                  id="header__profile-icon"
+                  id='header__profile-icon'
                   aria-owns={open ? 'menu-appbar' : null}
                   aria-haspopup='true'
                   onClick={this.handleMenu}
