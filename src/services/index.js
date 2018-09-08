@@ -3,17 +3,13 @@ export {
   setSubscriptions,
   subscribe,
   tip,
-  publish
-} from './write'
+  publish,
 
-export {
   getAddress,
   getProfile,
   getSubscriptions,
   getSettings,
-  getFeed
-} from './read'
+  getFeed,
 
-export {
   updateCache
-} from './cache'
+} from './api'

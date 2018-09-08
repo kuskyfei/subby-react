@@ -12,24 +12,21 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 
 // components
-import Header from './components/Header'
-import Footer from './components/Footer'
-import Feed from './components/Feed'
+import {Header, Footer} from '../../components'
+import {Feed} from '../../containers'
+
+// actions
+import actions from './reducers'
 
 // apis
-import {events, init, getBlockNumber} from './ethereum'
-import * as ipfs from './ipfs'
-//import {getTorrent} from './torrent'
+const services = require('../../services')
 
 // util
 const queryString = require('query-string')
-const {isRouteChange} = require('./util')
-
-// init
-ipfs.setProvider(window.SUBBY_GLOBAL_SETTINGS.IPFS_PROVIDER)
+const {isRouteChange} = require('../util')
 
 // css
-import './css/main.css'
+import './App.css'
 
 class App extends Component {
   
@@ -37,21 +34,19 @@ class App extends Component {
 
   componentDidMount() {
 
-    const username = await ethereum.getUsername(address)
-    const setUsername = this.props.appActions.setEthereumAddress
-
-    const ethereumAddress = await ethereum.getAddress()
-    const setEthereumAddress = this.props.appActions.setEthereumAddress
-
-    const subscriptions = await ethereum.getSubscriptions(username, address)
-    const setSubscriptions = this.props.appActions.setSubscriptions
-
-    console.log('mounted')
-
-    this.handleRouteChange()
-
     ;(async() => {
 
+      const settings = await services.getSettings()
+
+      const address = await services.getAddress()
+      const profile = await services.getProfile({username: 'test'})
+      const subscriptions = await services.getSubscriptions({username: 'test'})
+
+      const {setEthereumAddress, setProfile, setSubscriptions} = this.props.actions
+
+      this.handleRouteChange()
+
+      console.log('mounted')
     })()
 
     const urlParams = queryString.parse(this.props.location.search)
@@ -104,8 +99,6 @@ class App extends Component {
   }
 }
 
-
-
 const Home = () => ''
 
 const getRouteFromUrlParams = (urlParams) => {
@@ -121,9 +114,13 @@ const getRouteFromUrlParams = (urlParams) => {
   }
 }
 
-const mapStateToProps = state => ({})
-const mapDispatchToProps = dispatch => ({})
+const mapStateToProps = state => ({
+  profile: state.profile,
+  ethereumAddress: state.ethereumAddress,
+  subscriptions: state.subscriptions
+})
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(actions, dispatch)
+})
 
-App = withRouter(connect(mapStateToProps, mapDispatchToProps)(App)) // eslint-disable-line
-
-export default App
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App)) // eslint-disable-line

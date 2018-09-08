@@ -8,7 +8,7 @@ import {Provider} from 'react-redux'
 
 // files
 import configureStore from '../src/store'
-import App from '../src/App'
+import {App} from '../src/containers'
 
 // material
 import {createShallow, createMount} from '@material-ui/core/test-utils' // eslint-disable-line

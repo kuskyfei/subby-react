@@ -23,9 +23,9 @@ import {
 
   getReadableStream, // eslint-disable-line
   getIpfs // eslint-disable-line
-} from '../../src/ipfs'
+} from '../../ipfs'
 
-import ipfsApiMock from '../mocks/ipfs'
+import ipfsApiMock from './mock/ipfs'
 
 const path = require('path')
 
@@ -74,7 +74,7 @@ describe('ipfs', () => {
   })
 
   test('getFileTypeFromBuffer', async () => {
-    const mediaPath = path.join(__dirname, '/../mocks/ipfs/media/images/dog-in-fence.jpg')
+    const mediaPath = path.join(__dirname, '/mock/media/images/dog-in-fence.jpg')
     const buffer = fs.readFileSync(mediaPath)
     const res = await getFileTypeFromBuffer(buffer)
     expect(res).toEqual({ ext: 'jpg', mime: 'image/jpeg' })

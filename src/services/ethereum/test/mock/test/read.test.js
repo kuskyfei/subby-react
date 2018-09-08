@@ -6,9 +6,9 @@ import {
   getSubscriptions,
   getPosts,
   onCategoryPost
-} from './index'
+} from '../index'
 
-import {__private__} from './read'
+import {__private__} from '../read'
 
 const ms = require('ms')
 

@@ -37,10 +37,10 @@ console.log(allObjs)
 */
 
 export {
-  setProfileCache, 
-  setFeedCache, 
-  setLoggedInSubscriptionsCache, 
-  setLoggedOutSubscriptions, 
+  setProfileCache,
+  setFeedCache,
+  setLoggedInSubscriptionsCache,
+  setLoggedOutSubscriptions,
   setSettings
 } from './write'
 
@@ -49,6 +49,8 @@ export {
   getLoggedInSubscriptionsCache,
   getLoggedOutSubscriptions,
   getLastFeedCacheTimeStamp,
+  getLastLoggedInSubscriptionsCacheTimeStamp,
+  getLastProfileCacheTimeStamp,
   getFeedCache,
   getFeedCacheCount,
   getLastFeedCacheCursor,

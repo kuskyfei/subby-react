@@ -1,4 +1,4 @@
-const getProfileCache = () => {
+const getProfileCache = ({username, address}) => {
 
 }
 
@@ -11,6 +11,14 @@ const getLoggedOutSubscriptions = () => {
 }
 
 const getLastFeedCacheTimeStamp = () => {
+
+}
+
+const getLastLoggedInSubscriptionsCacheTimeStamp = () => {
+
+}
+
+const getLastProfileCacheTimeStamp = () => {
 
 }
 
@@ -35,13 +43,15 @@ const hasMorePostsOnEthereum = () => {
 }
 
 export {
-	getProfileCache,
-	getLoggedInSubscriptionsCache,
-	getLoggedOutSubscriptions,
-	getLastFeedCacheTimeStamp,
-	getFeedCache,
-	getFeedCacheCount,
-	getLastFeedCacheCursor,
-	getSettings,
-	hasMorePostsOnEthereum
+  getProfileCache,
+  getLoggedInSubscriptionsCache,
+  getLoggedOutSubscriptions,
+  getLastFeedCacheTimeStamp,
+  getLastLoggedInSubscriptionsCacheTimeStamp,
+  getLastProfileCacheTimeStamp,
+  getFeedCache,
+  getFeedCacheCount,
+  getLastFeedCacheCursor,
+  getSettings,
+  hasMorePostsOnEthereum
 }

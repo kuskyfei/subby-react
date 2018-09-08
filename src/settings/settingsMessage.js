@@ -54,7 +54,14 @@ const settingsMessage = `<script>
     FEED_CACHE_TIME: ${settings.FEED_CACHE_TIME},
     LOGGED_IN_SUBSCRIPTIONS_CACHE_TIME: ${settings.LOGGED_IN_SUBSCRIPTIONS_CACHE_TIME},
     FEED_CACHED_PREEMPTIVELY_COUNT: ${settings.FEED_CACHED_PREEMPTIVELY_COUNT},
-    MINIMUM_UNREAD_FEED_CACHED_COUNT: ${settings.MINIMUM_UNREAD_FEED_CACHED_COUNT}
+    MINIMUM_UNREAD_FEED_CACHED_COUNT: ${settings.MINIMUM_UNREAD_FEED_CACHED_COUNT},
+
+    // the mock settings allow you to test Subby
+    // deterministically without depending on
+    // external apis. Thia should be set to false
+    // in production.
+    MOCK_ETHEREUM: ${settings.MOCK_ETHEREUM}
+
   }
 
 </script>`

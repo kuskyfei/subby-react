@@ -1,10 +1,23 @@
 /* eslint-disable */
 
+// react
 import React from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { withRouter, Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+
+// material
 import withStyles from '@material-ui/core/styles/withStyles'
 
-import Post from '../Post'
+// components
+import {Post} from '../../components'
+
+// actions
+import actions from './reducers'
+
+// api
+const services = require('../../services')
 
 const styles = theme => ({
   layout: {
@@ -70,6 +83,15 @@ const image = {
 
 class Feed extends React.Component {
 
+  componentDidMount() {
+
+    ;(async () => {
+      // const feed = await services.getFeed()
+      // const {getFeed} = this.props.actions
+    })()
+    
+  }
+
   render() {
     const { classes } = this.props
 
@@ -96,4 +118,11 @@ Feed.propTypes = {
   classes: PropTypes.object.isRequired,
 }
 
-export default withStyles(styles)(Feed)
+const mapStateToProps = state => ({
+  feed: state.feed
+})
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(actions, dispatch)
+})
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Feed))) // eslint-disable-line

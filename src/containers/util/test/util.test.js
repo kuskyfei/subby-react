@@ -1,7 +1,7 @@
 /* global describe, it */
 
 const assert = require('assert')
-const {sortBy} = require('../../src/util')
+const {sortBy} = require('../../util')
 
 describe('global util', () => {
   it('sortBy should sort by property', async () => {

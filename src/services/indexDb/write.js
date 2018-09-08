@@ -19,9 +19,9 @@ const setSettings = () => {
 }
 
 export {
-  setProfileCache, 
-  setFeedCache, 
-  setLoggedInSubscriptionsCache, 
-  setLoggedOutSubscriptions, 
+  setProfileCache,
+  setFeedCache,
+  setLoggedInSubscriptionsCache,
+  setLoggedOutSubscriptions,
   setSettings
 }

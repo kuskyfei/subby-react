@@ -1,17 +1,22 @@
+const ethereum = require('../ethereum')
+const indexDb = require('../indexDb')
+
 const profileCacheTime = window.SUBBY_GLOBAL_SETTINGS.PROFILE_CACHE_TIME
 const lastLoggedSubscriptionsCacheTime = window.SUBBY_GLOBAL_SETTINGS.LOGGED_IN_SUBSCRIPTIONS_CACHE_TIME
 const feedCacheTime = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_TIME
+// const feedCachedPreemptivelyCount = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHED_PREEMPTIVELY_COUNT
+const minimumUnreadFeedCachedCount = window.SUBBY_GLOBAL_SETTINGS.MINIMUM_UNREAD_FEED_CACHED_COUNT
 
 const updateCache = async () => {
-	if (await indexDb.profileCacheIsExpired()) {
-		await updateProfileCache()
-	}
-	if (await loggedInSubscriptionsCacheIsExpired()) {
-		await updateSubscriptionsCache()
-	}
-	if (await feedCacheIsExpired()) {
-		await updateFeedCache()
-	}
+  if (await indexDb.profileCacheIsExpired()) {
+    await updateProfileCache()
+  }
+  if (await loggedInSubscriptionsCacheIsExpired()) {
+    await updateSubscriptionsCache()
+  }
+  if (await feedCacheIsExpired()) {
+    await updateFeedCache()
+  }
 }
 
 const updateProfileCache = () => {
@@ -19,11 +24,11 @@ const updateProfileCache = () => {
 }
 
 const updateSubscriptionsCache = () => {
-	
+
 }
 
 const updateFeedCache = () => {
-	
+
 }
 
 const profileCacheIsExpired = () => {
@@ -44,12 +49,12 @@ const feedCacheIsExpired = () => {
   return lastPostCacheTimeStamp > expiresAtTimestamp
 }
 
-const feedCacheNeedsMorePosts = ({startAt, count}) => {
+const feedCacheNeedsMorePosts = async ({startAt, count}) => {
   const postCacheCount = await indexDb.getFeedCacheCount()
   const lastPostQueried = startAt + count
   const remainingPostsInCacheCount = postCacheCount - lastPostQueried
 
-  if (remainingPostsInCacheCount < MINIMUM_UNREAD_POST_CACHED_COUNT ) {
+  if (remainingPostsInCacheCount < minimumUnreadFeedCachedCount) {
     return true
   }
 }
@@ -61,13 +66,13 @@ const addPostsToFeedCache = async ({username, address, subscriptions, startAt, c
 }
 
 export {
-	updateCache, 
-	updateProfileCache, 
-	updateSubscriptionsCache, 
-	updateFeedCache,
-	profileCacheIsExpired,
-	subscriptionsCacheIsExpired,
-	feedCacheIsExpired,
-	feedCacheNeedsMorePosts,
-	addPostsToFeedCache
+  updateCache,
+  updateProfileCache,
+  updateSubscriptionsCache,
+  updateFeedCache,
+  profileCacheIsExpired,
+  loggedInSubscriptionsCacheIsExpired,
+  feedCacheIsExpired,
+  feedCacheNeedsMorePosts,
+  addPostsToFeedCache
 }

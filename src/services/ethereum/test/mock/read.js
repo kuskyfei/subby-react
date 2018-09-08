@@ -1,7 +1,5 @@
 import urls from './urls'
-import {fake} from '../util'
-
-const util = require('util')
+import {fake} from './util'
 
 const ms = require('ms')
 const {sortBy} = require('lodash')
@@ -76,7 +74,6 @@ const getPosts = async ({
 
   const mergedPosts = userSubscriptionsPosts.concat(addressSubscriptionsPosts)
 
-  let counter = 0
   for (const post of mergedPosts) {
     // filter posts that don't fit in correct time
     if (post.timestamp > beforeTimestamp) continue

@@ -1,6 +1,7 @@
-const ethereum = require('./ethereum')
-const indexDb = require('./indexDb')
+const ethereum = require('../ethereum')
+const indexDb = require('../indexDb')
 const cache = require('./cache')
+const {mergeSubscriptions, filterSubscriptions} = require('./util')
 
 const getAddress = async () => {
   const ethereumAddress = await ethereum.getAddress()
@@ -15,12 +16,12 @@ const getProfile = async ({username, address}) => {
   if (!profile || await cache.profileCacheIsExpired()) {
     profile = await ethereum.getProfile({username, address})
     indexDb.setProfileCache(profile)
-  }  
+  }
 
   return profile
 }
 
-// this will need a lot of testing to make sure the 3 lists of subscribtions don't 
+// this will need a lot of testing to make sure the 3 lists of subscribtions don't
 // overwrite each other in the wrong way
 const getSubscriptions = async ({username, address}) => {
   let loggedInSubscriptions = await indexDb.getLoggedInSubscriptionsCache({username, address})
@@ -46,7 +47,7 @@ const getSettings = async () => {
 const getFeed = async ({username, address, subscriptions, startAt, count, cursor}) => {
   subscriptions = filterSubscriptions(subscriptions) // remove muted or limited subscriptions
   const postQuery = {username, address, subscriptions, startAt, count, cursor}
-  
+
   let posts = await indexDb.getFeedCache(postQuery)
 
   if (!await cache.feedCacheIsExpired()) {
@@ -71,7 +72,7 @@ const getFeed = async ({username, address, subscriptions, startAt, count, cursor
     const cursor = indexDb.getLastFeedCacheCursor()
     cache.addPostsToFeedCache({...postQuery, cursor})
   }
-  
+
   return posts
 }
 

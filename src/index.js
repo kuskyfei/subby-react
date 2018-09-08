@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
-import App from './App'
+import {App} from './containers'
 import configureStore from './store'
 
 const initialState = {}
