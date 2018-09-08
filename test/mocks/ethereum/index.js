@@ -1,5 +1,5 @@
 export {
-	getAddress,
+  getAddress,
   getProfile,
   getSubscriptions,
   getPosts,

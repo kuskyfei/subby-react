@@ -1,5 +1,9 @@
 ##todo
 
+- mock ethereum in jest and real life
+- get indexdb working in browser
+- get indexDb working in jest
+
 - add translations
 - react-helmet for SEO and social media shares
 - optimize queuing for ethereum requests

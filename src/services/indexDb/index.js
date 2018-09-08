@@ -1,3 +1,7 @@
+/*
+
+GUIDE
+
 import idb from 'idb'
 
 const db = await idb.open('keyval-store', 2, upgradeDB => {
@@ -30,3 +34,24 @@ const allObjs = await db
   .getAll()
 
 console.log(allObjs)
+*/
+
+export {
+  setProfileCache, 
+  setFeedCache, 
+  setLoggedInSubscriptionsCache, 
+  setLoggedOutSubscriptions, 
+  setSettings
+} from './write'
+
+export {
+  getProfileCache,
+  getLoggedInSubscriptionsCache,
+  getLoggedOutSubscriptions,
+  getLastFeedCacheTimeStamp,
+  getFeedCache,
+  getFeedCacheCount,
+  getLastFeedCacheCursor,
+  getSettings,
+  hasMorePostsOnEthereum
+} from './read'

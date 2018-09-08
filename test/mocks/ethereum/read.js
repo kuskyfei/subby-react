@@ -11,7 +11,6 @@ const getAddress = async () => {
 }
 
 const getProfile = async ({username, address}) => {
-  
   let seed = address
 
   // if username is set, then address is ignored
@@ -27,15 +26,14 @@ const getProfile = async ({username, address}) => {
     thumbail: fake(seed).internet.avatar(),
     bio: fake(seed).lorem.paragraph() + ' ' + fake(seed).internet.domainName(),
     subscriberCount: fake(seed).random.number(),
-    subscriptionCount: fake(seed+1).random.number(),
-    tipCount: fake(seed+2).random.number(),
+    subscriptionCount: fake(seed + 1).random.number(),
+    tipCount: fake(seed + 2).random.number(),
     address: address
   }
   return profile
 }
 
 const getSubscriptions = async ({username, address}) => {
-  
   // if username is set, then address is ignored
   // completely and overwriten by the username's
   // address on Ethereum.
@@ -50,7 +48,7 @@ const getSubscriptions = async ({username, address}) => {
 
   const addressSubscriptions = []
 
-  counter = fake(seed+1).random.number() % 1000
+  counter = fake(seed + 1).random.number() % 1000
   while (counter--) {
     addressSubscriptions.push('0x' + fake(counter).finance.bitcoinAddress().toLowerCase())
   }
@@ -59,8 +57,8 @@ const getSubscriptions = async ({username, address}) => {
 }
 
 // this needs to be edited to match the new getPosts algorithm
-const getPosts = async ({ 
-  userSubscriptions, addressSubscriptions, 
+const getPosts = async ({
+  userSubscriptions, addressSubscriptions,
   startAt, count, cursor,
   beforeTimestamp, afterTimestamp
 }) => {
@@ -80,7 +78,6 @@ const getPosts = async ({
 
   let counter = 0
   for (const post of mergedPosts) {
-
     // filter posts that don't fit in correct time
     if (post.timestamp > beforeTimestamp) continue
     if (post.timestamp < afterTimestamp) continue
@@ -130,7 +127,7 @@ const __private__ = {
   getMockPosts: getMockPosts
 }
 
-/* usage: 
+/* usage:
   onCategoryPost('category', (post) => {
     console.log(post)
   })
@@ -138,14 +135,14 @@ const __private__ = {
 const onCategoryPost = (category, cb) => {
   const posts = getMockPosts(category)
 
-    for (const post of posts) {
-      cb(post)
-    }
+  for (const post of posts) {
+    cb(post)
+  }
 }
 
 export {
   __private__,
-  getAddress, 
+  getAddress,
   getProfile,
   getSubscriptions,
   getPosts,

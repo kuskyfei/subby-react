@@ -24,24 +24,24 @@ describe('ethereum read mocks', () => {
   test('get address', async () => {
     const address = await getAddress()
 
-    const res = "0x3rpzrv0nqplzwfree3axrfdme29b"
+    const res = '0x3rpzrv0nqplzwfree3axrfdme29b'
     expect(address).toEqual(res)
   })
 
   test('get profile', async () => {
-    const profile = await getProfile({username:'test'})
-    const profile2 = await getProfile({address:'test'})
+    const profile = await getProfile({username: 'test'})
+    const profile2 = await getProfile({address: 'test'})
 
-    const res = {"address": "0x3rpzrv0nqplzwfree3axrfdme29b", "bio": "Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name", "subscriberCount": 17157, "subscriptionCount": 64310, "thumbail": "https://s3.amazonaws.com/uifaces/faces/twitter/runningskull/128.jpg", "tipCount": 53119, "username": "test"}
-    const res2 = {"address": "test", "bio": "Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name", "subscriberCount": 17157, "subscriptionCount": 64310, "thumbail": "https://s3.amazonaws.com/uifaces/faces/twitter/runningskull/128.jpg", "tipCount": 53119, "username": "Celestine_OReilly99"}
+    const res = {'address': '0x3rpzrv0nqplzwfree3axrfdme29b', 'bio': 'Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name', 'subscriberCount': 17157, 'subscriptionCount': 64310, 'thumbail': 'https://s3.amazonaws.com/uifaces/faces/twitter/runningskull/128.jpg', 'tipCount': 53119, 'username': 'test'}
+    const res2 = {'address': 'test', 'bio': 'Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name', 'subscriberCount': 17157, 'subscriptionCount': 64310, 'thumbail': 'https://s3.amazonaws.com/uifaces/faces/twitter/runningskull/128.jpg', 'tipCount': 53119, 'username': 'Celestine_OReilly99'}
 
     expect(profile).toEqual(res)
     expect(profile2).toEqual(res2)
   })
 
   test('get subscriptions', async () => {
-    const subs = await getSubscriptions({username:'test'})
-    const subs2 = await getSubscriptions({address:'test2'})
+    const subs = await getSubscriptions({username: 'test'})
+    const subs2 = await getSubscriptions({address: 'test2'})
 
     expect(subs.userSubscriptions.length).toEqual(157)
     expect(subs.addressSubscriptions.length).toEqual(310)
@@ -97,6 +97,5 @@ describe('ethereum read mocks', () => {
     expect(posts[0].link).toEqual('https://www.youtube.com/watch?v=WAr4YVpfpII')
     expect(posts[0].comment).toEqual('Occaecati dolore ab hic qui.')
     expect(posts[0].category).toEqual('aliquid')
-  })  
-
+  })
 })
