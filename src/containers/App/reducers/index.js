@@ -1,7 +1,7 @@
 import A from './type'
 
 const initialState = {
-  ethereumAddress: null,
+  address: null,
   profile: null,
   subscriptions: null
 }
@@ -13,10 +13,10 @@ const reducer = (state = initialState, action) => {
         ...initialState
       }
 
-    case A.SET_ETHEREUM_ADDRESS:
+    case A.SET_ADDRESS:
       return {
         ...state,
-        ethereumAddress: action.payload
+        address: action.payload
       }
 
     case A.SET_PROFILE:

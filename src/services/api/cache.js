@@ -31,20 +31,26 @@ const updateFeedCache = () => {
 
 }
 
-const profileCacheIsExpired = () => {
-  const lastProfileCacheTimeStamp = indexDb.getLastProfileCacheTimeStamp()
+const profileCacheIsExpired = async () => {
+  const lastProfileCacheTimeStamp = await indexDb.getLastProfileCacheTimeStamp()
+  if (!lastProfileCacheTimeStamp) return true
+
   const expiresAtTimestamp = Date.now() - profileCacheTime
   return lastProfileCacheTimeStamp > expiresAtTimestamp
 }
 
-const loggedInSubscriptionsCacheIsExpired = () => {
-  const lastLoggedInSubscriptionsCacheTimeStamp = indexDb.getLastLoggedInSubscriptionsCacheTimeStamp()
+const loggedInSubscriptionsCacheIsExpired = async () => {
+  const lastLoggedInSubscriptionsCacheTimeStamp = await indexDb.getLastLoggedInSubscriptionsCacheTimeStamp()
+  if (!lastLoggedInSubscriptionsCacheTimeStamp) return true
+
   const expiresAtTimestamp = Date.now() - lastLoggedSubscriptionsCacheTime
   return lastLoggedInSubscriptionsCacheTimeStamp > expiresAtTimestamp
 }
 
-const feedCacheIsExpired = () => {
-  const lastPostCacheTimeStamp = indexDb.getLastFeedCacheTimeStamp()
+const feedCacheIsExpired = async () => {
+  const lastPostCacheTimeStamp = await indexDb.getLastFeedCacheTimeStamp()
+  if (!lastPostCacheTimeStamp) return true
+
   const expiresAtTimestamp = Date.now() - feedCacheTime
   return lastPostCacheTimeStamp > expiresAtTimestamp
 }
@@ -62,7 +68,7 @@ const feedCacheNeedsMorePosts = async ({startAt, count}) => {
 const addPostsToFeedCache = async ({username, address, subscriptions, startAt, count, cursor}) => {
   const postQuery = {username, address, subscriptions, startAt, count, cursor}
   const posts = await ethereum.getPosts(postQuery)
-  indexDb.setFeedCache(posts)
+  await indexDb.setFeedCache(posts)
 }
 
 export {

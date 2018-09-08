@@ -11,7 +11,7 @@ const Youtube = (props) => {
 }
 
 const getYoutubeVideoId = (url) => {
-  const id = /watch\?v=(.+)/.exec(url)[1]
+  const id = /watch\?v=([^&]+)/.exec(url)[1]
   return id
 }
 

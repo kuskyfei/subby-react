@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {Link} from 'react-router-dom'
 import { withStyles } from '@material-ui/core/styles'
 import classnames from 'classnames'
 import Card from '@material-ui/core/Card'
@@ -68,8 +69,8 @@ class Post extends React.Component {
       <Card className={classes.card}>
         <CardHeader
           avatar={
-            <Avatar className={classes.avatar}>
-              R
+            <Avatar src={post.thumbnail} className={classes.avatar}>
+              {post.username.substring(0, 2)}
             </Avatar>
           }
           action={
@@ -77,7 +78,7 @@ class Post extends React.Component {
               <MoreVertIcon />
             </IconButton>
           }
-          title={post.username}
+          title={<Link to={'?u=' + post.username}>{post.username}</Link>}
           subheader={post.timestamp}
         />
 

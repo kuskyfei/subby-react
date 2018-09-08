@@ -14,10 +14,12 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import {Post} from '../../components'
 
 // actions
-import actions from './reducers'
+import actions from './reducers/actions'
 
 // api
 const services = require('../../services')
+
+const day = 1000*60*60*24
 
 const styles = theme => ({
   layout: {
@@ -86,19 +88,38 @@ class Feed extends React.Component {
   componentDidMount() {
 
     ;(async () => {
-      // const feed = await services.getFeed()
-      // const {getFeed} = this.props.actions
+
+      const postQuery = {
+        subscriptions: this.props.subscriptions,
+        startAt: 0,
+        count: 20,
+        beforeTimestamp: Date.now(),
+        afterTimestamp: Date.now() - 7*day
+      }
+
+      const feed = await services.getFeed(postQuery)
+      const {setFeed} = this.props.actions
+      setFeed(feed)
+
+      console.log('feed', feed)
     })()
     
   }
 
   render() {
-    const { classes } = this.props
+    const { classes, feed } = this.props
+
+    const posts = []
+    for (const post of feed) {
+      console.log(post)
+
+      posts.push(<Post key={JSON.stringify(post)} post={post}/>)
+    }
 
     return (
       <div className={classes.layout}>
         
-        <Post post={image}/>
+        {posts}
 
         {/* 
         <Post post={youtube}/>
@@ -119,6 +140,7 @@ Feed.propTypes = {
 }
 
 const mapStateToProps = state => ({
+  subscriptions: state.app.subscriptions,
   feed: state.feed
 })
 const mapDispatchToProps = dispatch => ({

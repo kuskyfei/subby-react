@@ -1,3 +1,5 @@
+
+
 ##todo
 
 - mock ethereum in jest and real life
@@ -37,7 +39,11 @@
 
 ##code for db
 
-
+## username rules
+min 3 characters
+maximum 39 characters
+cannot start or end with 1 or more spaces or tabs
+unicode (utf-8) to accept asian characters and stuff
 
 ##versions
 tested on node v10.9.0 and npm v6.2.0
@@ -154,8 +160,13 @@ commentIpfs: "string" // point to the string directly
 
 ideas for new methods
 
-tip(username, address, amount) // use address if username is undefined
+tip(username, address, amount, message) // use address if username is undefined
+// the owner should have a function to enable tip and price per byte
+
 terminateAccount() // if your account gets hacked you can terminate it so your followers don't get spammed. Terminated accounts don't show in any feeds.
+
+setDonationPricePerCharacter(int)
+getDonationPricePerCharacter(username, address)
 
 new subscriptions methods:
 

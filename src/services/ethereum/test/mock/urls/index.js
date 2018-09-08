@@ -4,6 +4,7 @@ const redditUrls = require('./redditUrls')
 const twitterUrls = require('./twitterUrls')
 const vimeoUrls = require('./vimeoUrls')
 const youtubeUrls = require('./youtubeUrls')
+const imageUrls = require('./imageUrls')
 
 export default {
   facebookUrls,
@@ -11,5 +12,6 @@ export default {
   redditUrls,
   twitterUrls,
   vimeoUrls,
-  youtubeUrls
+  youtubeUrls,
+  imageUrls
 }

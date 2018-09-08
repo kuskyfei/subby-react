@@ -1,7 +1,7 @@
 const ethereum = require('../ethereum')
 const indexDb = require('../indexDb')
 const cache = require('./cache')
-const {mergeSubscriptions, filterSubscriptions} = require('./util')
+const {mergeSubscriptionsLoggedInSubscriptions, mergeSubscriptions, filterSubscriptions, formatSubscriptions} = require('./util')
 
 const getAddress = async () => {
   const ethereumAddress = await ethereum.getAddress()
@@ -29,13 +29,13 @@ const getSubscriptions = async ({username, address}) => {
 
   if (await cache.loggedInSubscriptionsCacheIsExpired()) {
     const ethereumSubscriptions = await ethereum.getSubscriptions({username, address})
-    loggedInSubscriptions = mergeSubscriptions(ethereumSubscriptions, loggedInSubscriptions)
+    loggedInSubscriptions = mergeSubscriptionsLoggedInSubscriptions({ethereumSubscriptions, loggedInSubscriptions})
 
     // indexDbLoggedInSubscriptions have a "muted" status which the ethereumSubscriptions should not overwrite
     await indexDb.setLoggedInSubscriptionsCache(loggedInSubscriptions)
   }
 
-  const subscriptions = mergeSubscriptions(loggedInSubscriptions, loggedOutSubscriptions)
+  const subscriptions = mergeSubscriptions({loggedInSubscriptions, loggedOutSubscriptions})
 
   return subscriptions
 }
@@ -44,15 +44,29 @@ const getSettings = async () => {
   return indexDb.getSettings()
 }
 
-const getFeed = async ({username, address, subscriptions, startAt, count, cursor}) => {
+const getFeed = async ({subscriptions, startAt, count, beforeTimestamp, afterTimestamp, cursor}) => {
   subscriptions = filterSubscriptions(subscriptions) // remove muted or limited subscriptions
-  const postQuery = {username, address, subscriptions, startAt, count, cursor}
+  const {userSubscriptions, addressSubscriptions} = formatSubscriptions(subscriptions)
+
+  const postQuery = {
+    startAt,
+    count,
+    beforeTimestamp,
+    afterTimestamp,
+    userSubscriptions,
+    addressSubscriptions
+  }
 
   let posts = await indexDb.getFeedCache(postQuery)
 
-  if (!await cache.feedCacheIsExpired()) {
+  console.log(1, posts)
+
+  if (await cache.feedCacheIsExpired()) {
+    console.log(1.5, posts)
     posts = await ethereum.getPosts(postQuery)
   }
+
+  console.log(2, posts)
 
   // if there is no more posts on ethereum,
   // there is no point in fetching more
@@ -61,12 +75,16 @@ const getFeed = async ({username, address, subscriptions, startAt, count, cursor
     return posts
   }
 
+  console.log(3, posts)
+
   // if there is more posts on ethereum and
   // the post count received is smaller than
   // query count, it should be fetched again
   if (posts.count < count) {
     posts = await ethereum.getPosts(postQuery)
   }
+
+  console.log(4, posts)
 
   if (cache.feedCacheNeedsMorePosts({startAt, count})) {
     const cursor = indexDb.getLastFeedCacheCursor()

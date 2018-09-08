@@ -16,7 +16,7 @@ import {Header, Footer} from '../../components'
 import {Feed} from '../../containers'
 
 // actions
-import actions from './reducers'
+import actions from './reducers/actions'
 
 // apis
 const services = require('../../services')
@@ -39,10 +39,19 @@ class App extends Component {
       const settings = await services.getSettings()
 
       const address = await services.getAddress()
-      const profile = await services.getProfile({username: 'test'})
-      const subscriptions = await services.getSubscriptions({username: 'test'})
+      const profile = await services.getProfile({address})
+      const subscriptions = await services.getSubscriptions(address)
 
-      const {setEthereumAddress, setProfile, setSubscriptions} = this.props.actions
+      console.log(this.props)
+
+      const {setAddress, setProfile, setSubscriptions} = this.props.actions
+      setAddress(address)
+      setProfile(profile)
+      setSubscriptions(subscriptions)
+
+      console.log('address', address)
+      console.log('profile', profile)
+      console.log('subscriptions', subscriptions)
 
       this.handleRouteChange()
 

@@ -1,11 +1,13 @@
 import urls from './urls'
-import {fake} from './util'
+let counter = 8; while (counter--) urls.imageUrls.unshift(null)
+
+import {fake, formatSubscriptions} from './util'
 
 const ms = require('ms')
 const {sortBy} = require('lodash')
 
 const getAddress = async () => {
-  return '0x' + fake('test').finance.bitcoinAddress().toLowerCase()
+  return '0x' + fake('test').finance.ethereumAddress()
 }
 
 const getProfile = async ({username, address}) => {
@@ -16,12 +18,14 @@ const getProfile = async ({username, address}) => {
   // address on Ethereum.
   if (username) {
     seed = username
-    address = '0x' + fake(seed).finance.bitcoinAddress().toLowerCase()
+    address = '0x' + fake(seed).finance.ethereumAddress()
   }
+
+  console.log(urls)
 
   const profile = {
     username: username || fake(seed).internet.userName(),
-    thumbail: fake(seed).internet.avatar(),
+    thumbail: urls.imageUrls[fake(seed).random.number() % (urls.imageUrls.length - 1)],
     bio: fake(seed).lorem.paragraph() + ' ' + fake(seed).internet.domainName(),
     subscriberCount: fake(seed).random.number(),
     subscriptionCount: fake(seed + 1).random.number(),
@@ -48,28 +52,32 @@ const getSubscriptions = async ({username, address}) => {
 
   counter = fake(seed + 1).random.number() % 1000
   while (counter--) {
-    addressSubscriptions.push('0x' + fake(counter).finance.bitcoinAddress().toLowerCase())
+    addressSubscriptions.push('0x' + fake(counter).finance.ethereumAddress())
   }
 
-  return {userSubscriptions, addressSubscriptions}
+  const subscriptions = formatSubscriptions({userSubscriptions, addressSubscriptions})
+
+  return subscriptions
 }
 
 // this needs to be edited to match the new getPosts algorithm
-const getPosts = async ({
-  userSubscriptions, addressSubscriptions,
-  startAt, count, cursor,
-  beforeTimestamp, afterTimestamp
-}) => {
+const getPosts = async ({userSubscriptions, addressSubscriptions, startAt, count, cursor, beforeTimestamp, afterTimestamp}) => {
+  console.log({userSubscriptions, addressSubscriptions, startAt, count, cursor, beforeTimestamp, afterTimestamp})
+
   const posts = []
 
-  let userSubscriptionsPosts
+  let counter = 0
+  let userSubscriptionsPosts = []
   for (const sub of userSubscriptions) {
-    userSubscriptionsPosts = getMockPosts(sub)
+    userSubscriptionsPosts = userSubscriptionsPosts.concat(getMockPosts(sub))
+    if (counter++ > 50) break
   }
 
-  let addressSubscriptionsPosts
+  counter = 0
+  let addressSubscriptionsPosts = []
   for (const sub of addressSubscriptions) {
-    addressSubscriptionsPosts = getMockPosts(sub)
+    addressSubscriptionsPosts = addressSubscriptionsPosts.concat(getMockPosts(sub))
+    if (counter++ > 50) break
   }
 
   const mergedPosts = userSubscriptionsPosts.concat(addressSubscriptionsPosts)
@@ -98,20 +106,23 @@ const getPosts = async ({
 const getMockPosts = (seed) => {
   const posts = []
 
-  let counter = fake(seed).random.number() % 1000
+  let i = 0
+  let counter = fake(seed).random.number() % 50
   while (counter--) {
     const urlsArrays = Object.values(urls)
 
-    const type = fake(counter).random.number() % urlsArrays.length
-    const i = fake(counter).random.number() % urlsArrays[type].length
+    const type = fake(seed + counter).random.number() % urlsArrays.length
+    const i = fake(seed + counter).random.number() % urlsArrays[type].length
 
-    const randomNumber = fake(counter).random.number() % 100 / 100
+    const randomNumber = fake(seed + counter).random.number() % 100 / 100
 
     const post = {
       link: urlsArrays[type][i],
-      comment: fake(counter).lorem.sentence(),
-      category: fake(counter).lorem.word(),
-      timestamp: Math.round(Date.now() - ms('30 days') * randomNumber)
+      comment: fake(seed + counter).lorem.sentence(),
+      category: fake(seed + counter).lorem.word(),
+      timestamp: Math.round(Date.now() - ms('30 days') * randomNumber),
+      username: seed,
+      thumbnail: urls.imageUrls[fake(seed).random.number() % (urls.imageUrls.length - 1)]
     }
 
     posts.push(post)
