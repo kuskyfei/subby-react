@@ -5,7 +5,7 @@ const Youtube = (props) => {
 
   return (
     <div className='embed-container'>
-      <iframe src={`https://www.youtube.com/embed/${id}`} frameborder='0' allowfullscreen />
+      <iframe src={`https://www.youtube.com/embed/${id}`} frameBorder='0' allowFullScreen />
     </div>
   )
 }

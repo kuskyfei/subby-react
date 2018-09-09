@@ -24,7 +24,7 @@ describe('ethereum read mocks', () => {
   test('get address', async () => {
     const address = await getAddress()
 
-    const res = '0x3rpzrv0nqplzwfree3axrfdme29b'
+    const res = '0x0cd350b97786c48444611381b95b820222532311'
     expect(address).toEqual(res)
   })
 
@@ -32,8 +32,8 @@ describe('ethereum read mocks', () => {
     const profile = await getProfile({username: 'test'})
     const profile2 = await getProfile({address: 'test'})
 
-    const res = {'address': '0x3rpzrv0nqplzwfree3axrfdme29b', 'bio': 'Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name', 'subscriberCount': 17157, 'subscriptionCount': 64310, 'thumbail': 'https://s3.amazonaws.com/uifaces/faces/twitter/runningskull/128.jpg', 'tipCount': 53119, 'username': 'test'}
-    const res2 = {'address': 'test', 'bio': 'Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name', 'subscriberCount': 17157, 'subscriptionCount': 64310, 'thumbail': 'https://s3.amazonaws.com/uifaces/faces/twitter/runningskull/128.jpg', 'tipCount': 53119, 'username': 'Celestine_OReilly99'}
+    const res = {'address': '0x0cd350b97786c48444611381b95b820222532311', 'bio': 'Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name', 'subscriberCount': 17157, 'subscriptionCount': 64310, 'thumbail': 'https://i.imgur.com/359os81.jpg', 'tipCount': 53119, 'username': 'test'}
+    const res2 = {'address': 'test', 'bio': 'Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name', 'subscriberCount': 17157, 'subscriptionCount': 64310, 'thumbail': 'https://i.imgur.com/359os81.jpg', 'tipCount': 53119, 'username': 'Celestine_OReilly99'}
 
     expect(profile).toEqual(res)
     expect(profile2).toEqual(res2)
@@ -41,26 +41,24 @@ describe('ethereum read mocks', () => {
 
   test('get subscriptions', async () => {
     const subs = await getSubscriptions({username: 'test'})
+    const subsKeys = Object.keys(subs)
     const subs2 = await getSubscriptions({address: 'test2'})
+    const subs2Keys = Object.keys(subs2)
 
-    expect(subs.userSubscriptions.length).toEqual(157)
-    expect(subs.addressSubscriptions.length).toEqual(310)
-    expect(subs.userSubscriptions[0]).toEqual('Tobin.Swift')
-    expect(subs.addressSubscriptions[0]).toEqual('0x3w0ob0d4k3y1iabiyv6p5hg5ya5zgu2')
+    expect(subsKeys.length).toEqual(467)
+    expect(subsKeys[0]).toEqual('Tobin.Swift')
 
-    expect(subs2.userSubscriptions.length).toEqual(119)
-    expect(subs2.addressSubscriptions.length).toEqual(920)
-    expect(subs2.userSubscriptions[0]).toEqual('Hadley_Gorczany')
-    expect(subs2.addressSubscriptions[0]).toEqual('0x353drfrv0s9mh1rgjjzbajvrij8auii6')
+    expect(subs2Keys.length).toEqual(1039)
+    expect(subs2Keys[0]).toEqual('Hadley_Gorczany')
   })
 
   test('get posts from a single subscription', async () => {
     const posts = __private__.getMockPosts('test')
 
-    expect(posts.length).toEqual(157)
-    expect(posts[0].link).toEqual('https://www.youtube.com/watch?v=EwJUveiSg8k')
-    expect(posts[0].comment).toEqual('Officiis totam ut doloremque voluptas modi velit numquam reiciendis non.')
-    expect(posts[0].category).toEqual('non')
+    expect(posts.length).toEqual(7)
+    expect(posts[0].link).toEqual('https://www.facebook.com/refinery29/posts/10156966352367922')
+    expect(posts[0].comment).toEqual('Qui id rem fuga ut.')
+    expect(posts[0].category).toEqual('quaerat')
   })
 
   test('get posts from subscriptions', async () => {
@@ -81,21 +79,21 @@ describe('ethereum read mocks', () => {
     expect(posts[0].timestamp < beforeTimestamp).toEqual(true)
     expect(posts[count - 1].timestamp > afterTimestamp).toEqual(true)
 
-    expect(posts[0].link).toEqual('https://www.reddit.com/r/UpliftingNews/comments/9b160a/a_teacher_sat_in_her_car_with_a_former_students/')
-    expect(posts[0].comment).toEqual('Nihil nobis mollitia aut eius velit praesentium mollitia quidem sunt.')
-    expect(posts[0].category).toEqual('repellat')
+    expect(posts[0].link).toEqual('https://vimeo.com/131376602')
+    expect(posts[0].comment).toEqual('Excepturi molestiae aliquid ea.')
+    expect(posts[0].category).toEqual('dolore')
   })
 
   test('onCategoryPost get category post', async () => {
     const posts = []
 
-    onCategoryPost('testCategory', (post) => {
+    await onCategoryPost('testCategory', (post) => {
       posts.push(post)
     })
 
-    expect(posts.length).toEqual(295)
-    expect(posts[0].link).toEqual('https://www.youtube.com/watch?v=WAr4YVpfpII')
-    expect(posts[0].comment).toEqual('Occaecati dolore ab hic qui.')
-    expect(posts[0].category).toEqual('aliquid')
+    expect(posts.length).toEqual(45)
+    expect(posts[0].link).toEqual('https://www.facebook.com/refinery29/posts/10156966039962922')
+    expect(posts[0].comment).toEqual('Quo et eos sit architecto soluta.')
+    expect(posts[0].category).toEqual('blanditiis')
   })
 })

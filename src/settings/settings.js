@@ -26,11 +26,8 @@ const settings = {
   FEED_CACHED_PREEMPTIVELY_COUNT: 500,
   MINIMUM_UNREAD_FEED_CACHED_COUNT: 200,
 
-  // the mock settings allow you to test Subby
-  // deterministically without depending on
-  // external apis. Thia should be set to false
-  // in production.
-  MOCK_ETHEREUM: true
+  MOCK_ETHEREUM: true,
+  MOCK_ETHEREUM_NETWORK_DELAY: 2000
 
 }
 

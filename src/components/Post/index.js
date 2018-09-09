@@ -18,6 +18,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 import EmbedWidget from './EmbedWidget'
+import Loading from './Loading'
+
+const Timeago = require('timeago.js')
+const timeago = Timeago()
 
 const styles = theme => ({
   card: {
@@ -63,7 +67,9 @@ class Post extends React.Component {
   };
 
   render () {
-    const {classes, post} = this.props
+    let {classes, post, loading} = this.props
+
+    if (loading) return <LoadingCard classes={classes} />
 
     return (
       <Card className={classes.card}>
@@ -79,7 +85,7 @@ class Post extends React.Component {
             </IconButton>
           }
           title={<Link to={'?u=' + post.username}>{post.username}</Link>}
-          subheader={post.timestamp}
+          subheader={<Link to={`?u=${post.username}&id=${post.id}`}>{timeago.format(post.timestamp)}</Link>}
         />
 
         <EmbedWidget url={post.link} />
@@ -114,6 +120,14 @@ class Post extends React.Component {
     )
   }
 }
+
+const LoadingCard = (props) =>
+
+  <Card className={props.classes.card}>
+
+    <Loading />
+
+  </Card>
 
 Post.propTypes = {
   post: PropTypes.object.isRequired

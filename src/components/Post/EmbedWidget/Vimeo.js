@@ -5,7 +5,7 @@ const Vimeo = (props) => {
 
   return (
     <div className='embed-container'>
-      <iframe src={`https://player.vimeo.com/video/${id}`} frameborder='0' allowfullscreen />
+      <iframe src={`https://player.vimeo.com/video/${id}`} frameBorder='0' allowFullScreen />
     </div>
   )
 }

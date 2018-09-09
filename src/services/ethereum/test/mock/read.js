@@ -1,16 +1,19 @@
+import {fake, formatSubscriptions} from './util'
 import urls from './urls'
 let counter = 8; while (counter--) urls.imageUrls.unshift(null)
 
-import {fake, formatSubscriptions} from './util'
-
 const ms = require('ms')
 const {sortBy} = require('lodash')
+const {networkDelayMock} = require('./util')
 
 const getAddress = async () => {
+  // await networkDelayMock()
   return '0x' + fake('test').finance.ethereumAddress()
 }
 
 const getProfile = async ({username, address}) => {
+  // await networkDelayMock()
+
   let seed = address
 
   // if username is set, then address is ignored
@@ -20,8 +23,6 @@ const getProfile = async ({username, address}) => {
     seed = username
     address = '0x' + fake(seed).finance.ethereumAddress()
   }
-
-  console.log(urls)
 
   const profile = {
     username: username || fake(seed).internet.userName(),
@@ -36,6 +37,8 @@ const getProfile = async ({username, address}) => {
 }
 
 const getSubscriptions = async ({username, address}) => {
+  // await networkDelayMock()
+
   // if username is set, then address is ignored
   // completely and overwriten by the username's
   // address on Ethereum.
@@ -62,7 +65,7 @@ const getSubscriptions = async ({username, address}) => {
 
 // this needs to be edited to match the new getPosts algorithm
 const getPosts = async ({userSubscriptions, addressSubscriptions, startAt, count, cursor, beforeTimestamp, afterTimestamp}) => {
-  console.log({userSubscriptions, addressSubscriptions, startAt, count, cursor, beforeTimestamp, afterTimestamp})
+  await networkDelayMock()
 
   const posts = []
 
@@ -106,7 +109,6 @@ const getPosts = async ({userSubscriptions, addressSubscriptions, startAt, count
 const getMockPosts = (seed) => {
   const posts = []
 
-  let i = 0
   let counter = fake(seed).random.number() % 50
   while (counter--) {
     const urlsArrays = Object.values(urls)
@@ -140,7 +142,9 @@ const __private__ = {
     console.log(post)
   })
 */
-const onCategoryPost = (category, cb) => {
+const onCategoryPost = async (category, cb) => {
+  await networkDelayMock()
+
   const posts = getMockPosts(category)
 
   for (const post of posts) {

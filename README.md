@@ -2,6 +2,7 @@
 
 ##todo
 
+- load icon
 - mock ethereum in jest and real life
 - get indexdb working in browser
 - get indexDb working in jest

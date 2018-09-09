@@ -7,7 +7,7 @@ const Facebook = (props) => {
   return (
     <div className='card__white-border-1px'>
       <div className='embed-container'>
-        <iframe src={`https://www.facebook.com/plugins/${type}.php?href=${props.url}`} scrolling='no' frameborder='0' allowTransparency='true' allow='encrypted-media' allowFullScreen='true' />
+        <iframe src={`https://www.facebook.com/plugins/${type}.php?href=${props.url}`} scrolling='no' frameBorder='0' allow='encrypted-media' allowFullScreen='true' />
       </div>
     </div>
   )

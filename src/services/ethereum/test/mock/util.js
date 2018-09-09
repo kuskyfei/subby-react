@@ -30,4 +30,12 @@ const sha256 = (data) => {
   return crypto.createHash('sha256').update(data).digest('hex').substring(0, 40)
 }
 
-export {fake, formatSubscriptions}
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+const networkDelayMock = async () => {
+  if (window.SUBBY_GLOBAL_SETTINGS.MOCK_ETHEREUM_NETWORK_DELAY) {
+    await sleep(window.SUBBY_GLOBAL_SETTINGS.MOCK_ETHEREUM_NETWORK_DELAY)
+  }
+}
+
+export {fake, formatSubscriptions, networkDelayMock}

@@ -60,7 +60,8 @@ const settingsMessage = `<script>
     // deterministically without depending on
     // external apis. Thia should be set to false
     // in production.
-    MOCK_ETHEREUM: ${settings.MOCK_ETHEREUM}
+    MOCK_ETHEREUM: ${settings.MOCK_ETHEREUM},
+    MOCK_ETHEREUM_NETWORK_DELAY: ${settings.MOCK_ETHEREUM_NETWORK_DELAY}
 
   }
 

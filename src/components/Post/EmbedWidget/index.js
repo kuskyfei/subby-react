@@ -8,7 +8,7 @@ import Twitter from './Twitter'
 import Vimeo from './Vimeo'
 import Youtube from './Youtube'
 import Image from './Image'
-import Default from './Default'
+import Link from './Link'
 
 const {extractRootDomain} = require('./util')
 
@@ -45,7 +45,7 @@ const getWidgetFromUrl = (url) => {
       return Youtube
 
     default:
-      return Default
+      return Link
   }
 }
 
