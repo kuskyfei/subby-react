@@ -1,3 +1,5 @@
+const init = () => {}
+
 export {
   getAddress,
   getProfile,
@@ -5,3 +7,5 @@ export {
   getPosts,
   onCategoryPost
 } from './read'
+
+export {init}

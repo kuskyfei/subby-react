@@ -2,16 +2,21 @@
 
 ##todo
 
-- load icon
-- mock ethereum in jest and real life
+idb in browser
+idb in jest
+torrent card
+video card
+audio card
+ipfs card
+
 - get indexdb working in browser
 - get indexDb working in jest
 
+- add warning to use chrome
 - add translations
 - react-helmet for SEO and social media shares
 - optimize queuing for ethereum requests
 - make profile page
-- make forever scroll
 - set up optional embeds
 - set up analytics events
 - add torrent card
@@ -207,6 +212,40 @@ subscribe(username, address, category='default')
 Other possibility:
 
 getSubscriptions(username, address) return [ [name, address, category], [name, address, category], [name, address, category], [name, address, category] ]
+
+
+#object stores in Idb
+
+- profiles // object store
+  - usernameOrAddress
+    - username
+    - thumbnail
+    - bio
+    - subscriberCount
+    - subscribtionCount
+    - tipCount
+    - lastProfileCacheTimeStamp
+  - usernameOrAddress2
+  - etc...
+- feed // object store
+  - posts
+    - post1
+    - post2
+    - etc...
+  - hasMorePostsOnEthereum
+  - lastFeedCacheCursor
+- loggedInSubscriptions // object store
+  - usernameOrAddress
+    - subscriptions
+      - subscription1
+      - subscription2
+      - etc...
+    - lastLoggedInSubscriptionsCacheTimeStamp
+- loggedOutSubscriptions // object store
+  - subscription1
+  - subscription2
+  - etc....
+- settings // object store
 
 
 

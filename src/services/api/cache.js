@@ -1,5 +1,5 @@
 const ethereum = require('../ethereum')
-const indexDb = require('../indexDb')
+const indexedDb = require('../indexedDb')
 
 const profileCacheTime = window.SUBBY_GLOBAL_SETTINGS.PROFILE_CACHE_TIME
 const lastLoggedSubscriptionsCacheTime = window.SUBBY_GLOBAL_SETTINGS.LOGGED_IN_SUBSCRIPTIONS_CACHE_TIME
@@ -8,7 +8,7 @@ const feedCacheTime = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_TIME
 const minimumUnreadFeedCachedCount = window.SUBBY_GLOBAL_SETTINGS.MINIMUM_UNREAD_FEED_CACHED_COUNT
 
 const updateCache = async () => {
-  if (await indexDb.profileCacheIsExpired()) {
+  if (await indexedDb.profileCacheIsExpired()) {
     await updateProfileCache()
   }
   if (await loggedInSubscriptionsCacheIsExpired()) {
@@ -32,7 +32,7 @@ const updateFeedCache = () => {
 }
 
 const profileCacheIsExpired = async () => {
-  const lastProfileCacheTimeStamp = await indexDb.getLastProfileCacheTimeStamp()
+  const lastProfileCacheTimeStamp = await indexedDb.getLastProfileCacheTimeStamp()
   if (!lastProfileCacheTimeStamp) return true
 
   const expiresAtTimestamp = Date.now() - profileCacheTime
@@ -40,7 +40,7 @@ const profileCacheIsExpired = async () => {
 }
 
 const loggedInSubscriptionsCacheIsExpired = async () => {
-  const lastLoggedInSubscriptionsCacheTimeStamp = await indexDb.getLastLoggedInSubscriptionsCacheTimeStamp()
+  const lastLoggedInSubscriptionsCacheTimeStamp = await indexedDb.getLastLoggedInSubscriptionsCacheTimeStamp()
   if (!lastLoggedInSubscriptionsCacheTimeStamp) return true
 
   const expiresAtTimestamp = Date.now() - lastLoggedSubscriptionsCacheTime
@@ -48,7 +48,7 @@ const loggedInSubscriptionsCacheIsExpired = async () => {
 }
 
 const feedCacheIsExpired = async () => {
-  const lastPostCacheTimeStamp = await indexDb.getLastFeedCacheTimeStamp()
+  const lastPostCacheTimeStamp = await indexedDb.getLastFeedCacheTimeStamp()
   if (!lastPostCacheTimeStamp) return true
 
   const expiresAtTimestamp = Date.now() - feedCacheTime
@@ -56,7 +56,7 @@ const feedCacheIsExpired = async () => {
 }
 
 const feedCacheNeedsMorePosts = async ({startAt, count}) => {
-  const postCacheCount = await indexDb.getFeedCacheCount()
+  const postCacheCount = await indexedDb.getFeedCacheCount()
   const lastPostQueried = startAt + count
   const remainingPostsInCacheCount = postCacheCount - lastPostQueried
 
@@ -68,7 +68,7 @@ const feedCacheNeedsMorePosts = async ({startAt, count}) => {
 const addPostsToFeedCache = async ({username, address, subscriptions, startAt, count, cursor}) => {
   const postQuery = {username, address, subscriptions, startAt, count, cursor}
   const posts = await ethereum.getPosts(postQuery)
-  await indexDb.setFeedCache(posts)
+  await indexedDb.setFeedCache(posts)
 }
 
 export {

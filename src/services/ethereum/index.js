@@ -26,7 +26,9 @@ module.exports = {
 
 // for Jest unit tests or for integration tests, you
 // can mock this entire module using the settings below
-if (window.SUBBY_GLOBAL_SETTINGS.MOCK_ETHEREUM) {
+const {settings} = require('../../settings')
+console.log(settings)
+if (settings.MOCK_ETHEREUM) {
   const mock = require('./test/mock')
   module.exports = mock
 }

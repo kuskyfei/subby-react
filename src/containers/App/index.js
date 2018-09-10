@@ -36,11 +36,13 @@ class App extends Component {
 
     ;(async() => {
 
+      await services.init()
+
       const settings = await services.getSettings()
 
       const address = await services.getAddress()
       const profile = await services.getProfile({address})
-      const subscriptions = await services.getSubscriptions(address)
+      const subscriptions = await services.getSubscriptions({address})
 
       console.log(this.props)
 

@@ -32,9 +32,10 @@ const sha256 = (data) => {
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
+const {settings} = require('../../../../settings')
 const networkDelayMock = async () => {
-  if (window.SUBBY_GLOBAL_SETTINGS.MOCK_ETHEREUM_NETWORK_DELAY) {
-    await sleep(window.SUBBY_GLOBAL_SETTINGS.MOCK_ETHEREUM_NETWORK_DELAY)
+  if (settings.MOCK_ETHEREUM_NETWORK_DELAY) {
+    await sleep(settings.MOCK_ETHEREUM_NETWORK_DELAY)
   }
 }
 

@@ -1,3 +1,17 @@
+const indexedDb = require('../indexedDb')
+const ethereum = require('../ethereum')
+const {settings} = require('../../settings')
+
+const init = async () => {
+
+  console.log(ethereum)
+
+  await indexedDb.init({version: settings.INDEXEDDB_VERSION})
+  await ethereum.init({provider: window.SUBBY_GLOBAL_SETTINGS.WEB3_PROVIDER})
+}
+
+export {init}
+
 export {
   setSettings,
   setSubscriptions,

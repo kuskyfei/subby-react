@@ -1,5 +1,5 @@
 const ethereum = require('../ethereum')
-const indexDb = require('../indexDb')
+const indexedDb = require('../indexedDb')
 const cache = require('./cache')
 const {mergeSubscriptionsLoggedInSubscriptions, mergeSubscriptions, filterSubscriptions, formatSubscriptions} = require('./util')
 
@@ -9,13 +9,16 @@ const getAddress = async () => {
 }
 
 const getProfile = async ({username, address}) => {
-  let profile = await indexDb.getProfileCache({username, address})
+  let profile = await indexedDb.getProfileCache({username, address})
 
   // if cache is empty or expired, fetch from ethereum
   // and set the cache
   if (!profile || await cache.profileCacheIsExpired()) {
     profile = await ethereum.getProfile({username, address})
-    indexDb.setProfileCache(profile)
+
+    console.log(indexedDb)
+
+    indexedDb.setProfileCache(profile)
   }
 
   return profile
@@ -24,15 +27,15 @@ const getProfile = async ({username, address}) => {
 // this will need a lot of testing to make sure the 3 lists of subscribtions don't
 // overwrite each other in the wrong way
 const getSubscriptions = async ({username, address}) => {
-  let loggedInSubscriptions = await indexDb.getLoggedInSubscriptionsCache({username, address})
-  const loggedOutSubscriptions = await indexDb.getLoggedOutSubscriptions()
+  let loggedInSubscriptions = await indexedDb.getLoggedInSubscriptionsCache({username, address})
+  const loggedOutSubscriptions = await indexedDb.getLoggedOutSubscriptions()
 
   if (await cache.loggedInSubscriptionsCacheIsExpired()) {
     const ethereumSubscriptions = await ethereum.getSubscriptions({username, address})
     loggedInSubscriptions = mergeSubscriptionsLoggedInSubscriptions({ethereumSubscriptions, loggedInSubscriptions})
 
-    // indexDbLoggedInSubscriptions have a "muted" status which the ethereumSubscriptions should not overwrite
-    await indexDb.setLoggedInSubscriptionsCache(loggedInSubscriptions)
+    // indexedDbLoggedInSubscriptions have a "muted" status which the ethereumSubscriptions should not overwrite
+    await indexedDb.setLoggedInSubscriptionsCache({username, address, loggedInSubscriptions})
   }
 
   const subscriptions = mergeSubscriptions({loggedInSubscriptions, loggedOutSubscriptions})
@@ -41,7 +44,7 @@ const getSubscriptions = async ({username, address}) => {
 }
 
 const getSettings = async () => {
-  return indexDb.getSettings()
+  return indexedDb.getSettings()
 }
 
 const getFeed = async ({subscriptions, startAt, count, beforeTimestamp, afterTimestamp, cursor}) => {
@@ -57,7 +60,7 @@ const getFeed = async ({subscriptions, startAt, count, beforeTimestamp, afterTim
     addressSubscriptions
   }
 
-  let posts = await indexDb.getFeedCache(postQuery)
+  let posts = await indexedDb.getFeedCache(postQuery)
 
   if (await cache.feedCacheIsExpired()) {
     posts = await ethereum.getPosts(postQuery)
@@ -66,7 +69,7 @@ const getFeed = async ({subscriptions, startAt, count, beforeTimestamp, afterTim
   // if there is no more posts on ethereum,
   // there is no point in fetching more
   // or refilling the cache
-  if (!indexDb.hasMorePostsOnEthereum()) {
+  if (!indexedDb.hasMorePostsOnEthereum()) {
     return posts
   }
 
@@ -78,7 +81,7 @@ const getFeed = async ({subscriptions, startAt, count, beforeTimestamp, afterTim
   }
 
   if (cache.feedCacheNeedsMorePosts({startAt, count})) {
-    const cursor = indexDb.getLastFeedCacheCursor()
+    const cursor = indexedDb.getLastFeedCacheCursor()
     cache.addPostsToFeedCache({...postQuery, cursor})
   }
 

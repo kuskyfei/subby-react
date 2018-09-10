@@ -1,4 +1,6 @@
 export {
+  init,
+
   setSettings,
   setSubscriptions,
   subscribe,

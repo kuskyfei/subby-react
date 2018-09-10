@@ -1,17 +1,17 @@
 // const ethereum = require('../ethereum')
-const indexDb = require('../indexDb')
+const indexedDb = require('../indexedDb')
 
 const setSettings = async (settings) => {
-  await indexDb.setSettings(settings)
+  await indexedDb.setSettings(settings)
 }
 
 const subscribe = async ({username, address}) => {
 
 }
 
-const setSubscriptions = async ({loggedInSubscriptions, loggedOutSubscriptions}) => {
-  await indexDb.setLoggedInSubscriptionsCache(loggedInSubscriptions)
-  await indexDb.setLoggedOutSubscriptions(loggedOutSubscriptions)
+const setSubscriptions = async ({username, address, loggedInSubscriptions, loggedOutSubscriptions}) => {
+  await indexedDb.setLoggedInSubscriptionsCache({address, username, loggedInSubscriptions})
+  await indexedDb.setLoggedOutSubscriptions(loggedOutSubscriptions)
 }
 
 const tip = async ({username, address}) => {

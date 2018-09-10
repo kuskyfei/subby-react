@@ -32,11 +32,24 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle'
 import ContactSupportIcon from '@material-ui/icons/ContactSupport'
 import SettingsIcon from '@material-ui/icons/Settings'
 import ListIcon from '@material-ui/icons/List'
+import HomeIcon from '@material-ui/icons/Home'
+
+
+import {images} from '../../settings'
 
 // util
 const queryString = require('query-string')
 
 const styles = theme => ({
+
+  logo: {
+    height: 55,
+    minWidth: 70,
+    backgroundImage: `url(${images.logo})`,
+    backgroundSize: 'contain',
+    backgroundRepeat: 'no-repeat',
+    backgroundPositionY: 'center'
+  },
 
   publishButton: {
     margin: theme.spacing.unit
@@ -152,7 +165,7 @@ class Header extends React.Component {
               <Typography variant='title' color='inherit'>
                 <div id='header__logo'>
                   <Link to='?p=feed'>
-                    Subby
+                    <div className={classes.logo} />
                   </Link>
                 </div>
               </Typography>
@@ -214,6 +227,15 @@ class Header extends React.Component {
                   open={open}
                   onClose={this.handleClose}
                 >
+                  <Link className={classes.menuLink} to='?p=feed'>
+                    <MenuItem onClick={this.handleClose}>
+                      <ListItemIcon className={classes.icon}>
+                        <HomeIcon />
+                      </ListItemIcon>
+                      <ListItemText classes={{ primary: classes.primary }} inset primary='Home' />
+                    </MenuItem>
+                  </Link>
+
                   <Link className={classes.menuLink} to='?p=profile'>
                     <MenuItem onClick={this.handleClose}>
                       <ListItemIcon className={classes.icon}>

@@ -26,9 +26,17 @@ const settings = {
   FEED_CACHED_PREEMPTIVELY_COUNT: 500,
   MINIMUM_UNREAD_FEED_CACHED_COUNT: 200,
 
+  // The mock settings allow you to test Subby
+  // deterministically without depending on
+  // external apis. Thia should be set to false
+  // in production.
   MOCK_ETHEREUM: true,
-  MOCK_ETHEREUM_NETWORK_DELAY: 2000
+  MOCK_ETHEREUM_NETWORK_DELAY: 2000,
 
+  // IndexedDb is Chrome's local database that Subby
+  // uses to cache posts as well as store your subscriptions.
+  MOCK_INDEXEDDB: false,
+  INDEXEDDB_VERSION: 1
 }
 
 module.exports = settings

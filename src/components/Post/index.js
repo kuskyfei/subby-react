@@ -24,6 +24,18 @@ const Timeago = require('timeago.js')
 const timeago = Timeago()
 
 const styles = theme => ({
+
+  // this is to make the username have ellipsis when too long 
+  cardHeader: {
+    '& > div:nth-of-type(2)': {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
+    },
+    '& > div:nth-of-type(2) > span:nth-of-type(1)': {
+      display: 'inline-block',
+    },
+  },
+
   card: {
     marginTop: theme.spacing.unit * 3,
     marginBottom: theme.spacing.unit * 3,
@@ -74,6 +86,7 @@ class Post extends React.Component {
     return (
       <Card className={classes.card}>
         <CardHeader
+          className={classes.cardHeader}
           avatar={
             <Avatar src={post.thumbnail} className={classes.avatar}>
               {post.username.substring(0, 2)}

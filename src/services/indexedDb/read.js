@@ -1,3 +1,5 @@
+const db = require('./db')
+
 const getProfileCache = ({username, address}) => {
 
 }
@@ -42,7 +44,7 @@ const hasMorePostsOnEthereum = () => {
 
 }
 
-export {
+module.exports = {
   getProfileCache,
   getLoggedInSubscriptionsCache,
   getLoggedOutSubscriptions,
