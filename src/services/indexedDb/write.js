@@ -1,19 +1,30 @@
 import db from './db'
 
 const setProfileCache = async (profile) => {
+  profile.lastProfileCacheTimeStamp = Date.now()
 
-  const key = profile.username || profile.address
+  if (profile.username) {
+    const key = profile.username
+    const tx = await db // eslint-disable-line
+      .db
+      .transaction(['profiles'], 'readwrite')
+      .objectStore('profiles')
+      .put(profile, key)
+  }
 
-  const tx = await db
-    .db
-    .transaction(['profiles'], 'readwrite')
-    .objectStore('profiles')
-    .put(profile, key)
-
-  return tx.complete
+  if (profile.address) {
+    const key = profile.address
+    const tx = await db // eslint-disable-line
+      .db
+      .transaction(['profiles'], 'readwrite')
+      .objectStore('profiles')
+      .put(profile, key)
+  }
 }
 
 const setFeedCache = async ({posts, hasMorePostsOnEthereum, lastFeedCacheCursor}) => {
+  const cacheTimeStampKey = (!lastFeedCacheCursor) ? 'lastFeedCacheTimeStamp' : 'lastFeedCacheTimeStampUsingACursor'
+  const lastFeedCacheTimeStamp = Date.now()
 
   const tx = await db
     .db
@@ -22,44 +33,39 @@ const setFeedCache = async ({posts, hasMorePostsOnEthereum, lastFeedCacheCursor}
     .put(posts, 'posts')
     .put(hasMorePostsOnEthereum, 'hasMorePostsOnEthereum')
     .put(lastFeedCacheCursor, 'lastFeedCacheCursor')
+    .put(lastFeedCacheTimeStamp, cacheTimeStampKey)
 
   return tx.complete
 }
 
 const setLoggedInSubscriptionsCache = async ({address, username, loggedInSubscriptions}) => {
-
-  console.log({address, username, loggedInSubscriptions})
-
   if (!username) username = address
 
-  console.log({username, loggedInSubscriptions})
-
-  console.log(db)
-  console.log(db.db)
-  console.log(Object.keys(db))
+  const req = {
+    subscriptions: loggedInSubscriptions,
+    lastLoggedInSubscriptionsCacheTimeStamp: Date.now()
+  }
 
   const tx = await db
     .db
     .transaction(['loggedInSubscriptions'], 'readwrite')
     .objectStore('loggedInSubscriptions')
-    .put(loggedInSubscriptions, username)
+    .put(req, username)
 
   return tx.complete
 }
 
 const setLoggedOutSubscriptions = async (loggedOutSubscriptions) => {
-
   const tx = await db
     .db
     .transaction(['loggedOutSubscriptions'], 'readwrite')
     .objectStore('loggedOutSubscriptions')
-    .put(loggedInSubscriptions, 'subscriptions')
+    .put(loggedOutSubscriptions, 'subscriptions')
 
   return tx.complete
 }
 
 const setSettings = async (settings) => {
-
   const tx = await db
     .db
     .transaction(['settings'], 'readwrite')

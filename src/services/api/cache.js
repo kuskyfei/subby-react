@@ -8,7 +8,7 @@ const feedCacheTime = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_TIME
 const minimumUnreadFeedCachedCount = window.SUBBY_GLOBAL_SETTINGS.MINIMUM_UNREAD_FEED_CACHED_COUNT
 
 const updateCache = async () => {
-  if (await indexedDb.profileCacheIsExpired()) {
+  if (await profileCacheIsExpired()) {
     await updateProfileCache()
   }
   if (await loggedInSubscriptionsCacheIsExpired()) {

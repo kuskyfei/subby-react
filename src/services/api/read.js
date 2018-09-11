@@ -16,8 +16,6 @@ const getProfile = async ({username, address}) => {
   if (!profile || await cache.profileCacheIsExpired()) {
     profile = await ethereum.getProfile({username, address})
 
-    console.log(indexedDb)
-
     indexedDb.setProfileCache(profile)
   }
 

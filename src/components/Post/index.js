@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import {Link} from 'react-router-dom'
 import { withStyles } from '@material-ui/core/styles'
 import classnames from 'classnames'
@@ -25,15 +24,15 @@ const timeago = Timeago()
 
 const styles = theme => ({
 
-  // this is to make the username have ellipsis when too long 
+  // this is to make the username have ellipsis when too long
   cardHeader: {
     '& > div:nth-of-type(2)': {
       overflow: 'hidden',
       textOverflow: 'ellipsis'
     },
     '& > div:nth-of-type(2) > span:nth-of-type(1)': {
-      display: 'inline-block',
-    },
+      display: 'inline-block'
+    }
   },
 
   card: {
@@ -72,11 +71,11 @@ const styles = theme => ({
 })
 
 class Post extends React.Component {
-  state = { expanded: false };
+  state = { expanded: false }
 
   handleExpandClick = () => {
     this.setState(state => ({ expanded: !state.expanded }))
-  };
+  }
 
   render () {
     let {classes, post, loading} = this.props
@@ -141,9 +140,5 @@ const LoadingCard = (props) =>
     <Loading />
 
   </Card>
-
-Post.propTypes = {
-  post: PropTypes.object.isRequired
-}
 
 export default withStyles(styles)(Post)

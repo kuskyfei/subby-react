@@ -43,6 +43,11 @@ ipfs card
   - manage/import/export your subscribtions ----> /manage
   - new post
 
+long term todos:
+
+creates indexer
+make ledger nano interface
+
 ##code for db
 
 ## username rules

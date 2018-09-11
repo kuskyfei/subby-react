@@ -139,7 +139,7 @@ const __private__ = {
 
 /* usage:
   onCategoryPost('category', (post) => {
-    console.log(post)
+    doSomething(post)
   })
 */
 const onCategoryPost = async (category, cb) => {

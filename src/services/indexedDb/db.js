@@ -1,3 +1,39 @@
+/* database schema
+
+  - profiles // object store
+    - usernameOrAddress
+      - username
+      - thumbnail
+      - bio
+      - subscriberCount
+      - subscribtionCount
+      - tipCount
+      - lastProfileCacheTimeStamp
+    - usernameOrAddress2
+    - etc...
+  - feed // object store
+    - posts
+      - post1
+      - post2
+      - etc...
+    - hasMorePostsOnEthereum
+    - lastFeedCacheCursor
+    - lastFeedCacheTimeStamp
+  - loggedInSubscriptions // object store
+    - usernameOrAddress
+      - subscriptions
+        - subscription1
+        - subscription2
+        - etc...
+      - lastLoggedInSubscriptionsCacheTimeStamp
+  - loggedOutSubscriptions // object store
+    - subscription1
+    - subscription2
+    - etc....
+  - settings // object store
+
+*/
+
 const idb = require('idb')
 
 const state = {}
@@ -25,38 +61,3 @@ let init = async ({version}) => {
 state.init = init
 
 export default state
-
-/*
-object stores
-
-- profiles // object store
-	- usernameOrAddress
-		- username
-		- thumbnail
-		- bio
-		- subscriberCount
-		- subscribtionCount
-		- tipCount
-		- lastProfileCacheTimeStamp
-	- usernameOrAddress2
-	- etc...
-- feed // object store
-  - posts
-  	- post1
-  	- post2
-  	- etc...
-  - hasMorePostsOnEthereum
-  - lastFeedCacheCursor
-- loggedInSubscriptions // object store
-  - usernameOrAddress
-  	- subscriptions
-    	- subscription1
-    	- subscription2
-    	- etc...
-		- lastLoggedInSubscriptionsCacheTimeStamp
-- loggedOutSubscriptions // object store
-  - subscription1
-  - subscription2
-  - etc....
-- settings // object store
-*/

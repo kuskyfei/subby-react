@@ -34,7 +34,6 @@ import SettingsIcon from '@material-ui/icons/Settings'
 import ListIcon from '@material-ui/icons/List'
 import HomeIcon from '@material-ui/icons/Home'
 
-
 import {images} from '../../settings'
 
 // util

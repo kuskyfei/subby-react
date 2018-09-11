@@ -1,14 +1,10 @@
-/* eslint-disable */
-
 // react redux
 import React, { Component } from 'react'
-import {Switch, Route, withRouter, Link} from 'react-router-dom'
+import {withRouter} from 'react-router-dom'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import PropTypes from 'prop-types'
 
 // material
-import withStyles from '@material-ui/core/styles/withStyles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 
 // components
@@ -18,76 +14,64 @@ import {Feed} from '../../containers'
 // actions
 import actions from './reducers/actions'
 
+// css
+import './App.css'
+
 // apis
 const services = require('../../services')
 
 // util
 const queryString = require('query-string')
 const {isRouteChange} = require('../util')
-
-// css
-import './App.css'
+const debug = require('debug')('containers:App')
 
 class App extends Component {
-  
   state = {route: Home}
 
-  componentDidMount() {
-
-    ;(async() => {
-
+  componentDidMount () {
+    ;(async () => {
       await services.init()
 
-      const settings = await services.getSettings()
+      // const settings = await services.getSettings()
 
       const address = await services.getAddress()
       const profile = await services.getProfile({address})
       const subscriptions = await services.getSubscriptions({address})
-
-      console.log(this.props)
 
       const {setAddress, setProfile, setSubscriptions} = this.props.actions
       setAddress(address)
       setProfile(profile)
       setSubscriptions(subscriptions)
 
-      console.log('address', address)
-      console.log('profile', profile)
-      console.log('subscriptions', subscriptions)
-
       this.handleRouteChange()
 
-      console.log('mounted')
+      debug('props', this.props)
+      debug('address', address)
+      debug('profile', profile)
+      debug('subscriptions', subscriptions)
+      debug('mounted')
     })()
-
-    const urlParams = queryString.parse(this.props.location.search)
-    console.log('url params')
-    console.log(urlParams)
   }
 
-  componentDidUpdate(prevProps) {
-
-    console.log('updated')
-
+  componentDidUpdate (prevProps) {
     this.handleRouteChange(prevProps)
 
-    const urlParams = queryString.parse(this.props.location.search)
-    console.log('url params')
-    console.log(urlParams)
+    debug('updated')
   }
 
-  handleRouteChange(prevProps) {
-    
+  handleRouteChange (prevProps) {
     if (!isRouteChange(this.props, prevProps)) {
       return
     }
     const urlParams = queryString.parse(this.props.location.search)
     const Route = getRouteFromUrlParams(urlParams)
     this.setState({...this.state, route: Route})
+
+    debug('urlParams', urlParams)
+    debug('route changed')
   }
 
   render () {
-
     const Route = this.state.route
 
     return (
@@ -113,7 +97,6 @@ class App extends Component {
 const Home = () => ''
 
 const getRouteFromUrlParams = (urlParams) => {
-
   const page = urlParams.p
 
   switch (page) {
