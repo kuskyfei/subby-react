@@ -19,6 +19,10 @@ const EmbedWidget = (props) => {
 }
 
 const getWidgetFromUrl = (url) => {
+  if (!url) {
+    return () => <div />
+  }
+
   if (isImage(url)) {
     return Image
   }

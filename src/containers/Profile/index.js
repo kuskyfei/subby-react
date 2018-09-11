@@ -20,8 +20,6 @@ const services = require('../../services')
 // util
 const {getPercentScrolled} = require('./util')
 const debug = require('debug')('containers:Feed')
-const queryString = require('query-string')
-const {isValidAddress} = require('../util')
 
 const day = 1000 * 60 * 60 * 24
 const PERCERT_SCROLL_TO_ADD_MORE_POST = 50
@@ -116,6 +114,8 @@ class Feed extends React.Component {
 
     return (
       <div className={classes.layout}>
+
+        <Profile />
 
         {posts}
 

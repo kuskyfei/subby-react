@@ -6,13 +6,15 @@ const ms = require('ms')
 const {sortBy} = require('lodash')
 const {networkDelayMock} = require('./util')
 
+const debug = require('debug')('services:ethereum:mock:read')
+
 const getAddress = async () => {
-  // await networkDelayMock()
+  debug('getAddress')
   return '0x' + fake('test').finance.ethereumAddress()
 }
 
 const getProfile = async ({username, address}) => {
-  // await networkDelayMock()
+  debug('getProfile', {username, address})
 
   let seed = address
 
@@ -37,7 +39,7 @@ const getProfile = async ({username, address}) => {
 }
 
 const getSubscriptions = async ({username, address}) => {
-  // await networkDelayMock()
+  debug('getSubscriptions', {username, address})
 
   // if username is set, then address is ignored
   // completely and overwriten by the username's
@@ -65,6 +67,8 @@ const getSubscriptions = async ({username, address}) => {
 
 // this needs to be edited to match the new getPosts algorithm
 const getPosts = async ({userSubscriptions, addressSubscriptions, startAt, count, cursor, beforeTimestamp, afterTimestamp}) => {
+  debug('getPosts', {userSubscriptions, addressSubscriptions, startAt, count, cursor, beforeTimestamp, afterTimestamp})
+
   await networkDelayMock()
 
   const posts = []
@@ -121,7 +125,6 @@ const getMockPosts = (seed) => {
     const post = {
       link: urlsArrays[type][i],
       comment: fake(seed + counter).lorem.sentence(),
-      category: fake(seed + counter).lorem.word(),
       timestamp: Math.round(Date.now() - ms('30 days') * randomNumber),
       username: seed,
       thumbnail: urls.imageUrls[fake(seed).random.number() % (urls.imageUrls.length - 1)]
@@ -137,26 +140,10 @@ const __private__ = {
   getMockPosts: getMockPosts
 }
 
-/* usage:
-  onCategoryPost('category', (post) => {
-    doSomething(post)
-  })
-*/
-const onCategoryPost = async (category, cb) => {
-  await networkDelayMock()
-
-  const posts = getMockPosts(category)
-
-  for (const post of posts) {
-    cb(post)
-  }
-}
-
 export {
   __private__,
   getAddress,
   getProfile,
   getSubscriptions,
-  getPosts,
-  onCategoryPost
+  getPosts
 }

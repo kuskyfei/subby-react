@@ -1,4 +1,23 @@
+## How to debug
 
+Subby has a few global variables attached to the window object:
+
+1. SUBBY_GLOBAL_SETTINGS
+// tells you the public global variables
+
+2. SUBBY_DEBUG_INDEXEDDB()
+// tells you the entire content of indexedDb variable
+
+Subby uses the debug npm module to log information to the console. To use it, type one of these options in the Chrome console:
+
+```
+localStorage.debug = 'indexedDb:*'
+localStorage.debug = 'indexedDb:read'
+localStorage.debug = 'indexedDb:write'
+localStorage.debug = 'containers:*'
+localStorage.debug = 'containers:App'
+localStorage.debug = 'containers:Feed'
+```
 
 ##todo
 
@@ -9,6 +28,7 @@ video card
 audio card
 ipfs card
 
+- setFeedCache needs to b updated when final get Post design is decided
 - get indexdb working in browser
 - get indexDb working in jest
 

@@ -87,9 +87,11 @@ class Post extends React.Component {
         <CardHeader
           className={classes.cardHeader}
           avatar={
-            <Avatar src={post.thumbnail} className={classes.avatar}>
-              {post.username.substring(0, 2)}
-            </Avatar>
+            <Link to={'?u=' + post.username}>
+              <Avatar src={post.thumbnail} className={classes.avatar}>
+                {post.username.substring(0, 2)}
+              </Avatar>
+            </Link>
           }
           action={
             <IconButton>

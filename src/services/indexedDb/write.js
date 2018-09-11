@@ -1,6 +1,10 @@
 import db from './db'
 
+const debug = require('debug')('services:indexedDb:write')
+
 const setProfileCache = async (profile) => {
+  debug('setProfileCache', profile)
+
   profile.lastProfileCacheTimeStamp = Date.now()
 
   if (profile.username) {
@@ -12,7 +16,7 @@ const setProfileCache = async (profile) => {
       .put(profile, key)
   }
 
-  if (profile.address) {
+  if (profile.address) {    
     const key = profile.address
     const tx = await db // eslint-disable-line
       .db
@@ -22,23 +26,31 @@ const setProfileCache = async (profile) => {
   }
 }
 
+// this needs to be updated when the final cursor design is decided
 const setFeedCache = async ({posts, hasMorePostsOnEthereum, lastFeedCacheCursor}) => {
+  debug('setFeedCache', {posts, hasMorePostsOnEthereum, lastFeedCacheCursor})
+
   const cacheTimeStampKey = (!lastFeedCacheCursor) ? 'lastFeedCacheTimeStamp' : 'lastFeedCacheTimeStampUsingACursor'
   const lastFeedCacheTimeStamp = Date.now()
 
-  const tx = await db
+  const tx = db
     .db
     .transaction(['feed'], 'readwrite')
     .objectStore('feed')
-    .put(posts, 'posts')
-    .put(hasMorePostsOnEthereum, 'hasMorePostsOnEthereum')
-    .put(lastFeedCacheCursor, 'lastFeedCacheCursor')
-    .put(lastFeedCacheTimeStamp, cacheTimeStampKey)
+
+  tx.put(posts, 'posts')
+  tx.put(hasMorePostsOnEthereum, 'hasMorePostsOnEthereum')
+  tx.put(lastFeedCacheCursor, 'lastFeedCacheCursor')
+  tx.put(lastFeedCacheTimeStamp, cacheTimeStampKey)
+
+  await tx
 
   return tx.complete
 }
 
 const setLoggedInSubscriptionsCache = async ({address, username, loggedInSubscriptions}) => {
+  debug('setLoggedInSubscriptionsCache', {address, username, loggedInSubscriptions})
+
   if (!username) username = address
 
   const req = {
@@ -56,6 +68,8 @@ const setLoggedInSubscriptionsCache = async ({address, username, loggedInSubscri
 }
 
 const setLoggedOutSubscriptions = async (loggedOutSubscriptions) => {
+  debug('setLoggedOutSubscriptions', loggedOutSubscriptions)
+
   const tx = await db
     .db
     .transaction(['loggedOutSubscriptions'], 'readwrite')
@@ -66,6 +80,8 @@ const setLoggedOutSubscriptions = async (loggedOutSubscriptions) => {
 }
 
 const setSettings = async (settings) => {
+  debug('setSettings', settings)
+
   const tx = await db
     .db
     .transaction(['settings'], 'readwrite')

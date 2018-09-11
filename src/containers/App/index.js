@@ -9,7 +9,7 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 
 // components
 import {Header, Footer} from '../../components'
-import {Feed} from '../../containers'
+import {Feed, Profile, Permalink} from '../../containers'
 
 // actions
 import actions from './reducers/actions'
@@ -42,6 +42,10 @@ class App extends Component {
       setAddress(address)
       setProfile(profile)
       setSubscriptions(subscriptions)
+
+      setInterval(() => 
+        services.updateCache({address})
+      , 10000)
 
       this.handleRouteChange()
 
@@ -98,10 +102,29 @@ const Home = () => ''
 
 const getRouteFromUrlParams = (urlParams) => {
   const page = urlParams.p
+  const isPermalink = urlParams.u && urlParams.id
+  const isProfile = urlParams.u
+
+  if (isPermalink) {
+    return Permalink
+  }
+
+  if (isProfile) {
+    return Profile
+  }
 
   switch (page) {
     case 'feed':
       return Feed
+
+    case 'subscriptions':
+      return Home
+
+    case 'settings':
+      return Home
+
+    case 'profile':
+      return Home
 
     default:
       return Home

@@ -4,8 +4,7 @@ export {
   getAddress,
   getProfile,
   getSubscriptions,
-  getPosts,
-  onCategoryPost
+  getPosts
 } from './read'
 
 export {init}

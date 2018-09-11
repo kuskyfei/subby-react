@@ -1,5 +1,5 @@
-
 import React from 'react'
+import Loading from './Loading'
 
 const Facebook = (props) => {
   const type = getType(props.url)
@@ -7,6 +7,7 @@ const Facebook = (props) => {
   return (
     <div className='card__white-border-1px'>
       <div className='embed-container'>
+        <Loading />
         <iframe src={`https://www.facebook.com/plugins/${type}.php?href=${props.url}`} scrolling='no' frameBorder='0' allow='encrypted-media' allowFullScreen='true' />
       </div>
     </div>
