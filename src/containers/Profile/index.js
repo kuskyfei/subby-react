@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
-import {Post, Profile} from '../../components'
+import {Post, ProfileHeader} from '../../components'
 
 // actions
 import actions from './reducers/actions'
@@ -19,7 +19,9 @@ const services = require('../../services')
 
 // util
 const {getPercentScrolled} = require('./util')
-const debug = require('debug')('containers:Feed')
+const {isValidAddress} = require('../util')
+const queryString = require('query-string')
+const debug = require('debug')('containers:Profile')
 
 const day = 1000 * 60 * 60 * 24
 const PERCERT_SCROLL_TO_ADD_MORE_POST = 50
@@ -38,14 +40,31 @@ const styles = theme => ({
   }
 })
 
-class Feed extends React.Component {
-  state = {addingMorePosts: false}
+class Profile extends React.Component {
+  state = {
+    addingMorePosts: false,
+    profile: {},
+    feed: []
+  }
 
   componentDidMount () {
     window.addEventListener('scroll', this.handleScroll.bind(this))
 
     ;(async () => {
       await this.addMorePosts()
+    })()
+
+    ;(async () => {
+      console.log(this.props)
+      console.log(this.props.location)
+
+      const {u} = queryString.parse(this.props.location.search)
+      const profileQuery = isValidAddress(u) ? {address: u} : {username: u}
+      const profile = await services.getProfile(profileQuery)
+
+      console.log(profile)
+
+      this.setState({...this.state, profile})
     })()
 
     debug('props', this.props)
@@ -83,19 +102,23 @@ class Feed extends React.Component {
     }
     this.setState({...this.state, addingMorePosts: true})
 
-    const startAt = this.props.feed.length
+    const {u} = queryString.parse(this.props.location.search)
+    const address = isValidAddress(u) ? u : null
+    const username = isValidAddress(u) ? null : u
+
+    const startAt = this.state.feed.length
     const postQuery = {
-      subscriptions: this.props.subscriptions,
+      userSubscriptions: [address],
+      addressSubscriptions: [username],
       startAt,
       count: 5,
       beforeTimestamp: Date.now(),
       afterTimestamp: Date.now() - 7 * day
     }
 
-    const newPosts = await services.getFeed(postQuery)
-    const feed = this.props.feed
-    const {setFeed} = this.props.actions
-    setFeed([...feed, ...newPosts])
+    const newPosts = await services.getPosts(postQuery)
+    const feed = [...this.state.feed, ...newPosts]
+    this.setState({...this.state, feed})
 
     this.setState({...this.state, addingMorePosts: false})
 
@@ -105,28 +128,34 @@ class Feed extends React.Component {
   }
 
   render () {
-    const { classes, feed } = this.props
+    const {classes} = this.props
+    const {profile, addingMorePosts, feed} = this.state
 
     const posts = []
     for (const post of feed) {
+      if (!post) continue
+
+      post.username = profile.username
+      post.address = profile.address
+      post.thumbnail = profile.thumbnail
       posts.push(<Post key={JSON.stringify(post)} post={post} />)
     }
 
     return (
       <div className={classes.layout}>
 
-        <Profile />
+        {profile && <ProfileHeader profile={profile} />}
 
         {posts}
 
-        {this.state.addingMorePosts ? <Post loading /> : ''}
+        {addingMorePosts && <Post loading />}
 
       </div>
     )
   }
 }
 
-Feed.propTypes = {
+Profile.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
@@ -138,4 +167,4 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch)
 })
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Feed))) // eslint-disable-line
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Profile))) // eslint-disable-line

@@ -16,7 +16,7 @@ const setProfileCache = async (profile) => {
       .put(profile, key)
   }
 
-  if (profile.address) {    
+  if (profile.address) {
     const key = profile.address
     const tx = await db // eslint-disable-line
       .db

@@ -1,0 +1,6 @@
+const actions = {
+  SET_SETTINGS_TO_INITIAL_STATE: 'SET_SETTINGS_TO_INITIAL_STATE',
+  SET_SETTINGS: 'SET_SETTINGS'
+}
+
+export default actions

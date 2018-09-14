@@ -22,7 +22,8 @@ export {
   getProfile,
   getSubscriptions,
   getSettings,
-  getFeed
+  getFeed,
+  getPosts
 } from './read'
 
 export {

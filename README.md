@@ -28,10 +28,16 @@ video card
 audio card
 ipfs card
 
+- make home page
+- make settings page
+- make profile edit page 
+
+- fix user profile cache and reducers
 - setFeedCache needs to b updated when final get Post design is decided
 - get indexdb working in browser
 - get indexDb working in jest
 
+- add mute / unsub option to posts
 - add warning to use chrome
 - add translations
 - react-helmet for SEO and social media shares
@@ -42,7 +48,7 @@ ipfs card
 - add torrent card
 - add video and audio card (direct link to file)
 - do redux stuff
-- make profile page
+- make edit profile page (some kind of hover if you own the profile)
 - make subscribtions page
 - make settings page
 - add tests for navigation and footer

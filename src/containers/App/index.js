@@ -8,8 +8,8 @@ import { bindActionCreators } from 'redux'
 import CssBaseline from '@material-ui/core/CssBaseline'
 
 // components
-import {Header, Footer} from '../../components'
-import {Feed, Profile, Permalink} from '../../containers'
+import {Header} from '../../components'
+import {Feed, Profile, Permalink, Subscriptions, Settings, About} from '../../containers'
 
 // actions
 import actions from './reducers/actions'
@@ -43,9 +43,9 @@ class App extends Component {
       setProfile(profile)
       setSubscriptions(subscriptions)
 
-      setInterval(() => 
+      setInterval(() =>
         services.updateCache({address})
-      , 10000)
+        , 10000)
 
       this.handleRouteChange()
 
@@ -91,8 +91,6 @@ class App extends Component {
 
         </main>
 
-        <Footer />
-
       </div>
     )
   }
@@ -118,16 +116,16 @@ const getRouteFromUrlParams = (urlParams) => {
       return Feed
 
     case 'subscriptions':
-      return Home
+      return Subscriptions
 
     case 'settings':
-      return Home
+      return Settings
 
     case 'profile':
-      return Home
+      return Profile
 
     default:
-      return Home
+      return About
   }
 }
 

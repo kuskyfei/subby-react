@@ -82,6 +82,8 @@ class Post extends React.Component {
 
     if (loading) return <LoadingCard classes={classes} />
 
+    if (!post.username) post.username = post.address
+
     return (
       <Card className={classes.card}>
         <CardHeader

@@ -4,12 +4,12 @@ const initialState = []
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case A.SET_FEED_TO_INITIAL_STATE:
+    case A.SET_SUBSCRIPTIONS_TO_INITIAL_STATE:
       return [
         ...initialState
       ]
 
-    case A.SET_FEED:
+    case A.SET_SUBSCRIPTIONS:
       return [
         ...action.payload
       ]

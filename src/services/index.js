@@ -12,6 +12,7 @@ export {
   getSubscriptions,
   getSettings,
   getFeed,
+  getPosts,
 
   updateCache
 } from './api'

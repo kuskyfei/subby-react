@@ -117,10 +117,13 @@ const getFeed = async ({subscriptions, startAt, count, beforeTimestamp, afterTim
   return posts
 }
 
+const getPosts = ethereum.getPosts
+
 export {
   getAddress,
   getProfile,
   getSubscriptions,
   getSettings,
-  getFeed
+  getFeed,
+  getPosts
 }

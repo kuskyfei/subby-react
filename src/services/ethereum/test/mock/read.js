@@ -28,13 +28,25 @@ const getProfile = async ({username, address}) => {
 
   const profile = {
     username: username || fake(seed).internet.userName(),
-    thumbail: urls.imageUrls[fake(seed).random.number() % (urls.imageUrls.length - 1)],
+    thumbnail: urls.imageUrls[fake(seed).random.number() % (urls.imageUrls.length - 1)],
     bio: fake(seed).lorem.paragraph() + ' ' + fake(seed).internet.domainName(),
     subscriberCount: fake(seed).random.number(),
     subscriptionCount: fake(seed + 1).random.number(),
     tipCount: fake(seed + 2).random.number(),
     address: address
   }
+
+  // remove some parts of the profiles randomly
+  if (fake(seed).random.number() % 10 < 5) {
+    profile.subscriberCount = null
+  }
+  if (!username && fake(seed + 1).random.number() % 10 < 5) {
+    profile.username = null
+  }
+  if (!username && fake(seed + 2).random.number() % 10 < 5) {
+    profile.bio = null
+  }
+
   return profile
 }
 

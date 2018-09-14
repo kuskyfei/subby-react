@@ -1,7 +1,5 @@
 // react
 import React from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
@@ -9,21 +7,15 @@ import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
-import {Post, Profile} from '../../components'
-
-// actions
-import actions from './reducers/actions'
+import {Post, ProfileHeader} from '../../components'
 
 // api
 const services = require('../../services')
 
 // util
-const {getPercentScrolled} = require('./util')
-const debug = require('debug')('containers:Feed')
+const debug = require('debug')('containers:Permalink')
 
 const day = 1000 * 60 * 60 * 24
-const PERCERT_SCROLL_TO_ADD_MORE_POST = 50
-const MINIMUM_POSTS_LEFT_TO_ADD_MORE_POST = 20
 
 const styles = theme => ({
   layout: {
@@ -38,12 +30,10 @@ const styles = theme => ({
   }
 })
 
-class Feed extends React.Component {
+class Permalink extends React.Component {
   state = {addingMorePosts: false}
 
   componentDidMount () {
-    window.addEventListener('scroll', this.handleScroll.bind(this))
-
     ;(async () => {
       await this.addMorePosts()
     })()
@@ -54,27 +44,6 @@ class Feed extends React.Component {
 
   componentDidUpdate (prevProps) {
     debug('updated')
-  }
-
-  componentWillUnmount () {
-    window.removeEventListener('scroll', this.handleScroll.bind(this))
-  }
-
-  async handleScroll (event) {
-    const percentScrolled = getPercentScrolled()
-    const postCount = this.props.feed.length
-
-    if (postCount / 2 > MINIMUM_POSTS_LEFT_TO_ADD_MORE_POST) {
-      return
-    }
-
-    if (percentScrolled > PERCERT_SCROLL_TO_ADD_MORE_POST) {
-      await this.addMorePosts()
-
-      debug('post count', postCount)
-    }
-
-    debug('percent scrolled', percentScrolled)
   }
 
   async addMorePosts () {
@@ -115,7 +84,7 @@ class Feed extends React.Component {
     return (
       <div className={classes.layout}>
 
-        <Profile />
+        <ProfileHeader />
 
         {posts}
 
@@ -126,16 +95,8 @@ class Feed extends React.Component {
   }
 }
 
-Feed.propTypes = {
+Permalink.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-const mapStateToProps = state => ({
-  subscriptions: state.app.subscriptions,
-  feed: state.feed
-})
-const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(actions, dispatch)
-})
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Feed))) // eslint-disable-line
+export default withRouter(withStyles(styles)(Permalink)) // eslint-disable-line

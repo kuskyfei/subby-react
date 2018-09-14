@@ -32,8 +32,8 @@ describe('ethereum read mocks', () => {
     const profile = await getProfile({username: 'test'})
     const profile2 = await getProfile({address: 'test'})
 
-    const res = {'address': '0x0cd350b97786c48444611381b95b820222532311', 'bio': 'Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name', 'subscriberCount': 17157, 'subscriptionCount': 64310, 'thumbail': 'https://i.imgur.com/359os81.jpg', 'tipCount': 53119, 'username': 'test'}
-    const res2 = {'address': 'test', 'bio': 'Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name', 'subscriberCount': 17157, 'subscriptionCount': 64310, 'thumbail': 'https://i.imgur.com/359os81.jpg', 'tipCount': 53119, 'username': 'Celestine_OReilly99'}
+    const res = {'address': '0x0cd350b97786c48444611381b95b820222532311', 'bio': 'Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name', 'subscriberCount': 17157, 'subscriptionCount': 64310, 'thumbnail': 'https://i.imgur.com/359os81.jpg', 'tipCount': 53119, 'username': 'test'}
+    const res2 = {'address': 'test', 'bio': 'Facere cumque repellat omnis accusamus aut et est. Deserunt aut repudiandae dignissimos omnis in velit aut. Molestiae omnis nihil quis dolorum. celestine.name', 'subscriberCount': 17157, 'subscriptionCount': 64310, 'thumbnail': 'https://i.imgur.com/359os81.jpg', 'tipCount': 53119, 'username': 'Celestine_OReilly99'}
 
     expect(profile).toEqual(res)
     expect(profile2).toEqual(res2)

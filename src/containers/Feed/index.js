@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
-import {Post, Profile} from '../../components'
+import {Post} from '../../components'
 
 // actions
 import actions from './reducers/actions'
@@ -20,8 +20,6 @@ const services = require('../../services')
 // util
 const {getPercentScrolled} = require('./util')
 const debug = require('debug')('containers:Feed')
-const queryString = require('query-string')
-const {isValidAddress} = require('../util')
 
 const day = 1000 * 60 * 60 * 24
 const PERCERT_SCROLL_TO_ADD_MORE_POST = 50
