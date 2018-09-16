@@ -2,6 +2,10 @@ const isIpfsContent = (string = '') => {
   return !!string.match(/^ipfs:/)
 }
 
+const isTorrent = (string = '') => {
+  return !!string.match(/^magnet:/)
+}
+
 const getHash = (string) => {
 	const [protocol, hash] = string.split(':')
 	return hash
@@ -18,4 +22,4 @@ const downloadBlob = ({blob, fileName}) => {
     window.URL.revokeObjectURL(url)
 }
 
-module.exports = {isIpfsContent, getHash, downloadBlob}
+module.exports = {isIpfsContent, isTorrent, getHash, downloadBlob}

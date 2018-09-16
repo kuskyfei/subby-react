@@ -3,13 +3,13 @@ import React from 'react'
 
 // components
 import Card from '../../components/Card'
-import {Download} from './components'
+import {Download, Torrent} from './components'
 
 // api
 const services = require('../../services')
 
 // util
-const {isIpfsContent, getHash, downloadBlob} = require('./util')
+const {isIpfsContent, isTorrent, getHash, downloadBlob} = require('./util')
 const debug = require('debug')('containers:Post')
 
 class Post extends React.Component {
@@ -20,8 +20,12 @@ class Post extends React.Component {
   }
 
   componentDidMount = () => {
-    const {post} = this.props
-    this.handleIpfs()
+    const {post, isLoading} = this.props
+    if (isLoading) return
+
+    this.handleIpfsLink()
+    this.handleIpfsComment()
+    this.handleTorrent()
 
     debug('mounted')
   }
@@ -35,18 +39,54 @@ class Post extends React.Component {
     debug('unmount')
   }
 
-  handleIpfs = async () => {
+  handleTorrent = async () => {
     const {post} = this.props
+    if (!post.link) return
+
+    if (isTorrent(post.link)) {
+
+      const torrent = await services.getTorrent(post.link)
+
+      this.setState({
+        ...this.state,
+        link: (
+          <Torrent torrent={torrent} />
+        )
+      })
+
+      //console.log('torrent')
+      //console.log(torrent)
+      // this.setState({...this.state, comment: 'ipfs:loading'})
+
+      // const ipfsHash = getHash(post.comment)
+      // const string = await services.ipfs.getStringFromStream(ipfsHash, {maxLength: 10000}) // 1000 is an arbitrary small number to prevent too big IPFS files
+  
+      // this.setState({...this.state, comment: string})
+    }
+
+    debug('handleTorrent end')
+  }
+
+  handleIpfsComment = async () => {
+    const {post} = this.props
+    if (!post.comment) return
 
     if (isIpfsContent(post.comment)) {
       this.setState({...this.state, comment: 'ipfs:loading'})
 
       const ipfsHash = getHash(post.comment)
-      const string = await services.ipfs.getStringFromStream(ipfsHash, {maxLength: 1000}) // 1000 is an arbitrary small number to prevent too big IPFS files
+      const string = await services.ipfs.getStringFromStream(ipfsHash, {maxLength: 10000}) // 1000 is an arbitrary small number to prevent too big IPFS files
   
       this.setState({...this.state, comment: string})
     }
-/*
+
+    debug('handleIpfsComment end')
+  }
+
+  handleIpfsLink = async () => {
+    const {post} = this.props
+    if (!post.link) return
+
     if (isIpfsContent(post.link)) {
       this.setState({...this.state, link: 'ipfs:loading'})
 
@@ -92,8 +132,8 @@ class Post extends React.Component {
         })
       }
     }
-*/
-    debug('handleIpfs')
+
+    debug('handleIpfsLink end')
   }
 
   download = async ({ipfsHash, fileExtension}) => {
@@ -111,7 +151,7 @@ class Post extends React.Component {
           link: (
             <Download 
               download={this.download.bind(this, {ipfsHash, fileExtension})}
-              message={`${progressInMbs}mbs downloaded.`}
+              message={`${progressInMbs}mb downloaded.`}
               downloadMessage='Cancel'
             />
           ),

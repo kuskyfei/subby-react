@@ -11,6 +11,7 @@ input[placeholder] {
 a {
   color: unset;
   text-decoration: none;
+  cursor: pointer;
 }
 
 /* SOCIAL MEDIA EMBEDS */

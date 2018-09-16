@@ -15,6 +15,8 @@ export {
   getPosts,
 
   updateCache
-} from './api'
+} from './cache'
 
 export {default as ipfs} from './ipfs'
+
+export {getTorrent} from './torrent'

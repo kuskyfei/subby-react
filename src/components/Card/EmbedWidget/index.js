@@ -9,6 +9,7 @@ import Youtube from './Youtube'
 import Image from './Image'
 import Link from './Link'
 import Ipfs from './Ipfs'
+import Torrent from './Torrent'
 
 const {extractRootDomain} = require('./util')
 
@@ -30,6 +31,10 @@ const getWidgetFromUrl = (url) => {
 
   if (isIpfs(url)) {
     return Ipfs
+  }
+
+  if (isTorrent(url)) {
+    return Torrent
   }
 
   if (isImage(url)) {
@@ -83,6 +88,12 @@ const isImage = (url) => {
 
 const isIpfs = (url) => {
   if (url.match(/^ipfs:/)) {
+    return true
+  }
+}
+
+const isTorrent = (url) => {
+  if (url.match(/^magnet:/)) {
     return true
   }
 }

@@ -19,6 +19,9 @@ const styles = theme => ({
       width: 800,
       marginLeft: 'auto',
       marginRight: 'auto'
+    },
+    '& h1': {
+      marginBottom: '0.55em'
     }
   },
   title: {
@@ -123,6 +126,12 @@ class About extends React.Component {
           <Typography variant='display1' gutterBottom>
             <a href='https://subby.io/github' target='_blank'>Look at the code</a>
           </Typography>
+
+          {window.location.protocol !== 'file:' && 
+            <Typography variant='display1' gutterBottom>
+              <a href='https://subby.io/download' target='_blank'>Download</a>
+            </Typography>
+          }
         </div>
 
       </div>

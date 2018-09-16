@@ -1,7 +1,7 @@
 const ethereum = require('../ethereum')
 const indexedDb = require('../indexedDb')
 
-const debug = require('debug')('services:api:cache')
+const debug = require('debug')('services:cache:cache')
 
 const profileCacheTime = window.SUBBY_GLOBAL_SETTINGS.PROFILE_CACHE_TIME
 const lastLoggedSubscriptionsCacheTime = window.SUBBY_GLOBAL_SETTINGS.LOGGED_IN_SUBSCRIPTIONS_CACHE_TIME

@@ -12,7 +12,8 @@ const {
   concatTypedArrays,
   typedArrayToArrayBuffer,
   stringToIpfsBuffer,
-  bytesToMbs
+  bytesToMbs,
+  uint8ArrayToUtf8
 } = require('./util')
 
 const setProvider = (provider) => {
@@ -263,16 +264,14 @@ const getStringFromStream = async (hash, {maxLength}) => {
       }
 
       if (maxLength && entireBuffer.length > maxLength) {
+        resolve(uint8ArrayToUtf8(entireBuffer))
         s.pause()
         s.destroy()
       }
     })
 
     s.on('end', () => {
-      const utf8Decode = new window.TextDecoder('utf-8')
-      const string = utf8Decode.decode(entireBuffer)
-      
-      resolve(string)
+      resolve(uint8ArrayToUtf8(entireBuffer))
     })
   })
 }

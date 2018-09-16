@@ -65,6 +65,12 @@ const bytesToMbs = (number) => {
   return (number / 1048576).toFixed(2)
 }
 
+const uint8ArrayToUtf8 = (Uint8Array) => {
+  const utf8Decode = new window.TextDecoder('utf-8')
+  const string = utf8Decode.decode(Uint8Array)
+  return string
+}
+
 export {
   urlToProviderObject,
   objectToIpfsBuffer,
@@ -74,5 +80,6 @@ export {
   arrayBufferToBase64,
   concatTypedArrays,
   typedArrayToArrayBuffer,
-  bytesToMbs
+  bytesToMbs,
+  uint8ArrayToUtf8
 }

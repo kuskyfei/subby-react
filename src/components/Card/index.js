@@ -25,6 +25,8 @@ import Loading from './Loading'
 // util
 const timeago = require('timeago.js')()
 
+const MAX_COMMENT_LENGTH = 280
+
 const styles = theme => ({
 
   // this is to make the username have ellipsis when too long
@@ -113,7 +115,7 @@ class Card extends React.Component {
 
         <CardContent>
           <Typography className={classes.comment} component='p'>
-            {post.comment}
+            {formatComment(post.comment)}
           </Typography>
         </CardContent>
         <CardActions className={classes.actions} disableActionSpacing>
@@ -123,23 +125,38 @@ class Card extends React.Component {
           <IconButton aria-label='Share'>
             <ShareIcon />
           </IconButton>
-          <IconButton
-            className={classnames(classes.expand, {
-              [classes.expandOpen]: this.state.expanded
-            })}
-            onClick={this.handleExpandClick}
-            aria-expanded={this.state.expanded}
-            aria-label='Show more'
-          >
-            <ExpandMoreIcon />
-          </IconButton>
+
+          {isLongComment(post.comment) && 
+            <IconButton
+              className={classnames(classes.expand, {
+                [classes.expandOpen]: this.state.expanded
+              })}
+              onClick={this.handleExpandClick}
+              aria-expanded={this.state.expanded}
+              aria-label='Show more'
+            >
+              <ExpandMoreIcon />
+            </IconButton>
+          }
         </CardActions>
         <Collapse in={this.state.expanded} timeout='auto' unmountOnExit>
-          <CardContent />
+          <CardContent>
+            <Typography className={classes.comment} component='p'>
+              {isLongComment(post.comment) && post.comment}
+            </Typography>
+          </CardContent>
         </Collapse>
       </MaterialCard>
     )
   }
+}
+
+const isLongComment = (comment) => {
+  return comment.length > MAX_COMMENT_LENGTH
+}
+
+const formatComment = (comment) => {
+  return isLongComment(comment) ? comment.substring(0,MAX_COMMENT_LENGTH) + '...' : comment
 }
 
 const LoadingCard = (props) =>

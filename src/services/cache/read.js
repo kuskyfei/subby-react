@@ -2,7 +2,7 @@ const ethereum = require('../ethereum')
 const indexedDb = require('../indexedDb')
 const cache = require('./cache')
 const {mergeSubscriptionsLoggedInSubscriptions, mergeSubscriptions, filterSubscriptions, formatSubscriptions} = require('./util')
-const debug = require('debug')('services:api:read')
+const debug = require('debug')('services:cache:read')
 
 const getAddress = async () => {
   debug('getAddress')

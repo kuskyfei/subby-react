@@ -1,7 +1,7 @@
 // const ethereum = require('../ethereum')
 const indexedDb = require('../indexedDb')
 
-const debug = require('debug')('services:api:write')
+const debug = require('debug')('services:cache:write')
 
 const setSettings = async (settings) => {
   debug('setSettings', settings)

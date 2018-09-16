@@ -1,14 +1,16 @@
 const WebTorrent = require('webtorrent')
 const client = new WebTorrent()
+const debug = require('debug')('services:torrent')
 
-const getTorrent = (infoHash) => {
+const getTorrent = (magnetURI) => {
+  debug('getTorrent', magnetURI)
+
   return new Promise((resolve) => {
-    console.log(infoHash)
 
-    client.add(infoHash, (torrent) => {
-      console.log(torrent)
+    client.add(magnetURI, (torrent) => {
+      debug('torrent', torrent)
 
-      const {numPeers, infoHash, magnetURI} = torrent
+      const {numPeers, infoHash, magnetURI, length} = torrent
 
       const files = []
       for (const file of torrent.files) {
@@ -18,12 +20,14 @@ const getTorrent = (infoHash) => {
       const parsedTorrent = {
         name: getRoot(torrent.files[0].path),
         files,
-        numPeers,
+        peerCount: numPeers,
         infoHash,
-        magnetURI
+        magnet: magnetURI,
+        sizeInMbs: bytesToMbs(length)
       }
 
       resolve(parsedTorrent)
+      torrent.destroy()
     })
   })
 }
@@ -31,5 +35,11 @@ const getTorrent = (infoHash) => {
 const getRoot = (path) => {
   return path.match(/^[^/]+/)[0]
 }
+
+const bytesToMbs = (number) => {
+  const mb = 1048576
+  return (number / 1048576).toFixed(2)
+}
+
 
 export {getTorrent}
