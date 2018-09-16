@@ -60,6 +60,11 @@ const typedArrayToArrayBuffer = (typedArray) => {
   return [typedArray]
 }
 
+const bytesToMbs = (number) => {
+  const mb = 1048576
+  return (number / 1048576).toFixed(2)
+}
+
 export {
   urlToProviderObject,
   objectToIpfsBuffer,
@@ -68,5 +73,6 @@ export {
   noProvider,
   arrayBufferToBase64,
   concatTypedArrays,
-  typedArrayToArrayBuffer
+  typedArrayToArrayBuffer,
+  bytesToMbs
 }

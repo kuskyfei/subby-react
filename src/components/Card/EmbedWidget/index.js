@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import Facebook from './Facebook'
 import Instagram from './Instagram'
@@ -9,6 +8,7 @@ import Vimeo from './Vimeo'
 import Youtube from './Youtube'
 import Image from './Image'
 import Link from './Link'
+import Ipfs from './Ipfs'
 
 const {extractRootDomain} = require('./util')
 
@@ -19,8 +19,17 @@ const EmbedWidget = (props) => {
 }
 
 const getWidgetFromUrl = (url) => {
+
   if (!url) {
     return () => <div />
+  }
+
+  if (isReactElement(url)) {
+    return () => url
+  }
+
+  if (isIpfs(url)) {
+    return Ipfs
   }
 
   if (isImage(url)) {
@@ -53,10 +62,6 @@ const getWidgetFromUrl = (url) => {
   }
 }
 
-EmbedWidget.propTypes = {
-  url: PropTypes.string.isRequired
-}
-
 const getWidgetTypeFromUrl = (url) => {
   const domain = extractRootDomain(url)
   const type = domain.split('.')[0]
@@ -74,6 +79,16 @@ const isImage = (url) => {
   if (cleanUrl.match(/\.(jpg|jpeg|png|gif)$/)) {
     return true
   }
+}
+
+const isIpfs = (url) => {
+  if (url.match(/^ipfs:/)) {
+    return true
+  }
+}
+
+const isReactElement = (url) => {
+  return typeof url === 'object' && url.props
 }
 
 export default EmbedWidget

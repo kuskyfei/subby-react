@@ -19,6 +19,7 @@ import './App.css'
 
 // apis
 const services = require('../../services')
+window.SUBBY_DEBUG_SERVICES = services
 
 // util
 const queryString = require('query-string')
@@ -26,7 +27,7 @@ const {isRouteChange} = require('../util')
 const debug = require('debug')('containers:App')
 
 class App extends Component {
-  state = {route: Home}
+  state = {route: () => ''}
 
   componentDidMount () {
     ;(async () => {
@@ -43,9 +44,9 @@ class App extends Component {
       setProfile(profile)
       setSubscriptions(subscriptions)
 
-      setInterval(() =>
-        services.updateCache({address})
-        , 10000)
+      // setInterval(() =>
+      //   services.updateCache({address})
+      //   , 10000)
 
       this.handleRouteChange()
 
@@ -61,6 +62,10 @@ class App extends Component {
     this.handleRouteChange(prevProps)
 
     debug('updated')
+  }
+
+  componentWillUnmount = (prevProps) => {
+    debug('unmount')
   }
 
   handleRouteChange (prevProps) {
@@ -95,8 +100,6 @@ class App extends Component {
     )
   }
 }
-
-const Home = () => ''
 
 const getRouteFromUrlParams = (urlParams) => {
   const page = urlParams.p

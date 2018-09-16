@@ -61,7 +61,7 @@ const ProfileHeader = (props) => {
         {profile.username}
       </Typography>
       <Button size='small' variant='contained' color='default' className={classes.button}>
-        Subscribe&nbsp;<span className={classes.count}>{profile.subscriberCount}</span>
+        Subscribe&nbsp;<span className={classes.count}>{profile.subscriberCount || ''}</span>
       </Button>
       <Button size='small' variant='contained' color='default' className={classes.button}>
         Donate&nbsp;

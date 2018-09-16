@@ -9,7 +9,10 @@ import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
-import {Post, ProfileHeader} from '../../components'
+import {ProfileHeader} from '../../components'
+
+// containers
+import Post from '../Post'
 
 // actions
 import actions from './reducers/actions'
@@ -55,14 +58,9 @@ class Profile extends React.Component {
     })()
 
     ;(async () => {
-      console.log(this.props)
-      console.log(this.props.location)
-
       const {u} = queryString.parse(this.props.location.search)
       const profileQuery = isValidAddress(u) ? {address: u} : {username: u}
       const profile = await services.getProfile(profileQuery)
-
-      console.log(profile)
 
       this.setState({...this.state, profile})
     })()
@@ -138,6 +136,7 @@ class Profile extends React.Component {
       post.username = profile.username
       post.address = profile.address
       post.thumbnail = profile.thumbnail
+
       posts.push(<Post key={JSON.stringify(post)} post={post} />)
     }
 
@@ -148,7 +147,7 @@ class Profile extends React.Component {
 
         {posts}
 
-        {addingMorePosts && <Post loading />}
+        {addingMorePosts && <Post isLoading />}
 
       </div>
     )

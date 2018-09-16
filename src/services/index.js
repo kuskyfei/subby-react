@@ -16,3 +16,5 @@ export {
 
   updateCache
 } from './api'
+
+export {default as ipfs} from './ipfs'

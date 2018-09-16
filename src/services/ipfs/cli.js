@@ -3,7 +3,7 @@
 // to start. Then use ipfs.method in the
 // cli.
 
-const ipfs = require('./index')
+const ipfs = require('./index').default
 ipfs.setProvider('https://ipfs.infura.io:5001')
 
 // init CLI
@@ -31,5 +31,27 @@ some valid ipfs videos
 dog-loves-baby.mp4 QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV
 sleeping-dogs.mp4 QmWK3hDK8wDRgcTTiedXkWzEtj5aZpkqnYLWqXUMv6VhN9
 sleepy-dog.mp4 QmdbaL9CpPoJXHTSx9BxxkHAv9k1wcyzbdRLdKHPsPVfYs
+
+example of usage
+
+ipfs
+	.uploadFilePathWrappedWithDirectory(
+		'dog-loves-baby.mp4', 
+		'/Users/dave/Documents/git/subby-react/src/services/ipfs/test/mock/media/videos/dog-loves-baby.mp4'
+	)
+	.then(console.log)
+
+logs 
+
+[ { path: 'dog-loves-baby.mp4', // file name
+    hash: 'QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV',
+    size: 1119419 },
+  { path: '',
+    hash: 'QmZbp9u6yMDW94mfxTYe8hMaomBLr2NfckUhYf3J7ax7zM', // folder hash
+    size: 1119485 } ]
+
+use QmZbp9u6yMDW94mfxTYe8hMaomBLr2NfckUhYf3J7ax7zM/dog-loves-baby.mp4 to query it
+
+ipfs.getIpfs().ls('QmZbp9u6yMDW94mfxTYe8hMaomBLr2NfckUhYf3J7ax7zM').then(console.log) // does not work on infura
 
 */

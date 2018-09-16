@@ -7,15 +7,18 @@ import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
-import {Post, ProfileHeader} from '../../components'
+import {ProfileHeader} from '../../components'
+
+// containers
+import Post from '../Post'
 
 // api
 const services = require('../../services')
 
 // util
+const queryString = require('query-string')
+const {isValidAddress} = require('../util')
 const debug = require('debug')('containers:Permalink')
-
-const day = 1000 * 60 * 60 * 24
 
 const styles = theme => ({
   layout: {
@@ -31,11 +34,18 @@ const styles = theme => ({
 })
 
 class Permalink extends React.Component {
-  state = {addingMorePosts: false}
+  state = {
+    isLoading: false,
+    profile: {}
+  }
 
   componentDidMount () {
     ;(async () => {
-      await this.addMorePosts()
+      const {u} = queryString.parse(this.props.location.search)
+      const profileQuery = isValidAddress(u) ? {address: u} : {username: u}
+      const profile = await services.getProfile(profileQuery)
+
+      this.setState({...this.state, profile})
     })()
 
     debug('props', this.props)
@@ -46,49 +56,36 @@ class Permalink extends React.Component {
     debug('updated')
   }
 
-  async addMorePosts () {
-    if (this.state.addingMorePosts) {
-      return
-    }
-    this.setState({...this.state, addingMorePosts: true})
-
-    const startAt = this.props.feed.length
-    const postQuery = {
-      subscriptions: this.props.subscriptions,
-      startAt,
-      count: 5,
-      beforeTimestamp: Date.now(),
-      afterTimestamp: Date.now() - 7 * day
-    }
-
-    const newPosts = await services.getFeed(postQuery)
-    const feed = this.props.feed
-    const {setFeed} = this.props.actions
-    setFeed([...feed, ...newPosts])
-
-    this.setState({...this.state, addingMorePosts: false})
-
-    debug('added more posts')
-    debug('previous feed', feed)
-    debug('new posts', newPosts)
+  componentWillUnmount = (prevProps) => {
+    debug('unmount')
   }
 
   render () {
-    const { classes, feed } = this.props
+    const { classes } = this.props
+    const { isLoading, profile } = this.state
 
-    const posts = []
-    for (const post of feed) {
-      posts.push(<Post key={JSON.stringify(post)} post={post} />)
+    const {id} = queryString.parse(this.props.location.search)
+
+    const post = {
+      username: 'test',
+      address: '0x0000000000000000000000000000000000000000',
+      //comment: 'This is dope stuff',
+      comment: 'ipfs:QmX48d6q3YgSxZjUhoSziw47AcEuUAWN3BPfZtaNkUn6uj', // long string
+      link: 'ipfs:QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo', // image
+      // link: 'ipfs:QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV', // video
+      // link: 'ipfs:QmZbp9u6yMDW94mfxTYe8hMaomBLr2NfckUhYf3J7ax7zM/dog-loves-baby.mp4',
+      // link: 'ipfs:QmQ747r7eLfsVtBFBSRwfXsPK6tADJpQzJxz4uFdoZb9XJ', // big video
+      timestamp: Date.now()
     }
 
     return (
       <div className={classes.layout}>
 
-        <ProfileHeader />
+        {profile && <ProfileHeader profile={profile} />}
 
-        {posts}
+        <Post key={id} post={post} />
 
-        {this.state.addingMorePosts ? <Post loading /> : ''}
+        {isLoading && <Post loading />}
 
       </div>
     )

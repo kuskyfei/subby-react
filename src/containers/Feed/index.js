@@ -8,8 +8,8 @@ import PropTypes from 'prop-types'
 // material
 import withStyles from '@material-ui/core/styles/withStyles'
 
-// components
-import {Post} from '../../components'
+// containers
+import Post from '../Post'
 
 // actions
 import actions from './reducers/actions'
@@ -106,6 +106,7 @@ class Feed extends React.Component {
 
   render () {
     const { classes, feed } = this.props
+    const { addingMorePosts } = this.state
 
     const posts = []
     for (const post of feed) {
@@ -117,7 +118,7 @@ class Feed extends React.Component {
 
         {posts}
 
-        {this.state.addingMorePosts ? <Post loading /> : ''}
+        {addingMorePosts && <Post isLoading />}
 
       </div>
     )

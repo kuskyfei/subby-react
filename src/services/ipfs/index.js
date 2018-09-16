@@ -11,7 +11,8 @@ const {
   arrayBufferToBase64,
   concatTypedArrays,
   typedArrayToArrayBuffer,
-  stringToIpfsBuffer
+  stringToIpfsBuffer,
+  bytesToMbs
 } = require('./util')
 
 const setProvider = (provider) => {
@@ -113,7 +114,7 @@ const getFileTypeFromHash = (hash) => {
   })
 }
 
-const getBase64ImageFromStream = (hash) => {
+const getBase64ImageFromStream = (hash, progressCallback) => {
   if (!ipfs) noProvider()
   return new Promise(async resolve => {
     let entireBuffer
@@ -124,6 +125,17 @@ const getBase64ImageFromStream = (hash) => {
         entireBuffer = buffer
       } else {
         entireBuffer = concatTypedArrays(entireBuffer, buffer)
+      }
+
+      if (progressCallback) {
+        const progressResponse = {
+          killStream: () => {
+            s.pause()
+            s.destroy()
+          },
+          progressInMbs: bytesToMbs(entireBuffer.length)
+        }
+        progressCallback(progressResponse)
       }
     })
 
@@ -172,7 +184,7 @@ const getBlob = async (hash) => {
   return blob
 }
 
-const getBlobFromStream = async (hash) => {
+const getBlobFromStream = async (hash, progressCallback) => {
   if (!ipfs) noProvider()
 
   return new Promise(async resolve => {
@@ -185,6 +197,17 @@ const getBlobFromStream = async (hash) => {
         entireBuffer = buffer
       } else {
         entireBuffer = concatTypedArrays(entireBuffer, buffer)
+      }
+
+      if (progressCallback) {
+        const progressResponse = {
+          killStream: () => {
+            s.pause()
+            s.destroy()
+          },
+          progressInMbs: bytesToMbs(entireBuffer.length)
+        }
+        progressCallback(progressResponse)
       }
     })
 
@@ -211,10 +234,53 @@ const getJson = async (ipfsHash) => {
   return object
 }
 
+const getString = async (ipfsHash) => {
+  if (!ipfs) noProvider()
+
+  const res = await ipfs.get(ipfsHash)
+
+  const buffer = res[0].content
+
+  const utf8Decode = new window.TextDecoder('utf-8')
+  const string = utf8Decode.decode(buffer)
+
+  return string
+}
+
+const getStringFromStream = async (hash, {maxLength}) => {
+  if (!ipfs) noProvider()
+
+  return new Promise(async resolve => {
+    let entireBuffer
+
+    const s = await getReadableStream(hash)
+
+    s.on('data', buffer => {
+      if (!entireBuffer) {
+        entireBuffer = buffer
+      } else {
+        entireBuffer = concatTypedArrays(entireBuffer, buffer)
+      }
+
+      if (maxLength && entireBuffer.length > maxLength) {
+        s.pause()
+        s.destroy()
+      }
+    })
+
+    s.on('end', () => {
+      const utf8Decode = new window.TextDecoder('utf-8')
+      const string = utf8Decode.decode(entireBuffer)
+      
+      resolve(string)
+    })
+  })
+}
+
 // use this to call the ipfs methods directly
 const getIpfs = () => ipfs
 
-export {
+export default {
   setIpfsApi,
   setProvider,
 
@@ -229,6 +295,8 @@ export {
   getFileTypeFromHash,
 
   getJson,
+  getString,
+  getStringFromStream,
   getBase64Image,
   getBase64ImageFromStream,
   getTypedArray,

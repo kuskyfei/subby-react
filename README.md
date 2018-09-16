@@ -28,8 +28,11 @@ video card
 audio card
 ipfs card
 
-- make home page
-- make settings page
+
+- make torrent card
+- make ipfs card
+- make card buttons
+- make publish pop up
 - make profile edit page 
 
 - fix user profile cache and reducers
@@ -37,6 +40,11 @@ ipfs card
 - get indexdb working in browser
 - get indexDb working in jest
 
+- move ipfs download to web worker
+- fix username and postid of file download
+- add image / letter to header avatar
+- add use default settings to settings
+- fix the slow typing for user search
 - add mute / unsub option to posts
 - add warning to use chrome
 - add translations

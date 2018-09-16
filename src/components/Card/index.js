@@ -1,8 +1,11 @@
+// react
 import React from 'react'
 import {Link} from 'react-router-dom'
-import { withStyles } from '@material-ui/core/styles'
+
+// material
+import {withStyles} from '@material-ui/core/styles'
 import classnames from 'classnames'
-import Card from '@material-ui/core/Card'
+import MaterialCard from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
 import CardActions from '@material-ui/core/CardActions'
@@ -10,17 +13,17 @@ import Collapse from '@material-ui/core/Collapse'
 import Avatar from '@material-ui/core/Avatar'
 import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
-import red from '@material-ui/core/colors/red'
 import FavoriteIcon from '@material-ui/icons/Favorite'
 import ShareIcon from '@material-ui/icons/Share'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
+// components
 import EmbedWidget from './EmbedWidget'
 import Loading from './Loading'
 
-const Timeago = require('timeago.js')
-const timeago = Timeago()
+// util
+const timeago = require('timeago.js')()
 
 const styles = theme => ({
 
@@ -66,26 +69,28 @@ const styles = theme => ({
     transform: 'rotate(180deg)'
   },
   avatar: {
-    backgroundColor: red[500]
+  },
+  comment: {
+    overflowWrap: 'break-word',
   }
 })
 
-class Post extends React.Component {
-  state = { expanded: false }
+class Card extends React.Component {
+  state = {expanded: false}
 
   handleExpandClick = () => {
     this.setState(state => ({ expanded: !state.expanded }))
   }
 
   render () {
-    let {classes, post, loading} = this.props
+    const {classes, isLoading, post} = this.props
 
-    if (loading) return <LoadingCard classes={classes} />
+    if (isLoading) return <LoadingCard classes={classes} />
 
     if (!post.username) post.username = post.address
 
     return (
-      <Card className={classes.card}>
+      <MaterialCard className={classes.card}>
         <CardHeader
           className={classes.cardHeader}
           avatar={
@@ -107,7 +112,7 @@ class Post extends React.Component {
         <EmbedWidget url={post.link} />
 
         <CardContent>
-          <Typography component='p'>
+          <Typography className={classes.comment} component='p'>
             {post.comment}
           </Typography>
         </CardContent>
@@ -132,17 +137,17 @@ class Post extends React.Component {
         <Collapse in={this.state.expanded} timeout='auto' unmountOnExit>
           <CardContent />
         </Collapse>
-      </Card>
+      </MaterialCard>
     )
   }
 }
 
 const LoadingCard = (props) =>
 
-  <Card className={props.classes.card}>
+  <MaterialCard className={props.classes.card}>
 
     <Loading />
 
-  </Card>
+  </MaterialCard>
 
-export default withStyles(styles)(Post)
+export default withStyles(styles)(Card)
