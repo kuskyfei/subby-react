@@ -23,7 +23,7 @@ window.SUBBY_DEBUG_SERVICES = services
 
 // util
 const queryString = require('query-string')
-const {isRouteChange} = require('../util')
+const {isRouteChange} = require('./util')
 const debug = require('debug')('containers:App')
 
 class App extends Component {

@@ -50,7 +50,7 @@ const styles = theme => ({
     textAlign: 'center',
     color: theme.palette.text.secondary,
     [theme.breakpoints.up(600 + theme.spacing.unit * 3 * 2)]: {
-    }
+    },
   },
   links: {
     marginBottom: theme.spacing.unit * 4,

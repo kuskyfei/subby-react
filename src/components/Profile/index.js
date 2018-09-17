@@ -43,7 +43,7 @@ const styles = theme => ({
   }
 })
 
-const ProfileHeader = (props) => {
+const Profile = (props) => {
   const {classes, profile} = props
 
   if (!profile.username) profile.username = profile.address
@@ -74,4 +74,4 @@ const ProfileHeader = (props) => {
   )
 }
 
-export default withStyles(styles)(ProfileHeader)
+export default withStyles(styles)(Profile)

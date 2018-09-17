@@ -138,6 +138,7 @@ class Card extends React.Component {
               <ExpandMoreIcon />
             </IconButton>
           }
+          
         </CardActions>
         <Collapse in={this.state.expanded} timeout='auto' unmountOnExit>
           <CardContent>
@@ -156,7 +157,7 @@ const isLongComment = (comment) => {
 }
 
 const formatComment = (comment) => {
-  return isLongComment(comment) ? comment.substring(0,MAX_COMMENT_LENGTH) + '...' : comment
+  return isLongComment(comment) ? comment.substring(0, MAX_COMMENT_LENGTH) + '...' : comment
 }
 
 const LoadingCard = (props) =>

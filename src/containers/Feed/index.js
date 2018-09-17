@@ -8,8 +8,8 @@ import PropTypes from 'prop-types'
 // material
 import withStyles from '@material-ui/core/styles/withStyles'
 
-// containers
-import Post from '../Post'
+// components
+import {Feed as FeedComponent} from '../../components'
 
 // actions
 import actions from './reducers/actions'
@@ -18,12 +18,7 @@ import actions from './reducers/actions'
 const services = require('../../services')
 
 // util
-const {getPercentScrolled} = require('./util')
-const debug = require('debug')('containers:Feed')
-
-const day = 1000 * 60 * 60 * 24
-const PERCERT_SCROLL_TO_ADD_MORE_POST = 50
-const MINIMUM_POSTS_LEFT_TO_ADD_MORE_POST = 20
+const debug = require('debug')('components:Feed')
 
 const styles = theme => ({
   layout: {
@@ -39,13 +34,11 @@ const styles = theme => ({
 })
 
 class Feed extends React.Component {
-  state = {addingMorePosts: false}
-
+  
   componentDidMount () {
-    window.addEventListener('scroll', this.handleScroll.bind(this))
 
     ;(async () => {
-      await this.addMorePosts()
+      await this.addPostsToFeed()
     })()
 
     debug('props', this.props)
@@ -57,31 +50,11 @@ class Feed extends React.Component {
   }
 
   componentWillUnmount () {
-    window.removeEventListener('scroll', this.handleScroll.bind(this))
+    debug('unmounted')
   }
 
-  async handleScroll (event) {
-    const percentScrolled = getPercentScrolled()
-    const postCount = this.props.feed.length
-
-    if (postCount / 2 > MINIMUM_POSTS_LEFT_TO_ADD_MORE_POST) {
-      return
-    }
-
-    if (percentScrolled > PERCERT_SCROLL_TO_ADD_MORE_POST) {
-      await this.addMorePosts()
-
-      debug('post count', postCount)
-    }
-
-    debug('percent scrolled', percentScrolled)
-  }
-
-  async addMorePosts () {
-    if (this.state.addingMorePosts) {
-      return
-    }
-    this.setState({...this.state, addingMorePosts: true})
+  async addPostsToFeed () {
+    const day = 1000 * 60 * 60 * 24
 
     const startAt = this.props.feed.length
     const postQuery = {
@@ -97,8 +70,6 @@ class Feed extends React.Component {
     const {setFeed} = this.props.actions
     setFeed([...feed, ...newPosts])
 
-    this.setState({...this.state, addingMorePosts: false})
-
     debug('added more posts')
     debug('previous feed', feed)
     debug('new posts', newPosts)
@@ -106,19 +77,11 @@ class Feed extends React.Component {
 
   render () {
     const { classes, feed } = this.props
-    const { addingMorePosts } = this.state
-
-    const posts = []
-    for (const post of feed) {
-      posts.push(<Post key={JSON.stringify(post)} post={post} />)
-    }
 
     return (
       <div className={classes.layout}>
 
-        {posts}
-
-        {addingMorePosts && <Post isLoading />}
+        <FeedComponent feed={feed} addPostsToFeed={this.addPostsToFeed.bind(this)} />
 
       </div>
     )

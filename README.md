@@ -21,6 +21,10 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
+set up reduz everywhere
+set up post component as completely dumb compotent
+set up edit profile page
+
 idb in browser
 idb in jest
 torrent card
@@ -34,6 +38,7 @@ ipfs card
 - make card buttons
 - make publish pop up
 - make profile edit page 
+- make drag and drop torrent upload
 
 - fix user profile cache and reducers
 - setFeedCache needs to b updated when final get Post design is decided
@@ -285,6 +290,69 @@ getSubscriptions(username, address) return [ [name, address, category], [name, a
   - subscription2
   - etc....
 - settings // object store
+
+
+
+#redux stuff
+
+views
+  feed
+  profile
+  subscriptions
+  settings
+  help
+  permalink
+  
+state
+
+- app.feed
+- app.address
+- app.subscriptions
+- app.settings
+
+- profile.feed
+- profile.address
+- profile.profile
+
+- containers
+  - app
+    - app.address
+    - app.profile
+  - feed
+    - app.feed
+    - app.address
+    - app.subscriptions
+  - profile
+    - profile.feed
+    - profile.address
+    - profile.profile
+  - subscriptions
+    - app.subscriptions
+  - settings
+    - app.settings
+  - help
+  - permalink
+    - profile.feed
+    - profile.profile
+  
+components
+  feed
+  post
+  header
+  profile
+
+
+
+  new state
+
+- user.profile
+- user.address
+- user.subscriptions
+- user.settings
+
+- view.feed
+- view.profile
+- view.address
 
 
 

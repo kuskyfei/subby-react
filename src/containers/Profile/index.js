@@ -9,10 +9,7 @@ import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
-import {ProfileHeader} from '../../components'
-
-// containers
-import Post from '../Post'
+import {Profile as ProfileComponent, Feed} from '../../components'
 
 // actions
 import actions from './reducers/actions'
@@ -21,14 +18,9 @@ import actions from './reducers/actions'
 const services = require('../../services')
 
 // util
-const {getPercentScrolled} = require('./util')
-const {isValidAddress} = require('../util')
+const {getProfileQueryFromUrlParams, getUsernameFromUrlParams} = require('./util')
 const queryString = require('query-string')
 const debug = require('debug')('containers:Profile')
-
-const day = 1000 * 60 * 60 * 24
-const PERCERT_SCROLL_TO_ADD_MORE_POST = 50
-const MINIMUM_POSTS_LEFT_TO_ADD_MORE_POST = 20
 
 const styles = theme => ({
   layout: {
@@ -44,26 +36,10 @@ const styles = theme => ({
 })
 
 class Profile extends React.Component {
-  state = {
-    addingMorePosts: false,
-    profile: {},
-    feed: []
-  }
 
   componentDidMount () {
-    window.addEventListener('scroll', this.handleScroll.bind(this))
-
-    ;(async () => {
-      await this.addMorePosts()
-    })()
-
-    ;(async () => {
-      const {u} = queryString.parse(this.props.location.search)
-      const profileQuery = isValidAddress(u) ? {address: u} : {username: u}
-      const profile = await services.getProfile(profileQuery)
-
-      this.setState({...this.state, profile})
-    })()
+    this.addPostsToFeed()
+    this.setProfile()
 
     debug('props', this.props)
     debug('mounted')
@@ -74,51 +50,38 @@ class Profile extends React.Component {
   }
 
   componentWillUnmount () {
-    window.removeEventListener('scroll', this.handleScroll.bind(this))
+    debug('unmounted')
   }
 
-  async handleScroll (event) {
-    const percentScrolled = getPercentScrolled()
-    const postCount = this.props.feed.length
+  async setProfile () {
+    const {location, address, actions} = this.props
 
-    if (postCount / 2 > MINIMUM_POSTS_LEFT_TO_ADD_MORE_POST) {
-      return
-    }
-
-    if (percentScrolled > PERCERT_SCROLL_TO_ADD_MORE_POST) {
-      await this.addMorePosts()
-
-      debug('post count', postCount)
-    }
-
-    debug('percent scrolled', percentScrolled)
+    const profileQuery = getProfileQueryFromUrlParams(location.search, address)
+    const profile = await services.getProfile(profileQuery)
+    actions.setProfile(profile)
   }
 
-  async addMorePosts () {
-    if (this.state.addingMorePosts) {
-      return
-    }
-    this.setState({...this.state, addingMorePosts: true})
+  async addPostsToFeed () {
+    const {location, actions} = this.props
 
-    const {u} = queryString.parse(this.props.location.search)
-    const address = isValidAddress(u) ? u : null
-    const username = isValidAddress(u) ? null : u
+    const username = getUsernameFromUrlParams(location.search)
 
-    const startAt = this.state.feed.length
+    const day = 1000 * 60 * 60 * 24
+    const startAt = this.props.feed.length
     const postQuery = {
-      userSubscriptions: [address],
-      addressSubscriptions: [username],
+      subscriptions: [username],
       startAt,
       count: 5,
       beforeTimestamp: Date.now(),
-      afterTimestamp: Date.now() - 7 * day
+      afterTimestamp: Date.now() - 180 * day
     }
 
-    const newPosts = await services.getPosts(postQuery)
-    const feed = [...this.state.feed, ...newPosts]
-    this.setState({...this.state, feed})
+    const newPosts = await services.getFeed(postQuery)
 
-    this.setState({...this.state, addingMorePosts: false})
+    console.log(newPosts)
+
+    const feed = this.props.feed
+    actions.setFeed([...feed, ...newPosts])
 
     debug('added more posts')
     debug('previous feed', feed)
@@ -126,28 +89,26 @@ class Profile extends React.Component {
   }
 
   render () {
-    const {classes} = this.props
-    const {profile, addingMorePosts, feed} = this.state
+    const {classes, feed, profile} = this.props
 
-    const posts = []
+    const newFeed = []
+
     for (const post of feed) {
       if (!post) continue
+      if (!profile) continue
 
       post.username = profile.username
-      post.address = profile.address
       post.thumbnail = profile.thumbnail
 
-      posts.push(<Post key={JSON.stringify(post)} post={post} />)
+      newFeed.push(post)
     }
 
     return (
       <div className={classes.layout}>
 
-        {profile && <ProfileHeader profile={profile} />}
+        {profile && <ProfileComponent profile={profile} />}
 
-        {posts}
-
-        {addingMorePosts && <Post isLoading />}
+        <Feed feed={newFeed} addPostsToFeed={this.addPostsToFeed.bind(this)} />
 
       </div>
     )
@@ -159,8 +120,8 @@ Profile.propTypes = {
 }
 
 const mapStateToProps = state => ({
-  subscriptions: state.app.subscriptions,
-  feed: state.feed
+  feed: state.profile.feed,
+  profile: state.profile.profile
 })
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch)

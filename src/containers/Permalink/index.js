@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
-import {ProfileHeader} from '../../components'
+import {Profile, Feed} from '../../components'
 
 // containers
 import Post from '../Post'
@@ -17,7 +17,7 @@ const services = require('../../services')
 
 // util
 const queryString = require('query-string')
-const {isValidAddress} = require('../util')
+const {getProfileQueryFromUrlParams} = require('./util')
 const debug = require('debug')('containers:Permalink')
 
 const styles = theme => ({
@@ -41,8 +41,8 @@ class Permalink extends React.Component {
 
   componentDidMount () {
     ;(async () => {
-      const {u} = queryString.parse(this.props.location.search)
-      const profileQuery = isValidAddress(u) ? {address: u} : {username: u}
+      const {location} = this.props
+      const profileQuery = getProfileQueryFromUrlParams(location.search)
       const profile = await services.getProfile(profileQuery)
 
       this.setState({...this.state, profile})
