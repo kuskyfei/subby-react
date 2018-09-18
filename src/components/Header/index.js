@@ -3,7 +3,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {withRouter, Link} from 'react-router-dom'
 import {connect} from 'react-redux'
-// import {bindActionCreators} from 'redux'
 
 // material
 import { withStyles } from '@material-ui/core/styles'
@@ -36,87 +35,95 @@ import HomeIcon from '@material-ui/icons/Home'
 
 import {images} from '../../settings'
 
+// components
+import Publish from '../Publish'
+
 // util
 const queryString = require('query-string')
 
-const styles = theme => ({
+const styles = theme => {
 
-  logo: {
-    height: 55,
-    minWidth: 70,
-    backgroundImage: `url(${images.logo})`,
-    backgroundSize: 'contain',
-    backgroundRepeat: 'no-repeat',
-    backgroundPositionY: 'center'
-  },
+  const debug = require('debug')('theme')
+  debug(theme)
 
-  publishButton: {
-    margin: theme.spacing.unit
-  },
-  publishButtonText: {
-    [theme.breakpoints.down(1050)]: {
-      display: 'none'
-    }
-  },
-  rightIcon: {
-    [theme.breakpoints.up(1050)]: {
-      marginLeft: theme.spacing.unit
-    }
-  },
+  return {
+    logo: {
+      height: 55,
+      minWidth: 70,
+      backgroundImage: `url(${images.logo})`,
+      backgroundSize: 'contain',
+      backgroundRepeat: 'no-repeat',
+      backgroundPositionY: 'center'
+    },
 
-  searchBar: {
-    margin: theme.spacing.unit,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    borderRadius: 2,
-    paddingTop: 2,
-    paddingBottom: 1,
-    color: 'white',
-    background: 'rgba(255, 255, 255, 0.15)',
-    maxWidth: 600,
-    '&:hover': {
-      background: 'rgba(255, 255, 255, 0.25)'
-    }
-  },
-  searchIcon: {
-    marginLeft: 20,
-    marginRight: 20,
-    [theme.breakpoints.down(325)]: {
-      marginLeft: 10,
-      marginRight: 10
-    }
-  },
-  searchInput: {
-    color: 'white',
-    marginRight: 20,
-    [theme.breakpoints.down(325)]: {
-      marginRight: 10
-    }
-  },
+    publishButton: {
+      margin: theme.spacing.unit
+    },
+    publishButtonText: {
+      [theme.breakpoints.down(1050)]: {
+        display: 'none'
+      }
+    },
+    rightIcon: {
+      [theme.breakpoints.up(1050)]: {
+        marginLeft: theme.spacing.unit
+      }
+    },
 
-  middleContainer: {
-    marginLeft: theme.spacing.unit * 2,
-    marginRight: theme.spacing.unit * 2,
-    width: 600
-  },
-  rightContainer: {
-    flex: 1,
-    whiteSpace: 'nowrap',
-    textAlign: 'right'
-  },
-  leftContainer: {
-    flex: 1,
-    [theme.breakpoints.down(600 + theme.spacing.unit * 2 * 2)]: {
-      display: 'none'
-    }
-  },
+    searchBar: {
+      margin: theme.spacing.unit,
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      borderRadius: 2,
+      paddingTop: 2,
+      paddingBottom: 1,
+      color: 'white',
+      background: 'rgba(255, 255, 255, 0.15)',
+      maxWidth: 600,
+      '&:hover': {
+        background: 'rgba(255, 255, 255, 0.25)'
+      }
+    },
+    searchIcon: {
+      marginLeft: 20,
+      marginRight: 20,
+      [theme.breakpoints.down(325)]: {
+        marginLeft: 10,
+        marginRight: 10
+      }
+    },
+    searchInput: {
+      color: 'white',
+      marginRight: 20,
+      [theme.breakpoints.down(325)]: {
+        marginRight: 10
+      }
+    },
 
-  menuLink: {
-    '&:focus': {
-      outline: 'none'
+    middleContainer: {
+      marginLeft: theme.spacing.unit * 2,
+      marginRight: theme.spacing.unit * 2,
+      width: 600
+    },
+    rightContainer: {
+      flex: 1,
+      whiteSpace: 'nowrap',
+      textAlign: 'right'
+    },
+    leftContainer: {
+      flex: 1,
+      [theme.breakpoints.down(600 + theme.spacing.unit * 2 * 2)]: {
+        display: 'none'
+      }
+    },
+
+    menuLink: {
+      '&:focus': {
+        outline: 'none'
+      }
     }
   }
-})
+}
 
 class Header extends React.Component {
   state = {
@@ -196,11 +203,13 @@ class Header extends React.Component {
 
             {auth && (
               <div className={classes.rightContainer}>
-
+{/*
                 <Button variant='contained' color='default' className={classes.publishButton}>
                   <span className={classes.publishButtonText}>Publish</span>
                   <CloudUploadIcon className={classes.rightIcon} />
                 </Button>
+*/}
+                <Publish />
 
                 <IconButton
                   id='header__profile-icon'
@@ -290,4 +299,4 @@ Header.propTypes = {
 const mapStateToProps = state => ({})
 const mapDispatchToProps = dispatch => ({})
 
-export default withRouter( connect(mapStateToProps, mapDispatchToProps)( withStyles(styles)(Header) ) ) // eslint-disable-line
+export default withRouter(withStyles(styles)(Header)) // eslint-disable-line

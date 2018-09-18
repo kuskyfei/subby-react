@@ -5,6 +5,8 @@ import Button from '@material-ui/core/Button'
 import classNames from 'classnames'
 import Typography from '@material-ui/core/Typography'
 import MessageIcon from '@material-ui/icons/Message'
+import AddAPhotoIcon from '@material-ui/icons/AddAPhoto'
+import EditIcon from '@material-ui/icons/Edit'
 
 const styles = theme => ({
   profile: {
@@ -17,7 +19,7 @@ const styles = theme => ({
     textAlign: 'center'
   },
   username: {
-    margin: theme.spacing.unit
+    margin: theme.spacing.unit,
   },
   bio: {
     margin: theme.spacing.unit
@@ -40,7 +42,14 @@ const styles = theme => ({
   },
   button: {
     margin: theme.spacing.unit
-  }
+  },
+
+  editAvatar: {
+    cursor: 'pointer',
+    '&:hover': {
+      boxShadow: '0 0 0 2px rgba(189, 189, 189, 0.40)',
+    }
+  },
 })
 
 const Profile = (props) => {
@@ -50,24 +59,26 @@ const Profile = (props) => {
 
   return (
     <div className={classes.profile}>
+
       <Avatar
-        alt={profile.username}
-        src={profile.thumbnail}
-        className={classNames(classes.avatar, classes.bigAvatar)}
+        className={classNames(classes.avatar, classes.bigAvatar, classes.editAvatar)}
       >
-        {profile.username && profile.username.substring(0, 2)}
+        <AddAPhotoIcon />
       </Avatar>
+
       <Typography className={classes.username} variant='title' noWrap gutterBottom>
         {profile.username}
       </Typography>
+
       <Button size='small' variant='contained' color='default' className={classes.button}>
         Subscribe&nbsp;
         <span className={classes.count}>{profile.subscriberCount || ''}</span>
       </Button>
       <Button size='small' variant='contained' color='default' className={classes.button}>
-        Donate&nbsp;
-        <MessageIcon className={classes.iconSmall} />
+        Edit&nbsp;
+        <EditIcon className={classes.iconSmall} />
       </Button>
+      
       <Typography className={classes.bio} variant='body1' gutterBottom>
         {profile.bio}
       </Typography>

@@ -22,7 +22,9 @@ localStorage.debug = 'containers:Feed'
 ##todo
 
 
-set up edit profile page
+make publish pop up
+make card option pop up
+make edit pop up
 
 idb in browser
 idb in jest
