@@ -139,7 +139,8 @@ const getMockPosts = (seed) => {
       comment: fake(seed + counter).lorem.sentence(),
       timestamp: Math.round(Date.now() - ms('30 days') * randomNumber),
       username: seed,
-      thumbnail: urls.imageUrls[fake(seed).random.number() % (urls.imageUrls.length - 1)]
+      thumbnail: urls.imageUrls[fake(seed).random.number() % (urls.imageUrls.length - 1)],
+      id: counter
     }
 
     posts.push(post)

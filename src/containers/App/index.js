@@ -9,7 +9,7 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 
 // components
 import {Header} from '../../components'
-import {Feed, Profile, Permalink, Subscriptions, Settings, About} from '../../containers'
+import {Feed, Profile, Permalink, Subscriptions, Settings, Help} from '../../containers'
 
 // actions
 import actions from './reducers/actions'
@@ -103,15 +103,10 @@ class App extends Component {
 
 const getRouteFromUrlParams = (urlParams) => {
   const page = urlParams.p
-  const isPermalink = urlParams.u && urlParams.id
   const isProfile = urlParams.u
 
-  if (isPermalink) {
-    return Permalink
-  }
-
   if (isProfile) {
-    return Profile
+    return Feed
   }
 
   switch (page) {
@@ -125,10 +120,10 @@ const getRouteFromUrlParams = (urlParams) => {
       return Settings
 
     case 'profile':
-      return Profile
+      return Feed
 
     default:
-      return About
+      return Help
   }
 }
 

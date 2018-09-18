@@ -262,14 +262,14 @@ class Header extends React.Component {
                     </MenuItem>
                   </Link>
 
-                  <a href='https://subby.io/help' target='_blank'>
+                  <Link to='?p=help'>
                     <MenuItem onClick={this.handleClose}>
                       <ListItemIcon className={classes.icon}>
                         <ContactSupportIcon />
                       </ListItemIcon>
                       <ListItemText classes={{ primary: classes.primary }} inset primary='Help' />
                     </MenuItem>
-                  </a>
+                  </Link>
 
                 </Menu>
 

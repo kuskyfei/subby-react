@@ -5,9 +5,6 @@ import PropTypes from 'prop-types'
 // material
 import withStyles from '@material-ui/core/styles/withStyles'
 
-// containers
-import {Post} from '../../containers'
-
 // util
 const {getPercentScrolled} = require('./util')
 const debug = require('debug')('components:Feed')
@@ -16,7 +13,9 @@ const PERCERT_SCROLL_TO_ADD_MORE_POST = 50
 const MINIMUM_POSTS_LEFT_TO_ADD_MORE_POST = 20
 
 const styles = theme => ({
+  feed: {
 
+  }
 })
 
 class Feed extends React.Component {
@@ -42,7 +41,7 @@ class Feed extends React.Component {
 
   async handleScroll (event) {
     const percentScrolled = getPercentScrolled()
-    const postCount = this.props.feed.length
+    const {postCount} = this.props
 
     if (postCount / 2 > MINIMUM_POSTS_LEFT_TO_ADD_MORE_POST) {
       return
@@ -70,22 +69,12 @@ class Feed extends React.Component {
   }
 
   render () {
-    const { classes, feed } = this.props
-    const { addingMorePosts } = this.state
-
-    const isLoading = addingMorePosts || !feed.length
-
-    const posts = []
-    for (const post of feed) {
-      posts.push(<Post key={JSON.stringify(post)} post={post} />)
-    }
+    const { classes } = this.props
 
     return (
-      <div>
+      <div className={classes.feed}>
 
-        {posts}
-
-        {isLoading && <Post isLoading />}
+        {this.props.children}
 
       </div>
     )
@@ -93,7 +82,8 @@ class Feed extends React.Component {
 }
 
 Feed.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  postCount: PropTypes.number.isRequired,
 }
 
 export default withStyles(styles)(Feed) // eslint-disable-line

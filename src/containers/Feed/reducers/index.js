@@ -1,13 +1,23 @@
 import A from './type'
 
-const initialState = []
+const initialState = {
+  publisherProfile: null,
+  feed: []
+}
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case A.SET_FEED:
-      return [
-        ...action.payload
-      ]
+      return {
+        ...state, 
+        feed: action.payload
+      }
+
+    case A.SET_PUBLISHER_PROFILE:
+      return {
+        ...state,
+        profile: action.payload
+      }
 
     default:
       return state

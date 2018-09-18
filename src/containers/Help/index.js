@@ -25,9 +25,9 @@ const styles = theme => ({
     }
   },
   title: {
-    marginBottom: theme.spacing.unit * 4,
+    marginBottom: `${theme.spacing.unit * 4}px!important`,
     [theme.breakpoints.up(800 + theme.spacing.unit * 2 * 2)]: {
-      marginBottom: theme.spacing.unit * 6
+      marginBottom: `${theme.spacing.unit * 6}px!important`
     },
     [theme.breakpoints.down(400 + theme.spacing.unit * 2 * 2)]: {
       fontSize: '3rem'
@@ -63,7 +63,7 @@ const styles = theme => ({
   }
 })
 
-class About extends React.Component {
+class Help extends React.Component {
   componentDidMount () {
 
   }
@@ -139,8 +139,8 @@ class About extends React.Component {
   }
 }
 
-About.propTypes = {
+Help.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(About) // eslint-disable-line
+export default withStyles(styles)(Help) // eslint-disable-line

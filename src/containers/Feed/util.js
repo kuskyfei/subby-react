@@ -1,23 +1,5 @@
 const queryString = require('query-string')
 
-const getPercentScrolled = () => {
-  const winheight = window.innerHeight || (document.documentElement || document.body).clientHeight
-  const docheight = getDocHeight()
-  const scrollTop = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop
-  const trackLength = docheight - winheight
-  const pctScrolled = Math.floor(scrollTop / trackLength * 100) // gets percentage scrolled (ie: 80 or NaN if tracklength == 0)
-  return pctScrolled
-}
-
-const getDocHeight = () => {
-  const D = document
-  return Math.max(
-    D.body.scrollHeight, D.documentElement.scrollHeight,
-    D.body.offsetHeight, D.documentElement.offsetHeight,
-    D.body.clientHeight, D.documentElement.clientHeight
-  )
-}
-
 const getProfileQueryFromUrlParams = (urlParams, address) => {
   const {u, p} = queryString.parse(urlParams)
 
@@ -36,6 +18,26 @@ const getProfileQueryFromUrlParams = (urlParams, address) => {
 
 const getUsernameFromUrlParams = (urlParams) => {
   return queryString.parse(urlParams).u
+}
+
+const getPostIdFromUrlParams = (urlParams) => {
+  return queryString.parse(urlParams).id
+}
+
+const isPermalink = (urlParams) => {
+  return queryString.parse(urlParams).id && queryString.parse(urlParams).u
+}
+
+const isPublisher = (urlParams) => {
+  return !!queryString.parse(urlParams).u
+}
+
+const isFeed = (urlParams) => {
+  return queryString.parse(urlParams).p === 'feed'
+}
+
+const isProfile = (urlParams) => {
+  return queryString.parse(urlParams).p === 'profile'
 }
 
 const isValidAddress = (address) => {
@@ -71,4 +73,13 @@ const isValidHexNumber = (string) => {
   return !containsNonHexChar
 }
 
-module.exports = {getPercentScrolled, getProfileQueryFromUrlParams, isValidAddress, getUsernameFromUrlParams}
+module.exports = {
+  getProfileQueryFromUrlParams,
+  getUsernameFromUrlParams,
+  getPostIdFromUrlParams,
+  isValidAddress,
+  isPermalink,
+  isPublisher,
+  isProfile,
+  isFeed
+}

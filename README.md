@@ -21,8 +21,7 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
-set up reduz everywhere
-set up post component as completely dumb compotent
+
 set up edit profile page
 
 idb in browser
@@ -33,7 +32,6 @@ audio card
 ipfs card
 
 
-- make torrent card
 - make ipfs card
 - make card buttons
 - make publish pop up

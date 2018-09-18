@@ -78,7 +78,16 @@ const styles = theme => ({
 })
 
 class Card extends React.Component {
-  state = {expanded: false}
+  state = {
+    expanded: false,
+    timestamp: null
+  }
+
+  commentDidMount() {
+    const {post} = this.props
+
+    this.setState({...this.state, timestamp: post.timestamp})
+  }
 
   handleExpandClick = () => {
     this.setState(state => ({ expanded: !state.expanded }))
@@ -108,7 +117,7 @@ class Card extends React.Component {
             </IconButton>
           }
           title={<Link to={'?u=' + post.username}>{post.username}</Link>}
-          subheader={<Link to={`?u=${post.username}&id=${post.id}`}>{timeago.format(post.timestamp)}</Link>}
+          subheader={<Link to={`?u=${post.username}&id=${post.id}`}>{timeago.format(this.state.timestamp)}</Link>}
         />
 
         <EmbedWidget url={post.link} />

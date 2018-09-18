@@ -42,27 +42,16 @@ class Post extends React.Component {
   handleTorrent = async () => {
     const {post} = this.props
     if (!post.link) return
+    if (!isTorrent(post.link)) return
 
-    if (isTorrent(post.link)) {
+    const torrent = await services.getTorrent(post.link)
 
-      const torrent = await services.getTorrent(post.link)
-
-      this.setState({
-        ...this.state,
-        link: (
-          <Torrent torrent={torrent} />
-        )
-      })
-
-      //console.log('torrent')
-      //console.log(torrent)
-      // this.setState({...this.state, comment: 'ipfs:loading'})
-
-      // const ipfsHash = getHash(post.comment)
-      // const string = await services.ipfs.getStringFromStream(ipfsHash, {maxLength: 10000}) // 1000 is an arbitrary small number to prevent too big IPFS files
-  
-      // this.setState({...this.state, comment: string})
-    }
+    this.setState({
+      ...this.state,
+      link: (
+        <Torrent torrent={torrent} />
+      )
+    })
 
     debug('handleTorrent end')
   }
@@ -196,11 +185,13 @@ class Post extends React.Component {
     const {isLoading, post} = this.props
     const {link, comment} = this.state
 
-    if (link) post.link = link
-    if (comment) post.comment = comment
+    const newPost = {...post}
+
+    if (link) newPost.link = link
+    if (comment) newPost.comment = comment
 
     return (
-      <Card isLoading={isLoading} post={post} />
+      <Card isLoading={isLoading} post={newPost} />
     )
   }
 }
