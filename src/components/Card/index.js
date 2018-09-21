@@ -14,6 +14,7 @@ import Avatar from '@material-ui/core/Avatar'
 import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
 import FavoriteIcon from '@material-ui/icons/Favorite'
+import CloseIcon from '@material-ui/icons/Close'
 import ShareIcon from '@material-ui/icons/Share'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
@@ -28,9 +29,7 @@ const timeago = require('timeago.js')()
 const MAX_COMMENT_LENGTH = 280
 
 const styles = theme => ({
-
-  // this is to make the username have ellipsis when too long
-  cardHeader: {
+  cardHeaderEllipsis: {
     '& > div:nth-of-type(2)': {
       overflow: 'hidden',
       textOverflow: 'ellipsis'
@@ -74,8 +73,22 @@ const styles = theme => ({
   },
   comment: {
     overflowWrap: 'break-word',
+  },
+
+  closeButton: {
+    color: theme.palette.grey['300'],
+    fontSize: 48,
   }
 })
+
+const StyledIconButton = withStyles({
+  root: {
+    color: 'rgba(0, 0, 0, 0.1)',
+    '&:hover': {
+      backgroundColor: 'rgba(0, 0, 0, 0.02)'
+    }
+  }
+})(IconButton)
 
 class Card extends React.Component {
   state = {
@@ -94,16 +107,23 @@ class Card extends React.Component {
   }
 
   render () {
-    const {classes, isLoading, post} = this.props
+    let {classes, isLoading, post, preview, onPreviewClose} = this.props
+
+    if (!preview) {
+      onPreviewClose = () => {}
+    }
 
     if (isLoading) return <LoadingCard classes={classes} />
 
     if (!post.username) post.username = post.address
 
+    const date = (preview) ? 'Previewing...' : timeago.format(this.state.timestamp)
+
     return (
       <MaterialCard className={classes.card}>
+
         <CardHeader
-          className={classes.cardHeader}
+          className={classes.cardHeaderEllipsis}
           avatar={
             <Link to={'?u=' + post.username}>
               <Avatar src={post.thumbnail} className={classes.avatar}>
@@ -112,12 +132,16 @@ class Card extends React.Component {
             </Link>
           }
           action={
-            <IconButton>
-              <MoreVertIcon />
-            </IconButton>
+            preview
+              ? <StyledIconButton onClick={onPreviewClose}>
+                  <CloseIcon className={classes.closeButton} />
+                </StyledIconButton>
+              : <IconButton>
+                  <MoreVertIcon />
+                </IconButton>
           }
           title={<Link to={'?u=' + post.username}>{post.username}</Link>}
-          subheader={<Link to={`?u=${post.username}&id=${post.id}`}>{timeago.format(this.state.timestamp)}</Link>}
+          subheader={<Link to={`?u=${post.username}&id=${post.id}`}>{date}</Link>}
         />
 
         <EmbedWidget url={post.link} />
@@ -127,28 +151,31 @@ class Card extends React.Component {
             {formatComment(post.comment)}
           </Typography>
         </CardContent>
-        <CardActions className={classes.actions} disableActionSpacing>
-          <IconButton aria-label='Add to favorites'>
-            <FavoriteIcon />
-          </IconButton>
-          <IconButton aria-label='Share'>
-            <ShareIcon />
-          </IconButton>
 
-          {isLongComment(post.comment) && 
-            <IconButton
-              className={classnames(classes.expand, {
-                [classes.expandOpen]: this.state.expanded
-              })}
-              onClick={this.handleExpandClick}
-              aria-expanded={this.state.expanded}
-              aria-label='Show more'
-            >
-              <ExpandMoreIcon />
+        {!preview && 
+          <CardActions className={classes.actions} disableActionSpacing>
+            <IconButton aria-label='Add to favorites'>
+              <FavoriteIcon />
             </IconButton>
-          }
-          
-        </CardActions>
+            <IconButton aria-label='Share'>
+              <ShareIcon />
+            </IconButton>
+
+            {isLongComment(post.comment) && 
+              <IconButton
+                className={classnames(classes.expand, {
+                  [classes.expandOpen]: this.state.expanded
+                })}
+                onClick={this.handleExpandClick}
+                aria-expanded={this.state.expanded}
+                aria-label='Show more'
+              >
+                <ExpandMoreIcon />
+              </IconButton>
+            }
+          </CardActions>
+        }
+
         <Collapse in={this.state.expanded} timeout='auto' unmountOnExit>
           <CardContent>
             <Typography className={classes.comment} component='p'>
@@ -156,6 +183,7 @@ class Card extends React.Component {
             </Typography>
           </CardContent>
         </Collapse>
+
       </MaterialCard>
     )
   }

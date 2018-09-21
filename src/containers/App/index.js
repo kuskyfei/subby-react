@@ -91,9 +91,9 @@ class App extends Component {
         <Header />
 
         <main>
-{/*
+
           <Route />
-*/}
+
         </main>
 
       </div>

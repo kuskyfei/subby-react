@@ -182,7 +182,7 @@ class Post extends React.Component {
   }
 
   render () {
-    const {isLoading, post} = this.props
+    const {isLoading, post, preview, onPreviewClose} = this.props
     const {link, comment} = this.state
 
     const newPost = {...post}
@@ -191,7 +191,7 @@ class Post extends React.Component {
     if (comment) newPost.comment = comment
 
     return (
-      <Card isLoading={isLoading} post={newPost} />
+      <Card isLoading={isLoading} post={newPost} preview={preview} onPreviewClose={onPreviewClose} />
     )
   }
 }

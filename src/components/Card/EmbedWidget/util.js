@@ -38,4 +38,9 @@ function extractRootDomain (url) {
 
 /* eslint-enable */
 
-export {extractRootDomain}
+const stripUrlQuery = (url) => {
+  const cleanUrl = url.replace(/\?.+$/g, '')
+  return cleanUrl
+}
+
+export {extractRootDomain, stripUrlQuery}

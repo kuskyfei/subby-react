@@ -16,7 +16,7 @@ const reducer = (state = initialState, action) => {
     case A.SET_PUBLISHER_PROFILE:
       return {
         ...state,
-        profile: action.payload
+        publisherProfile: action.payload
       }
 
     default:

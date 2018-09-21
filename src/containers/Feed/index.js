@@ -75,7 +75,7 @@ class Feed extends React.Component {
 
     const profileQuery = getProfileQueryFromUrlParams(location.search, address)
     const profile = await services.getProfile(profileQuery)
-    actions.setFeedProfile(profile)
+    actions.setPublisherProfile(profile)
   }
 
   async addPostsToFeed () {
@@ -92,14 +92,25 @@ class Feed extends React.Component {
       const post = {
         username: 'test',
         address: '0x0000000000000000000000000000000000000000',
-        //comment: 'This is dope stuff',
+        // comment: 'This is dope stuff',
         comment: 'ipfs:QmX48d6q3YgSxZjUhoSziw47AcEuUAWN3BPfZtaNkUn6uj', // long string
         // link: 'ipfs:QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo', // image
         // link: 'ipfs:QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV', // video
         // link: 'ipfs:QmZbp9u6yMDW94mfxTYe8hMaomBLr2NfckUhYf3J7ax7zM/dog-loves-baby.mp4',
         // link: 'ipfs:QmQ747r7eLfsVtBFBSRwfXsPK6tADJpQzJxz4uFdoZb9XJ', // big video
-        link: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
-        timestamp: Date.now()
+        // link: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
+        // link: 'https://interactive-examples.mdn.mozilla.net/media/examples/stream_of_water.webm',
+        // link: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Example.ogg',
+        // link: 'http://www.hochmuth.com/mp3/Haydn_Cello_Concerto_D-1.mp3',
+        // link: 'https://twitter.com/APompliano/status/1034115384360792064',
+        // link: 'https://www.reddit.com/r/pics/comments/9b1epu/my_husband_started_17th_grade_his_masters_program/',
+        link: 'https://www.instagram.com/p/Bm1WJFoHqif/',
+        // link: 'https://vimeo.com/154583964',
+        // link: 'https://www.youtube.com/watch?v=pIbAXzEHjBI',
+        // link: 'https://www.facebook.com/refinery29/posts/10156965764817922',
+
+        timestamp: Date.now(),
+        id: 4
       }
 
       actions.setFeed([post])

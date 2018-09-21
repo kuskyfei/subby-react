@@ -21,6 +21,9 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
+possibl bug with twitter and IG cards
+
+fix long text preview
 
 make publish pop up
 make card option pop up
@@ -39,6 +42,33 @@ ipfs card
 - make publish pop up
 - make profile edit page 
 - make drag and drop torrent upload
+
+make subscribe/unsubscribe button work
+fix bug with cache
+modify mock ethereum API to match new api
+add donate button to cards
+add permalink copy button to card
+add unsub button to cards
+add thumbnail to header
+join profile and profile edit cmponent
+make profile edit form
+fix bug that doesnt detect url changes
+fix username headr bug
+make publish button send the right data to api
+add ipfs loading icon
+make preview show correct username and icon
+make donate pop up
+make donate/message button logic
+make subscribtions page work, all buttons and cache/db
+make settings page work, all buttons and settings, link with db
+add terminat account button
+add web torrent loading icon
+make subby npm module
+make publishing content guide
+make find accounts to follow post
+
+make puppeteer tests
+
 
 - fix user profile cache and reducers
 - setFeedCache needs to b updated when final get Post design is decided

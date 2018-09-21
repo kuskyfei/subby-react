@@ -15,6 +15,11 @@ const styles = theme => ({
     transform: 'translate(-50%, 0)',
     '&:focus': {
       outline: 'none'
+    },
+    marginBottom: '15%',
+    [theme.breakpoints.down(600)]: {
+      top: '7.5%',
+      marginBottom: '7.5%',
     }
   },
 
@@ -35,6 +40,12 @@ const styles = theme => ({
     }
   },
 })
+
+const StyledModal = withStyles({
+  root: {
+    overflow: 'scroll'
+  }
+})(Modal)
 
 class Publish extends React.Component {
   state = {
@@ -63,26 +74,16 @@ class Publish extends React.Component {
           <span className={classes.publishButtonText}>Publish</span>
           <CloudUploadIcon className={classes.rightIcon} />
         </Button>
-        <Modal
+        <StyledModal
           aria-labelledby="simple-modal-title"
           aria-describedby="simple-modal-description"
           open={this.state.open}
           onClose={this.handleClose}
         >
-          {/*
-          <div style={getModalStyle()} className={classes.paper}>
-            <Typography variant="title" id="modal-title">
-              Text in a modal
-            </Typography>
-            <Typography variant="subheading" id="simple-modal-description">
-              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-            </Typography>
-          </div>
-          */}
           <div className={classes.modal}>
             <Card />
           </div>
-        </Modal>
+        </StyledModal>
       </div>
     )
   }

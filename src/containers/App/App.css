@@ -14,6 +14,17 @@ a {
   cursor: pointer;
 }
 
+/* ANIMATIONS */
+
+@keyframes fadeIn {
+  0% {
+    opacity:0;
+  }
+  100% {
+    opacity:1;
+  }
+}
+
 /* SOCIAL MEDIA EMBEDS */
 
 /* this is specifically needed to 
@@ -35,21 +46,6 @@ twitterwidget::before {
   pointer-events: none;
 }
 
-.card__white-border-3px {
-  position: relative;
-}
-
-.card__white-border-3px::before {
-  content: " ";
-  display: block;
-  border: 3px solid white;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  z-index: 1;
-  pointer-events: none;
-}
-
 .card__white-border-1px {
   position: relative;
 }
@@ -63,32 +59,4 @@ twitterwidget::before {
   position: absolute;
   z-index: 1;
   pointer-events: none;
-}
-
-.card__image {
-  max-height: 600px;
-  max-width: 100%;
-  transform: translateX(-50%);
-  margin-left: 50%;
-}
-
-/* responsive embed cards */
-/* they also crop the bottom 
-   which is not ideal, might
-   be possible to fix in some
-   other way. */
-
-.embed-container { 
-  position: relative; 
-  padding-bottom: 56.25%; 
-  height: 0; overflow: 
-  hidden; max-width: 100%; 
-} 
-
-.embed-container iframe, .embed-container object, .embed-container embed {
-  position: absolute; 
-  top: 0; 
-  left: 0; 
-  width: 100%; 
-  height: 100%;
 }

@@ -1,17 +1,15 @@
 import React from 'react'
 
-import Facebook from './Facebook'
-import Instagram from './Instagram'
-import Reddit from './Reddit'
-import Twitter from './Twitter'
-import Vimeo from './Vimeo'
-import Youtube from './Youtube'
-import Image from './Image'
-import Link from './Link'
-import Ipfs from './Ipfs'
-import Torrent from './Torrent'
+import {
+  Facebook, Instagram,
+  Reddit, Twitter,
+  Vimeo, Youtube,
+  Image, Link,
+  Ipfs, Torrent,
+  Audio, Video
+} from './components'
 
-const {extractRootDomain} = require('./util')
+const {extractRootDomain, stripUrlQuery} = require('./util')
 
 const EmbedWidget = (props) => {
   const Widget = getWidgetFromUrl(props.url)
@@ -35,6 +33,14 @@ const getWidgetFromUrl = (url) => {
 
   if (isTorrent(url)) {
     return Torrent
+  }
+
+  if (isVideo(url)) {
+    return Video
+  }
+
+  if (isAudio(url)) {
+    return Audio
   }
 
   if (isImage(url)) {
@@ -80,8 +86,22 @@ const isImage = (url) => {
   }
 
   // this is a link to a normal external image
-  const cleanUrl = url.replace(/\?.+$/g, '')
+  const cleanUrl = stripUrlQuery(url)
   if (cleanUrl.match(/\.(jpg|jpeg|png|gif)$/)) {
+    return true
+  }
+}
+
+const isVideo = (url) => {
+  const cleanUrl = stripUrlQuery(url)
+  if (cleanUrl.match(/\.(webm|mp4|ogg)$/)) {
+    return true
+  }
+}
+
+const isAudio = (url) => {
+  const cleanUrl = stripUrlQuery(url)
+  if (cleanUrl.match(/\.(wav|mp3|flac)$/)) {
     return true
   }
 }
