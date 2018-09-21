@@ -3,14 +3,14 @@ import withStyles from '@material-ui/core/styles/withStyles'
 
 const styles = {
   audio: {
-    width: '100%',
+    width: '100%'
   }
 }
 
 const Audio = (props) => {
   return (
-    <audio 
-      className={props.classes.audio} 
+    <audio
+      className={props.classes.audio}
       controls
       src={props.url}
     >

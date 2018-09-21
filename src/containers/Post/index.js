@@ -20,7 +20,7 @@ class Post extends React.Component {
   }
 
   componentDidMount = () => {
-    const {post, isLoading} = this.props
+    const {isLoading} = this.props
     if (isLoading) return
 
     this.handleIpfsLink()
@@ -65,7 +65,7 @@ class Post extends React.Component {
 
       const ipfsHash = getHash(post.comment)
       const string = await services.ipfs.getStringFromStream(ipfsHash, {maxLength: 10000}) // 1000 is an arbitrary small number to prevent too big IPFS files
-  
+
       this.setState({...this.state, comment: string})
     }
 
@@ -96,7 +96,7 @@ class Post extends React.Component {
             this.setState({
               ...this.state,
               link: (
-                <Download 
+                <Download
                   download={this.download.bind(this, {ipfsHash, fileExtension})}
                   message={`File ${fileMimeType} too big.`}
                   downloadMessage='Download'
@@ -106,13 +106,11 @@ class Post extends React.Component {
           }
         })
         this.setState({...this.state, link: image})
-      }
-
-      else {
+      } else {
         this.setState({
-          ...this.state, 
+          ...this.state,
           link: (
-            <Download 
+            <Download
               download={this.download.bind(this, {ipfsHash, fileExtension})}
               message={`Unsuported IPFS content ${fileMimeType}.`}
               downloadMessage='Download'
@@ -136,23 +134,23 @@ class Post extends React.Component {
         this.killStream = killStream
 
         this.setState({
-          ...this.state, 
+          ...this.state,
           link: (
-            <Download 
+            <Download
               download={this.download.bind(this, {ipfsHash, fileExtension})}
               message={`${progressInMbs}mb downloaded.`}
               downloadMessage='Cancel'
             />
-          ),
+          )
         })
       })
 
       downloadBlob({blob, fileName: `username+postid.${fileExtension}`})
 
       this.setState({
-        ...this.state, 
+        ...this.state,
         link: (
-          <Download 
+          <Download
             download={() => downloadBlob({blob, fileName: `username+postid.${fileExtension}`})}
             message='Download complete.'
             downloadMessage='Save'
@@ -160,16 +158,15 @@ class Post extends React.Component {
         ),
         isDownloading: false
       })
-
     }
 
     if (isDownloading) {
       this.killStream()
 
       this.setState({
-        ...this.state, 
+        ...this.state,
         link: (
-          <Download 
+          <Download
             download={this.download.bind(this, {ipfsHash, fileExtension})}
             message={`Cancelled download.`}
             downloadMessage='Try again'
@@ -178,7 +175,6 @@ class Post extends React.Component {
         isDownloading: false
       })
     }
-    
   }
 
   render () {

@@ -15,7 +15,7 @@ const styles = theme => ({
       paddingLeft: 24,
       paddingRight: 24
     },
-    overflowWrap: 'break-word',
+    overflowWrap: 'break-word'
   },
   link: {
     color: theme.palette.primary.main,
@@ -26,7 +26,7 @@ const styles = theme => ({
   },
   row: {
     '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.background.default,
+      backgroundColor: theme.palette.background.default
     },
     height: 34
   },
@@ -45,8 +45,8 @@ let Download = (props) => {
   return (
     <Typography className={classes.margin} variant='body2' component='div' gutterBottom>
       {message}&nbsp;
-      <a 
-        className={classes.link} 
+      <a
+        className={classes.link}
         onClick={download}>
         {downloadMessage}
       </a>
@@ -60,12 +60,11 @@ class Torrent extends React.Component {
     filesOpen: false
   }
 
-  handleClick() {
+  handleClick () {
     this.setState({...this.state, filesOpen: !this.state.filesOpen})
   }
 
-  render() {
-
+  render () {
     const {classes, torrent} = this.props
 
     const files = []
@@ -100,9 +99,9 @@ class Torrent extends React.Component {
               Magnet
             </TableCell>
             <TableCell>
-                <a className={classes.link} href={torrent.magnet}>
+              <a className={classes.link} href={torrent.magnet}>
                   Magnet Link
-                </a>
+              </a>
             </TableCell>
           </TableRow>
 
@@ -128,10 +127,9 @@ class Torrent extends React.Component {
             </TableCell>
           </TableRow>
 
-          {this.state.filesOpen && 
+          {this.state.filesOpen &&
             <TableRow className={classes.row}>
-              <TableCell className={classes.nameCell} >
-              </TableCell>
+              <TableCell className={classes.nameCell} />
               <TableCell>
                 <div className={classes.filesRow}>
                   {files}
@@ -145,6 +143,6 @@ class Torrent extends React.Component {
     )
   }
 }
-Torrent = withStyles(styles)(Torrent)
+Torrent = withStyles(styles)(Torrent) // eslint-disable-line
 
 export {Download, Torrent}

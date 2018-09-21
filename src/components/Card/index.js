@@ -72,12 +72,12 @@ const styles = theme => ({
   avatar: {
   },
   comment: {
-    overflowWrap: 'break-word',
+    overflowWrap: 'break-word'
   },
 
   closeButton: {
     color: theme.palette.grey['300'],
-    fontSize: 48,
+    fontSize: 48
   }
 })
 
@@ -96,7 +96,7 @@ class Card extends React.Component {
     timestamp: null
   }
 
-  commentDidMount() {
+  commentDidMount () {
     const {post} = this.props
 
     this.setState({...this.state, timestamp: post.timestamp})
@@ -134,11 +134,11 @@ class Card extends React.Component {
           action={
             preview
               ? <StyledIconButton onClick={onPreviewClose}>
-                  <CloseIcon className={classes.closeButton} />
-                </StyledIconButton>
+                <CloseIcon className={classes.closeButton} />
+              </StyledIconButton>
               : <IconButton>
-                  <MoreVertIcon />
-                </IconButton>
+                <MoreVertIcon />
+              </IconButton>
           }
           title={<Link to={'?u=' + post.username}>{post.username}</Link>}
           subheader={<Link to={`?u=${post.username}&id=${post.id}`}>{date}</Link>}
@@ -152,7 +152,7 @@ class Card extends React.Component {
           </Typography>
         </CardContent>
 
-        {!preview && 
+        {!preview &&
           <CardActions className={classes.actions} disableActionSpacing>
             <IconButton aria-label='Add to favorites'>
               <FavoriteIcon />
@@ -161,7 +161,7 @@ class Card extends React.Component {
               <ShareIcon />
             </IconButton>
 
-            {isLongComment(post.comment) && 
+            {isLongComment(post.comment) &&
               <IconButton
                 className={classnames(classes.expand, {
                   [classes.expandOpen]: this.state.expanded

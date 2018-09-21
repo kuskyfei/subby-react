@@ -7,20 +7,20 @@ const responsiveEmbedStyles = {
   top: 0,
   left: 0,
   width: '100%',
-  height: '100%',
+  height: '100%'
 }
 
 const styles = {
-  responsiveEmbed: { 
+  responsiveEmbed: {
     position: 'relative',
-    paddingBottom: '56.25%', 
+    paddingBottom: '56.25%',
     height: 0,
-    overflow: 'hidden', 
-    maxWidth: '100%' ,
+    overflow: 'hidden',
+    maxWidth: '100%',
     '& iframe': responsiveEmbedStyles,
     '& object': responsiveEmbedStyles,
-    '& embed': responsiveEmbedStyles,
-  } 
+    '& embed': responsiveEmbedStyles
+  }
 }
 
 const Youtube = (props) => {

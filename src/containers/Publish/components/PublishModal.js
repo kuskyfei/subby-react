@@ -1,11 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
-import Typography from '@material-ui/core/Typography'
 import Modal from '@material-ui/core/Modal'
 import Button from '@material-ui/core/Button'
 import CloudUploadIcon from '@material-ui/icons/CloudUpload'
-import Card from './Card'
 
 const styles = theme => ({
   modal: {
@@ -19,7 +17,7 @@ const styles = theme => ({
     marginBottom: '15%',
     [theme.breakpoints.down(600)]: {
       top: '7.5%',
-      marginBottom: '7.5%',
+      marginBottom: '7.5%'
     }
   },
 
@@ -38,7 +36,7 @@ const styles = theme => ({
     [theme.breakpoints.up(1050)]: {
       marginLeft: theme.spacing.unit
     }
-  },
+  }
 })
 
 const StyledModal = withStyles({
@@ -47,9 +45,9 @@ const StyledModal = withStyles({
   }
 })(Modal)
 
-class Publish extends React.Component {
+class PublishModal extends React.Component {
   state = {
-    open: false,
+    open: false
   }
 
   handleOpen = () => {
@@ -60,14 +58,14 @@ class Publish extends React.Component {
     this.setState({ open: false })
   }
 
-  render() {
+  render () {
     const { classes } = this.props
 
     return (
       <div className={classes.container}>
-        <Button 
-          variant='contained' 
-          color='default' 
+        <Button
+          variant='contained'
+          color='default'
           className={classes.publishButton}
           onClick={this.handleOpen}
         >
@@ -75,13 +73,13 @@ class Publish extends React.Component {
           <CloudUploadIcon className={classes.rightIcon} />
         </Button>
         <StyledModal
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
+          aria-labelledby='simple-modal-title'
+          aria-describedby='simple-modal-description'
           open={this.state.open}
           onClose={this.handleClose}
         >
           <div className={classes.modal}>
-            <Card />
+            {this.props.children}
           </div>
         </StyledModal>
       </div>
@@ -89,8 +87,8 @@ class Publish extends React.Component {
   }
 }
 
-Publish.propTypes = {
-  classes: PropTypes.object.isRequired,
+PublishModal.propTypes = {
+  classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(Publish) // eslint-disable-line
+export default withStyles(styles)(PublishModal) // eslint-disable-line

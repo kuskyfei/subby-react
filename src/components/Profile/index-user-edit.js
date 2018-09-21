@@ -4,7 +4,6 @@ import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import classNames from 'classnames'
 import Typography from '@material-ui/core/Typography'
-import MessageIcon from '@material-ui/icons/Message'
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto'
 import EditIcon from '@material-ui/icons/Edit'
 
@@ -19,7 +18,7 @@ const styles = theme => ({
     textAlign: 'center'
   },
   username: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing.unit
   },
   bio: {
     margin: theme.spacing.unit
@@ -47,9 +46,9 @@ const styles = theme => ({
   editAvatar: {
     cursor: 'pointer',
     '&:hover': {
-      boxShadow: '0 0 0 2px rgba(189, 189, 189, 0.40)',
+      boxShadow: '0 0 0 2px rgba(189, 189, 189, 0.40)'
     }
-  },
+  }
 })
 
 const Profile = (props) => {
@@ -78,7 +77,7 @@ const Profile = (props) => {
         Edit&nbsp;
         <EditIcon className={classes.iconSmall} />
       </Button>
-      
+
       <Typography className={classes.bio} variant='body1' gutterBottom>
         {profile.bio}
       </Typography>

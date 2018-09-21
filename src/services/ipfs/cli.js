@@ -35,13 +35,13 @@ sleepy-dog.mp4 QmdbaL9CpPoJXHTSx9BxxkHAv9k1wcyzbdRLdKHPsPVfYs
 example of usage
 
 ipfs
-	.uploadFilePathWrappedWithDirectory(
-		'dog-loves-baby.mp4', 
-		'/Users/dave/Documents/git/subby-react/src/services/ipfs/test/mock/media/videos/dog-loves-baby.mp4'
-	)
-	.then(console.log)
+  .uploadFilePathWrappedWithDirectory(
+    'dog-loves-baby.mp4',
+    '/Users/dave/Documents/git/subby-react/src/services/ipfs/test/mock/media/videos/dog-loves-baby.mp4'
+  )
+  .then(console.log)
 
-logs 
+logs
 
 [ { path: 'dog-loves-baby.mp4', // file name
     hash: 'QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV',

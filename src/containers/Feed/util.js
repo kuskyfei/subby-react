@@ -8,9 +8,9 @@ const getProfileQueryFromUrlParams = (urlParams, address) => {
   if (u) {
     profileQuery = isValidAddress(u) ? {address: u} : {username: u}
   }
-  
+
   if (p === 'profile') {
-    profileQuery =  {address}
+    profileQuery = {address}
   }
 
   return profileQuery

@@ -50,7 +50,7 @@ const styles = theme => ({
     textAlign: 'center',
     color: theme.palette.text.secondary,
     [theme.breakpoints.up(600 + theme.spacing.unit * 3 * 2)]: {
-    },
+    }
   },
   links: {
     marginBottom: theme.spacing.unit * 4,
@@ -127,7 +127,7 @@ class Help extends React.Component {
             <a href='https://subby.io/github' target='_blank'>Look at the code</a>
           </Typography>
 
-          {window.location.protocol !== 'file:' && 
+          {window.location.protocol !== 'file:' &&
             <Typography variant='display1' gutterBottom>
               <a href='https://subby.io/download' target='_blank'>Download</a>
             </Typography>

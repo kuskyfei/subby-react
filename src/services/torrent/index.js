@@ -6,7 +6,6 @@ const getTorrent = (magnetURI) => {
   debug('getTorrent', magnetURI)
 
   return new Promise((resolve) => {
-
     client.add(magnetURI, (torrent) => {
       debug('torrent', torrent)
 
@@ -38,8 +37,7 @@ const getRoot = (path) => {
 
 const bytesToMbs = (number) => {
   const mb = 1048576
-  return (number / 1048576).toFixed(2)
+  return (number / mb).toFixed(2)
 }
-
 
 export {getTorrent}

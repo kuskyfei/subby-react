@@ -1,3 +1,5 @@
+const queryString = require('query-string')
+
 const isValidAddress = (address) => {
   if (typeof address !== 'string') {
     return false
@@ -31,4 +33,8 @@ const isValidHexNumber = (string) => {
   return !containsNonHexChar
 }
 
-export {isValidAddress}
+const getUsernameFromUrlParams = (urlParams) => {
+  return queryString.parse(urlParams).u
+}
+
+export {isValidAddress, getUsernameFromUrlParams}

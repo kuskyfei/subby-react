@@ -83,7 +83,7 @@ class Feed extends React.Component {
 
 Feed.propTypes = {
   classes: PropTypes.object.isRequired,
-  postCount: PropTypes.number.isRequired,
+  postCount: PropTypes.number.isRequired
 }
 
 export default withStyles(styles)(Feed) // eslint-disable-line

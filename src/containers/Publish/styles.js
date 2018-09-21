@@ -3,7 +3,7 @@ const styles = theme => ({
     width: '75vw',
     maxWidth: theme.spacing.unit * 62,
     [theme.breakpoints.down(600 + theme.spacing.unit * 2 * 2)]: {
-      width: '90vw',
+      width: '90vw'
     },
     boxShadow: '0 2px 3px 0 rgba(60,64,67,0.3),0 6px 10px 4px rgba(60,64,67,0.15)!important',
     background: theme.palette.background.default,
@@ -45,11 +45,11 @@ const styles = theme => ({
   },
   uploadNotDragging: {
     border: `5px ${theme.palette.grey['300']} dashed`,
-    color: theme.palette.grey['400'],
+    color: theme.palette.grey['400']
   },
   uploadDragging: {
     color: theme.palette.text.secondary,
-    border: `5px ${theme.palette.text.secondary} dashed`,
+    border: `5px ${theme.palette.text.secondary} dashed`
   },
 
   greyIcon: {
@@ -63,7 +63,7 @@ const styles = theme => ({
       borderRadius: 5,
       paddingTop: theme.spacing.unit,
       paddingBottom: theme.spacing.unit,
-      minHeight: theme.spacing.unit * 12,
+      minHeight: theme.spacing.unit * 12
     },
     '& div:after': {
       display: 'none!important'
@@ -74,11 +74,11 @@ const styles = theme => ({
     boxShadow: '0 0 2px 5px #e0e0e012',
     marginBottom: theme.spacing.unit * 3,
     '& textarea': {
-      margin: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
+      margin: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`
     },
     '& textarea::placeholder': {
       color: theme.palette.text.hint
-    },
+    }
   }
 
 })

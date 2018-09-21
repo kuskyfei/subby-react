@@ -62,7 +62,7 @@ const typedArrayToArrayBuffer = (typedArray) => {
 
 const bytesToMbs = (number) => {
   const mb = 1048576
-  return (number / 1048576).toFixed(2)
+  return (number / mb).toFixed(2)
 }
 
 const uint8ArrayToUtf8 = (Uint8Array) => {

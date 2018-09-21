@@ -18,7 +18,6 @@ const EmbedWidget = (props) => {
 }
 
 const getWidgetFromUrl = (url) => {
-
   if (!url) {
     return () => <div />
   }

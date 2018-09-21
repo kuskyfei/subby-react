@@ -66,6 +66,7 @@ add web torrent loading icon
 make subby npm module
 make publishing content guide
 make find accounts to follow post
+add warning before quitting post
 
 make puppeteer tests
 

@@ -9,7 +9,7 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case A.SET_FEED:
       return {
-        ...state, 
+        ...state,
         feed: action.payload
       }
 

@@ -10,8 +10,8 @@ const styles = {
 
 const Video = (props) => {
   return (
-    <video 
-      className={props.classes.video} 
+    <video
+      className={props.classes.video}
       controls
       src={props.url}
     >

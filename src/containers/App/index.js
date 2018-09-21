@@ -8,8 +8,10 @@ import { bindActionCreators } from 'redux'
 import CssBaseline from '@material-ui/core/CssBaseline'
 
 // components
-import {Header} from '../../components'
-import {Feed, Profile, Permalink, Subscriptions, Settings, Help} from '../../containers'
+import {Pages} from '../../components'
+
+// containers
+import {Header, Feed, Subscriptions, Settings} from '../../containers'
 
 // actions
 import actions from './reducers/actions'
@@ -123,7 +125,7 @@ const getRouteFromUrlParams = (urlParams) => {
       return Feed
 
     default:
-      return Help
+      return Pages.Help
   }
 }
 

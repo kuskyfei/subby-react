@@ -12,7 +12,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import {Profile, Feed as FeedComponent} from '../../components'
 
 // containers
-import Post from '../Post'
+import {Post} from '../../containers'
 
 // actions
 import actions from './reducers/actions'
@@ -22,9 +22,9 @@ const services = require('../../services')
 
 // util
 const {
-  getProfileQueryFromUrlParams, 
-  getUsernameFromUrlParams, 
-  getPostIdFromUrlParams, 
+  getProfileQueryFromUrlParams,
+  getUsernameFromUrlParams,
+  // getPostIdFromUrlParams,
   isPermalink,
   isPublisher,
   isProfile,
@@ -46,7 +46,6 @@ const styles = theme => ({
 })
 
 class Feed extends React.Component {
-
   state = {
     hasMorePosts: true,
     addingMorePosts: false
@@ -114,9 +113,7 @@ class Feed extends React.Component {
       }
 
       actions.setFeed([post])
-    }
-
-    else if (isPublisher(location.search)) {
+    } else if (isPublisher(location.search)) {
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length
@@ -130,9 +127,7 @@ class Feed extends React.Component {
 
       const newPosts = await services.getFeed(postQuery)
       actions.setFeed([...feed, ...newPosts])
-    }
-
-    else if (isProfile(location.search)) {
+    } else if (isProfile(location.search)) {
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length
@@ -146,9 +141,7 @@ class Feed extends React.Component {
 
       const newPosts = await services.getFeed(postQuery)
       actions.setFeed([...feed, ...newPosts])
-    }
-
-    else if (isFeed(location.search)) {
+    } else if (isFeed(location.search)) {
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length
@@ -173,14 +166,13 @@ class Feed extends React.Component {
 
     const posts = []
     for (const post of feed) {
-      posts.push(<Post key={post.username+post.address+post.id} post={post} />)
+      posts.push(<Post key={post.username + post.address + post.id} post={post} />)
     }
 
     let profile
     if (isProfile(location.search)) {
       profile = this.props.profile
-    }
-    else {
+    } else {
       profile = this.props.publisherProfile
     }
 
