@@ -35,6 +35,7 @@
 */
 
 const idb = require('idb')
+window.SUBBY_DEBUG_GET_IDB = idb
 
 const state = {}
 
@@ -57,6 +58,11 @@ let init = async ({version}) => {
     }
   })
 }
+
+const deleteEverything = () => {
+  return idb.deleteDatabase('subby')
+}
+window.SUBBY_DEBUG_DELETE_INDEXEDDB = deleteEverything
 
 state.init = init
 

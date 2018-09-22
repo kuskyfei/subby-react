@@ -13,6 +13,8 @@ const init = async ({provider = '', mnemonic = ''} = {}) => {
   const web3Provider = new HDWalletProvider(mnemonic, provider)
   // const subbyContractAddress = 'not on mainnet yet'
 
+  console.log('web3Provider', web3Provider)
+
   const web3 = new Web3(web3Provider)
   Promise.promisifyAll(web3.eth)
 

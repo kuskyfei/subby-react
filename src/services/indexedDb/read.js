@@ -86,7 +86,7 @@ const getLoggedInSubscriptionsCache = async ({username, address}) => {
     .objectStore('loggedInSubscriptions')
     .get(username)
 
-  const subscriptions = res.subscriptions
+  const subscriptions = res && res.subscriptions
 
   debug('getLoggedInSubscriptionsCache returns', subscriptions)
 
@@ -104,7 +104,7 @@ const getLastLoggedInSubscriptionsCacheTimeStamp = async ({username, address}) =
     .objectStore('loggedInSubscriptions')
     .get(username)
 
-  const lastLoggedInSubscriptionsCacheTimeStamp = res.lastLoggedInSubscriptionsCacheTimeStamp
+  const lastLoggedInSubscriptionsCacheTimeStamp = res && res.lastLoggedInSubscriptionsCacheTimeStamp
 
   debug('getLastLoggedInSubscriptionsCacheTimeStamp returns', lastLoggedInSubscriptionsCacheTimeStamp)
 
