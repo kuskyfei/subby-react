@@ -385,5 +385,26 @@ components
 - view.profile
 - view.address
 
+problems with smart contracts
+
+commentsLinksNamesThumbnails -> change to username
 
 
+yo a just relaaized getPostsFromPublisher also needs some kind of cursor to prevent new posts from fucking shit up, it needs a before / aftertime stamp
+
+i think we need to have a single setProfile function
+
+
+if (_address == 0x0000000000000000000000000000000000000000) {
+            _address = getAddressFromUsername(username);
+        } --> username should be the default value
+        
+        
+        get subscriptions is only returning addresses, has to return usernames
+        
+
+change minDonations to minimumDonations
+
+getPostFromIdAsync doesnt return minimumDonation
+
+getPostsFromPublisher needs to return minimumDonation
