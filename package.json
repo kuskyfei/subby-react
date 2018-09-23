@@ -12,6 +12,7 @@
     "material-ui-icons": "^1.0.0-beta.36",
     "ms": "^2.1.1",
     "query-string": "^6.1.0",
+    "queue": "^4.5.0",
     "react": "^16.4.2",
     "react-addons-test-utils": "^15.6.2",
     "react-dom": "^16.4.2",
