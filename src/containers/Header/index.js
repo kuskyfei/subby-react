@@ -48,13 +48,9 @@ class Header extends React.Component {
           <Toolbar>
 
             <div className={classes.leftContainer}>
-              <Typography variant='title' color='inherit'>
-                <div id='header__logo'>
-                  <Link to='?p=feed'>
-                    <div className={classes.logo} />
-                  </Link>
-                </div>
-              </Typography>
+              <Link to='?p=feed'>
+                <div className={classes.logo} />
+              </Link>
             </div>
 
             <div className={classes.middleContainer}>

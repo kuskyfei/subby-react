@@ -1,5 +1,5 @@
 import React from 'react'
-import Loading from './Loading'
+import {Loading} from './util'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 const responsiveEmbedStyles = {

@@ -1,8 +1,8 @@
 // react
 import React from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { withRouter } from 'react-router-dom'
+import {connect} from 'react-redux'
+import {bindActionCreators, compose} from 'redux'
+import {withRouter} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
@@ -261,4 +261,10 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch)
 })
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Settings))) // eslint-disable-line
+const enhance = compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps),
+  withStyles(styles)
+)
+
+export default enhance(Settings) // eslint-disable-line

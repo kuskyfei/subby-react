@@ -2,8 +2,7 @@
 import React from 'react'
 
 // components
-import Card from '../../components/Card'
-import {Download, Torrent} from './components'
+import {Card} from '../../components'
 
 // api
 const services = require('../../services')
@@ -31,6 +30,12 @@ class Post extends React.Component {
   }
 
   componentDidUpdate = (prevProps) => {
+    const prevPost = prevProps && prevProps.post || {}
+    const post = this.props && this.props.post || {}
+
+    if (prevPost.link !== post.link) {
+      this.handleIpfsLink()
+    }
     debug('updated')
   }
 
@@ -48,9 +53,7 @@ class Post extends React.Component {
 
     this.setState({
       ...this.state,
-      link: (
-        <Torrent torrent={torrent} />
-      )
+      link: torrent
     })
 
     debug('handleTorrent end')
@@ -61,7 +64,7 @@ class Post extends React.Component {
     if (!post.comment) return
 
     if (isIpfsContent(post.comment)) {
-      this.setState({...this.state, comment: 'ipfs:loading'})
+      this.setState({...this.state, comment: 'loading'})
 
       const ipfsHash = getHash(post.comment)
       const string = await services.ipfs.getStringFromStream(ipfsHash, {maxLength: 10000}) // 1000 is an arbitrary small number to prevent too big IPFS files
@@ -77,31 +80,29 @@ class Post extends React.Component {
     if (!post.link) return
 
     if (isIpfsContent(post.link)) {
-      this.setState({...this.state, link: 'ipfs:loading'})
+      this.setState({...this.state, link: 'loading'})
 
       const ipfsHash = getHash(post.link)
       const fileType = await services.ipfs.getFileTypeFromHash(ipfsHash)
-      const fileMimeType = fileType.mime
-      const fileExtension = fileType.ext
+      const fileMimeType = fileType ? fileType.mime : 'unknown'
+      const fileExtension = fileType ? `.${fileType.ext}` : ''
 
       if (fileMimeType.match(/image/)) {
         const image = await services.ipfs.getBase64ImageFromStream(ipfsHash, (progressResponse) => {
           const {progressInMbs, killStream} = progressResponse
           this.killStream = killStream
 
-          this.setState({...this.state, link: `ipfs:loading:${progressInMbs}`})
+          this.setState({...this.state, link: 'loading'})
 
           if (progressInMbs > 10) {
             killStream()
             this.setState({
               ...this.state,
-              link: (
-                <Download
-                  download={this.download.bind(this, {ipfsHash, fileExtension})}
-                  message={`File ${fileMimeType} too big.`}
-                  downloadMessage='Download'
-                />
-              )
+              link: {
+                download: this.download.bind(this, {ipfsHash, fileExtension}),
+                message: `File type ${fileMimeType} too big to embed.`,
+                downloadMessage: 'Download'
+              }
             })
           }
         })
@@ -109,13 +110,11 @@ class Post extends React.Component {
       } else {
         this.setState({
           ...this.state,
-          link: (
-            <Download
-              download={this.download.bind(this, {ipfsHash, fileExtension})}
-              message={`Unsuported IPFS content ${fileMimeType}.`}
-              downloadMessage='Download'
-            />
-          )
+          link: {
+            download: this.download.bind(this, {ipfsHash, fileExtension}),
+            message: `Cannot embed file type ${fileMimeType}.`,
+            downloadMessage: 'Download'
+          }
         })
       }
     }
@@ -125,6 +124,9 @@ class Post extends React.Component {
 
   download = async ({ipfsHash, fileExtension}) => {
     const {isDownloading} = this.state
+    const {post} = this.props
+    const username = post.username || post.address
+    const postId = post.id
 
     if (!isDownloading) {
       this.setState({...this.state, isDownloading: true})
@@ -135,27 +137,23 @@ class Post extends React.Component {
 
         this.setState({
           ...this.state,
-          link: (
-            <Download
-              download={this.download.bind(this, {ipfsHash, fileExtension})}
-              message={`${progressInMbs}mb downloaded.`}
-              downloadMessage='Cancel'
-            />
-          )
+          link: {
+            download: this.download.bind(this, {ipfsHash, fileExtension}),
+            message: `${progressInMbs} MB downloaded.`,
+            downloadMessage: 'Cancel'
+          }
         })
       })
 
-      downloadBlob({blob, fileName: `username+postid.${fileExtension}`})
+      downloadBlob({blob, fileName: `${username}-${postId}${fileExtension}`})
 
       this.setState({
         ...this.state,
-        link: (
-          <Download
-            download={() => downloadBlob({blob, fileName: `username+postid.${fileExtension}`})}
-            message='Download complete.'
-            downloadMessage='Save'
-          />
-        ),
+        link: {
+          download: () => downloadBlob({blob, fileName: `${username}-${postId}${fileExtension}`}),
+          message: 'Download complete.',
+          downloadMessage: 'Save'
+        },
         isDownloading: false
       })
     }
@@ -165,13 +163,11 @@ class Post extends React.Component {
 
       this.setState({
         ...this.state,
-        link: (
-          <Download
-            download={this.download.bind(this, {ipfsHash, fileExtension})}
-            message={`Cancelled download.`}
-            downloadMessage='Try again'
-          />
-        ),
+        link: {
+          download: this.download.bind(this, {ipfsHash, fileExtension}),
+          message: 'Cancelled download.',
+          downloadMessage: 'Try again'
+        },
         isDownloading: false
       })
     }
@@ -185,6 +181,10 @@ class Post extends React.Component {
 
     if (link) newPost.link = link
     if (comment) newPost.comment = comment
+
+    // catch loading IPFS content on first render
+    if (isIpfsContent(newPost.link)) newPost.link = 'loading'
+    if (isIpfsContent(newPost.comment)) newPost.comment = 'loading'
 
     return (
       <Card isLoading={isLoading} post={newPost} preview={preview} onPreviewClose={onPreviewClose} />

@@ -1,7 +1,7 @@
 // react
 import React from 'react'
 import {connect} from 'react-redux'
-import {bindActionCreators} from 'redux'
+import {bindActionCreators, compose} from 'redux'
 import {withRouter} from 'react-router-dom'
 import PropTypes from 'prop-types'
 
@@ -242,4 +242,10 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch)
 })
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Subscriptions))) // eslint-disable-line
+const enhance = compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps),
+  withStyles(styles)
+)
+
+export default enhance(Subscriptions) // eslint-disable-line

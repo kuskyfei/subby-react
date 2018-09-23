@@ -1,10 +1,12 @@
 const IPFS = require('ipfs-api')
 const getFileTypeFromBuffer = require('file-type')
+const debug = require('debug')('services:ipfs')
 
 let ipfs
 
 const {
   urlToProviderObject,
+  typedArrayToIpfsBuffer,
   objectToIpfsBuffer,
   noProvider,
   fileToIpfsBuffer,
@@ -37,19 +39,29 @@ const uploadObject = async (object) => {
 }
 
 const uploadString = async (string) => {
+  debug('uploadString', string)
   if (!ipfs) noProvider()
 
   const buffer = stringToIpfsBuffer(string)
   return ipfs.add(buffer)
 }
 
-const uploadBuffer = async (buffer) => {
+const uploadIpfsBuffer = async (ipfsBuffer) => {
   if (!ipfs) noProvider()
 
+  // IPFS buffers are special types of buffers that need a conversion
+  return ipfs.add(ipfsBuffer)
+}
+
+const uploadTypedArray = async (typedArray) => {
+  debug('uploadTypedArray', typedArray)
+  if (!ipfs) noProvider()
+
+  const buffer = typedArrayToIpfsBuffer(typedArray)
   return ipfs.add(buffer)
 }
 
-const uploadBufferWrappedWithDirectory = async (fileName, buffer) => {
+const uploadIpfsBufferWrappedWithDirectory = async (fileName, buffer) => {
   if (!ipfs) noProvider()
 
   const data = [{
@@ -82,13 +94,17 @@ const uploadFilePathWrappedWithDirectory = (fileName, path) => {
 }
 
 const getReadableStream = async (ipfsHash) => {
+  debug('getReadableStream', ipfsHash)
   if (!ipfs) noProvider()
+
   const stream = await getReadableFileContentStream(ipfsHash)
   return stream
 }
 
 const getReadableFileContentStream = (ipfsHash) => {
+  debug('getReadableFileContentStream', ipfsHash)
   if (!ipfs) noProvider()
+
   return new Promise((resolve, reject) => {
     const stream = ipfs.files.getReadableStream(ipfsHash)
 
@@ -100,11 +116,12 @@ const getReadableFileContentStream = (ipfsHash) => {
   })
 }
 
-const getFileTypeFromHash = (hash) => {
+const getFileTypeFromHash = (ipfsHash) => {
+  debug('getFileTypeFromHash', ipfsHash)
   if (!ipfs) noProvider()
 
   return new Promise(async resolve => {
-    const s = await getReadableStream(hash)
+    const s = await getReadableStream(ipfsHash)
     s.on('data', buffer => {
       s.pause()
       s.destroy()
@@ -115,12 +132,14 @@ const getFileTypeFromHash = (hash) => {
   })
 }
 
-const getBase64ImageFromStream = (hash, progressCallback) => {
+const getBase64ImageFromStream = (ipfsHash, progressCallback) => {
+  debug('getBase64ImageFromStream', ipfsHash)
   if (!ipfs) noProvider()
+
   return new Promise(async resolve => {
     let entireBuffer
 
-    const s = await getReadableStream(hash)
+    const s = await getReadableStream(ipfsHash)
     s.on('data', buffer => {
       if (!entireBuffer) {
         entireBuffer = buffer
@@ -147,10 +166,11 @@ const getBase64ImageFromStream = (hash, progressCallback) => {
   })
 }
 
-const getBase64Image = async (hash) => {
+const getBase64Image = async (ipfsHash) => {
+  debug('getBase64Image', ipfsHash)
   if (!ipfs) noProvider()
 
-  const res = await ipfs.get(hash)
+  const res = await ipfs.get(ipfsHash)
 
   const buffer = res[0].content
 
@@ -159,20 +179,22 @@ const getBase64Image = async (hash) => {
   return base64Image
 }
 
-const getTypedArray = async (hash) => {
+const getTypedArray = async (ipfsHash) => {
+  debug('getTypedArray', ipfsHash)
   if (!ipfs) noProvider()
 
-  const res = await ipfs.get(hash)
+  const res = await ipfs.get(ipfsHash)
 
   const typedArray = res[0].content
 
   return typedArray
 }
 
-const getBlob = async (hash) => {
+const getBlob = async (ipfsHash) => {
+  debug('getBlob', ipfsHash)
   if (!ipfs) noProvider()
 
-  const res = await ipfs.get(hash)
+  const res = await ipfs.get(ipfsHash)
 
   const buffer = res[0].content
 
@@ -185,13 +207,14 @@ const getBlob = async (hash) => {
   return blob
 }
 
-const getBlobFromStream = async (hash, progressCallback) => {
+const getBlobFromStream = async (ipfsHash, progressCallback) => {
+  debug('getBlobFromStream', ipfsHash)
   if (!ipfs) noProvider()
 
   return new Promise(async resolve => {
     let entireBuffer
 
-    const s = await getReadableStream(hash)
+    const s = await getReadableStream(ipfsHash)
 
     s.on('data', buffer => {
       if (!entireBuffer) {
@@ -221,6 +244,7 @@ const getBlobFromStream = async (hash, progressCallback) => {
 }
 
 const getJson = async (ipfsHash) => {
+  debug('getJson', ipfsHash)
   if (!ipfs) noProvider()
 
   const res = await ipfs.get(ipfsHash)
@@ -236,6 +260,7 @@ const getJson = async (ipfsHash) => {
 }
 
 const getString = async (ipfsHash) => {
+  debug('getString', ipfsHash)
   if (!ipfs) noProvider()
 
   const res = await ipfs.get(ipfsHash)
@@ -248,13 +273,14 @@ const getString = async (ipfsHash) => {
   return string
 }
 
-const getStringFromStream = async (hash, {maxLength}) => {
+const getStringFromStream = async (ipfsHash, {maxLength}) => {
+  debug('getStringFromStream', ipfsHash)
   if (!ipfs) noProvider()
 
   return new Promise(async resolve => {
     let entireBuffer
 
-    const s = await getReadableStream(hash)
+    const s = await getReadableStream(ipfsHash)
 
     s.on('data', buffer => {
       if (!entireBuffer) {
@@ -285,9 +311,10 @@ export default {
 
   uploadObject,
   uploadString,
-  uploadBuffer,
+  uploadTypedArray,
+  uploadIpfsBuffer,
   uploadFilePath,
-  uploadBufferWrappedWithDirectory,
+  uploadIpfsBufferWrappedWithDirectory,
   uploadFilePathWrappedWithDirectory,
 
   getFileTypeFromBuffer,

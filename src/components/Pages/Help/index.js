@@ -14,7 +14,12 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit * 3,
     marginRight: theme.spacing.unit * 3,
     paddingTop: theme.spacing.unit * 4,
-    [theme.breakpoints.up(800 + theme.spacing.unit * 2 * 2)]: {
+    [theme.breakpoints.up(600 + theme.spacing.unit * 2 * 2)]: {
+      marginLeft: theme.spacing.unit * 6,
+      marginRight: theme.spacing.unit * 6,
+      paddingTop: theme.spacing.unit * 6,
+    },
+    [theme.breakpoints.up(900 + theme.spacing.unit * 2 * 2)]: {
       paddingTop: theme.spacing.unit * 6,
       width: 800,
       marginLeft: 'auto',
@@ -29,8 +34,11 @@ const styles = theme => ({
     [theme.breakpoints.up(800 + theme.spacing.unit * 2 * 2)]: {
       marginBottom: `${theme.spacing.unit * 6}px!important`
     },
-    [theme.breakpoints.down(400 + theme.spacing.unit * 2 * 2)]: {
+    [theme.breakpoints.down(500 + theme.spacing.unit * 2 * 2)]: {
       fontSize: '3rem'
+    },
+    [theme.breakpoints.down(500 + theme.spacing.unit * 2 * 2)]: {
+      fontSize: '2.7rem'
     }
   },
   grid: {
@@ -59,6 +67,16 @@ const styles = theme => ({
     },
     '& a:hover': {
       textDecoration: 'underline'
+    },
+    [theme.breakpoints.down(500 + theme.spacing.unit * 2 * 2)]: {
+      '& h1': {
+        fontSize: '2rem'
+      }
+    },
+    [theme.breakpoints.down(400 + theme.spacing.unit * 2 * 2)]: {
+      '& h1': {
+        fontSize: '1.7rem'
+      }
     }
   }
 })

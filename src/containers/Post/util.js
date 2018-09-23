@@ -1,5 +1,5 @@
 const isIpfsContent = (string = '') => {
-  return !!string.match(/^ipfs:/)
+  return typeof string === 'string' && string.match(/^ipfs:/)
 }
 
 const isTorrent = (string = '') => {

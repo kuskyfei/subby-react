@@ -6,7 +6,9 @@ import {
   Vimeo, Youtube,
   Image, Link,
   Ipfs, Torrent,
-  Audio, Video
+  Audio, Video,
+  Loading, Magnet,
+  Download
 } from './components'
 
 const {extractRootDomain, stripUrlQuery} = require('./util')
@@ -22,16 +24,28 @@ const getWidgetFromUrl = (url) => {
     return () => <div />
   }
 
+  if (isDownload(url)) {
+    return Download
+  }
+
+  if (isTorrent(url)) {
+    return Torrent
+  }
+
   if (isReactElement(url)) {
     return () => url
+  }
+
+  if (isLoading(url)) {
+    return Loading
   }
 
   if (isIpfs(url)) {
     return Ipfs
   }
 
-  if (isTorrent(url)) {
-    return Torrent
+  if (isMagnet(url)) {
+    return Magnet
   }
 
   if (isVideo(url)) {
@@ -111,10 +125,24 @@ const isIpfs = (url) => {
   }
 }
 
-const isTorrent = (url) => {
+const isMagnet = (url) => {
   if (url.match(/^magnet:/)) {
     return true
   }
+}
+
+const isLoading = (url) => {
+  if (url.match(/^loading:/) || url.match(/^loading$/)) {
+    return true
+  }
+}
+
+const isTorrent = (url) => {
+  return typeof url === 'object' && url.magnet
+}
+
+const isDownload = (url) => {
+  return typeof url === 'object' && url.download
 }
 
 const isReactElement = (url) => {

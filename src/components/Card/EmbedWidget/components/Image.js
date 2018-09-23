@@ -6,7 +6,8 @@ const styles = {
     maxHeight: 600,
     maxWidth: '100%',
     transform: 'translateX(-50%)',
-    marginLeft: '50%'
+    marginLeft: '50%',
+    animation: 'fadeIn ease 0.5s'
   }
 }
 

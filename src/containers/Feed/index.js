@@ -1,8 +1,8 @@
 // react
 import React from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { withRouter } from 'react-router-dom'
+import {connect} from 'react-redux'
+import {bindActionCreators, compose} from 'redux'
+import {withRouter} from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 // material
@@ -95,7 +95,7 @@ class Feed extends React.Component {
         comment: 'ipfs:QmX48d6q3YgSxZjUhoSziw47AcEuUAWN3BPfZtaNkUn6uj', // long string
         // link: 'ipfs:QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo', // image
         // link: 'ipfs:QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV', // video
-        // link: 'ipfs:QmZbp9u6yMDW94mfxTYe8hMaomBLr2NfckUhYf3J7ax7zM/dog-loves-baby.mp4',
+        link: 'ipfs:QmZbp9u6yMDW94mfxTYe8hMaomBLr2NfckUhYf3J7ax7zM/dog-loves-baby.mp4',
         // link: 'ipfs:QmQ747r7eLfsVtBFBSRwfXsPK6tADJpQzJxz4uFdoZb9XJ', // big video
         // link: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
         // link: 'https://interactive-examples.mdn.mozilla.net/media/examples/stream_of_water.webm',
@@ -103,7 +103,7 @@ class Feed extends React.Component {
         // link: 'http://www.hochmuth.com/mp3/Haydn_Cello_Concerto_D-1.mp3',
         // link: 'https://twitter.com/APompliano/status/1034115384360792064',
         // link: 'https://www.reddit.com/r/pics/comments/9b1epu/my_husband_started_17th_grade_his_masters_program/',
-        link: 'https://www.instagram.com/p/Bm1WJFoHqif/',
+        // link: 'https://www.instagram.com/p/Bm1WJFoHqif/',
         // link: 'https://vimeo.com/154583964',
         // link: 'https://www.youtube.com/watch?v=pIbAXzEHjBI',
         // link: 'https://www.facebook.com/refinery29/posts/10156965764817922',
@@ -113,7 +113,9 @@ class Feed extends React.Component {
       }
 
       actions.setFeed([post])
-    } else if (isPublisher(location.search)) {
+    } 
+
+    else if (isPublisher(location.search)) { // eslint-disable-line
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length
@@ -127,7 +129,9 @@ class Feed extends React.Component {
 
       const newPosts = await services.getFeed(postQuery)
       actions.setFeed([...feed, ...newPosts])
-    } else if (isProfile(location.search)) {
+    } 
+
+    else if (isProfile(location.search)) { // eslint-disable-line
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length
@@ -141,7 +145,9 @@ class Feed extends React.Component {
 
       const newPosts = await services.getFeed(postQuery)
       actions.setFeed([...feed, ...newPosts])
-    } else if (isFeed(location.search)) {
+    } 
+
+    else if (isFeed(location.search)) { // eslint-disable-line
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length
@@ -206,4 +212,10 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch)
 })
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Feed))) // eslint-disable-line
+const enhance = compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps),
+  withStyles(styles)
+)
+
+export default enhance(Feed) // eslint-disable-line

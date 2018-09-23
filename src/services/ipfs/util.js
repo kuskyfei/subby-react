@@ -30,6 +30,11 @@ const stringToIpfsBuffer = (string) => {
   return buffer
 }
 
+const typedArrayToIpfsBuffer = (typedArray) => {
+  const buffer = ipfsBuffer.from(typedArray)
+  return buffer
+}
+
 const arrayBufferToBase64 = (buffer) => {
   var binary = ''
   var bytes = new Uint8Array(buffer)
@@ -71,8 +76,14 @@ const uint8ArrayToUtf8 = (Uint8Array) => {
   return string
 }
 
+const arrayBufferToTypedArray = (buffer) => {
+  var bytes = new Uint8Array(buffer)
+  return bytes
+}
+
 export {
   urlToProviderObject,
+  typedArrayToIpfsBuffer,
   objectToIpfsBuffer,
   stringToIpfsBuffer,
   fileToIpfsBuffer,

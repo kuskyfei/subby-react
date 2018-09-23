@@ -21,9 +21,17 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
+add download to web worker
+add support for streaming videos https://github.com/gpac/mp4box.js/
+
 possibl bug with twitter and IG cards
 
-fix long text preview
+take car of web worker and video fmp4
+
+
+identify torrent file on drop
+add torrent load icon
+
 
 make publish pop up
 make card option pop up
@@ -408,3 +416,5 @@ change minDonations to minimumDonations
 getPostFromIdAsync doesnt return minimumDonation
 
 getPostsFromPublisher needs to return minimumDonation
+
+use startAt and limit instead of start and amount

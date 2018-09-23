@@ -72,7 +72,8 @@ const styles = theme => ({
   avatar: {
   },
   comment: {
-    overflowWrap: 'break-word'
+    overflowWrap: 'break-word',
+    animation: 'fadeIn ease 0.5s'
   },
 
   closeButton: {
@@ -146,11 +147,17 @@ class Card extends React.Component {
 
         <EmbedWidget url={post.link} />
 
-        <CardContent>
-          <Typography className={classes.comment} component='p'>
-            {formatComment(post.comment)}
-          </Typography>
-        </CardContent>
+        {post.comment !== 'loading' &&
+          <CardContent>
+            <Typography className={classes.comment} component='p'>
+              {formatComment(post.comment)}
+            </Typography>
+          </CardContent>
+        }
+
+        {post.comment === 'loading' &&
+          <EmbedWidget url='loading' />
+        }
 
         {!preview &&
           <CardActions className={classes.actions} disableActionSpacing>

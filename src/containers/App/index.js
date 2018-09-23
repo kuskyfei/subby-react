@@ -1,8 +1,8 @@
 // react redux
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import {withRouter} from 'react-router-dom'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import {connect} from 'react-redux'
+import {bindActionCreators, compose} from 'redux'
 
 // material
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -131,11 +131,16 @@ const getRouteFromUrlParams = (urlParams) => {
 
 const mapStateToProps = state => ({
   profile: state.profile,
-  ethereumAddress: state.ethereumAddress,
+  address: state.address,
   subscriptions: state.subscriptions
 })
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch)
 })
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App)) // eslint-disable-line
+const enhance = compose(
+  withRouter,
+  connect(mapStateToProps, mapDispatchToProps)
+)
+
+export default enhance(App) // eslint-disable-line
