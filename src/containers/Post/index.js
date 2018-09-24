@@ -11,6 +11,8 @@ const services = require('../../services')
 const {isIpfsContent, isTorrent, getHash, downloadBlob} = require('./util')
 const debug = require('debug')('containers:Post')
 
+const IPFS_COMMENT_MAX_LENGTH = 10000 // arbitrary small number to prevent too big IPFS files
+
 class Post extends React.Component {
   state = {
     link: null,
@@ -67,7 +69,7 @@ class Post extends React.Component {
       this.setState({...this.state, comment: 'loading'})
 
       const ipfsHash = getHash(post.comment)
-      const string = await services.ipfs.getStringFromStream(ipfsHash, {maxLength: 10000}) // 1000 is an arbitrary small number to prevent too big IPFS files
+      const string = await services.ipfs.getStringFromStream(ipfsHash, {maxLength: IPFS_COMMENT_MAX_LENGTH}) 
 
       this.setState({...this.state, comment: string})
     }
@@ -122,7 +124,45 @@ class Post extends React.Component {
     debug('handleIpfsLink end')
   }
 
+  getBlobFromStream = ({ipfsHash, fileExtension}) => new Promise(resolve => {
+    this.setState({
+      ...this.state,
+      link: {
+        download: this.download.bind(this, {ipfsHash, fileExtension}),
+        message: 'Connecting.',
+        downloadMessage: 'Cancel'
+      },
+      isDownloading: true
+    })
+
+    const getBlobFromStream = new services.ipfs.webWorkers.GetBlobFromStream
+    this.killStream = () => getBlobFromStream.postMessage({killStream: true})
+    getBlobFromStream.postMessage({
+      ipfsHash,
+      ipfsProvider: window.SUBBY_GLOBAL_SETTINGS.IPFS_PROVIDER
+    })
+    getBlobFromStream.onmessage = ({data}) => {
+      if (data.progressInMbs) {
+        this.setState({
+          ...this.state,
+          link: {
+            download: this.download.bind(this, {ipfsHash, fileExtension}),
+            message: `${data.progressInMbs} MB downloaded.`,
+            downloadMessage: 'Cancel'
+          },
+          isDownloading: true
+        })
+      }
+      if (data.blob) {
+        resolve(data.blob)
+      }
+    }
+
+  })
+
   download = async ({ipfsHash, fileExtension}) => {
+    debug('isDownloading', isDownloading)
+
     const {isDownloading} = this.state
     const {post} = this.props
     const username = post.username || post.address
@@ -131,19 +171,7 @@ class Post extends React.Component {
     if (!isDownloading) {
       this.setState({...this.state, isDownloading: true})
 
-      const blob = await services.ipfs.getBlobFromStream(ipfsHash, (progressResponse) => {
-        const {progressInMbs, killStream} = progressResponse
-        this.killStream = killStream
-
-        this.setState({
-          ...this.state,
-          link: {
-            download: this.download.bind(this, {ipfsHash, fileExtension}),
-            message: `${progressInMbs} MB downloaded.`,
-            downloadMessage: 'Cancel'
-          }
-        })
-      })
+      const blob = await this.getBlobFromStream({ipfsHash, fileExtension})
 
       downloadBlob({blob, fileName: `${username}-${postId}${fileExtension}`})
 

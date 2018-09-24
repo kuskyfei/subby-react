@@ -55,21 +55,20 @@ module.exports = function override (config, env) {
     // remove sourcemaps
     config.devtool = false
 
-    /* debugging */
-
-    /* analyze bundle sizes
+    // analyze bundle sizes
     config.plugins.push(
       new BundleAnalyzerPlugin({
         analyzerMode: "static",
         reportFilename: "report.html",
       })
-    ) */
+    )
 
-    // console.log(util.inspect(config, {depth: null}))
-    // process.kill()
+    // console.log(util.inspect(config, {depth: null})) // debug
+    // process.kill() // debug
 
-    /* end debugging */
-  } else {
+  } 
+
+  else { // eslint-disable-line
     config.plugins.push(new HtmlWebpackPlugin({
       inlineSource: '.(js|css)$',
       inject: 'body',
@@ -79,6 +78,7 @@ module.exports = function override (config, env) {
       subbyManifest: JSON.stringify(manifest),
       settingsMessage
     }))
+
   }
 
   // replace default create-react-app ESLint with Standard.js
@@ -91,6 +91,16 @@ module.exports = function override (config, env) {
       parser: 'babel-eslint'
     }
   }
+
+  // enable inline web workers as .worker.js files
+  config.module.rules.push({
+    test: /\.worker\.js$/,
+    use: { 
+      loader: 'worker-loader',
+      options: {inline: true}
+    }
+  })
+  //config.output.globalObject = `typeof self !== 'undefined' ? self : this`
 
   return config
 }
