@@ -21,8 +21,9 @@ const {
   getTypedArray,
   getBlob,
   getBlobFromStream,
-
+  getMediaSourceFromStream,
   getReadableStream,
+
   getIpfs
 } = require('./lib')
 
@@ -51,8 +52,9 @@ export default {
   getTypedArray,
   getBlob,
   getBlobFromStream,
-
+  getMediaSourceFromStream,
   getReadableStream,
+
   getIpfs,
 
   webWorkers

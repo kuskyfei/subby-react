@@ -82,6 +82,7 @@ const arrayBufferToTypedArray = (buffer) => {
 }
 
 export {
+  arrayBufferToTypedArray,
   urlToProviderObject,
   typedArrayToIpfsBuffer,
   objectToIpfsBuffer,

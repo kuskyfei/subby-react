@@ -32,8 +32,8 @@ class Post extends React.Component {
   }
 
   componentDidUpdate = (prevProps) => {
-    const prevPost = prevProps && prevProps.post || {}
-    const post = this.props && this.props.post || {}
+    const prevPost = (prevProps && prevProps.post) || {}
+    const post = (this.props && this.props.post) || {}
 
     if (prevPost.link !== post.link) {
       this.handleIpfsLink()
@@ -69,7 +69,7 @@ class Post extends React.Component {
       this.setState({...this.state, comment: 'loading'})
 
       const ipfsHash = getHash(post.comment)
-      const string = await services.ipfs.getStringFromStream(ipfsHash, {maxLength: IPFS_COMMENT_MAX_LENGTH}) 
+      const string = await services.ipfs.getStringFromStream(ipfsHash, {maxLength: IPFS_COMMENT_MAX_LENGTH})
 
       this.setState({...this.state, comment: string})
     }
@@ -135,7 +135,7 @@ class Post extends React.Component {
       isDownloading: true
     })
 
-    const getBlobFromStream = new services.ipfs.webWorkers.GetBlobFromStream
+    const getBlobFromStream = new services.ipfs.webWorkers.GetBlobFromStream()
     this.killStream = () => getBlobFromStream.postMessage({killStream: true})
     getBlobFromStream.postMessage({
       ipfsHash,
@@ -157,13 +157,11 @@ class Post extends React.Component {
         resolve(data.blob)
       }
     }
-
   })
 
   download = async ({ipfsHash, fileExtension}) => {
-    debug('isDownloading', isDownloading)
-
     const {isDownloading} = this.state
+    debug('isDownloading', isDownloading)
     const {post} = this.props
     const username = post.username || post.address
     const postId = post.id

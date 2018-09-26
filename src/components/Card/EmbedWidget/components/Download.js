@@ -8,7 +8,7 @@ const styles = theme => ({
     marginTop: 16,
     paddingLeft: 16,
     paddingRight: 16,
-    [theme.breakpoints.up(600 + theme.spacing.unit * 2 * 2)]: {
+    [theme.breakpoints.up(600)]: {
       paddingLeft: 24,
       paddingRight: 24
     },
@@ -36,7 +36,7 @@ let Download = (props) => {
 
   return (
     <Typography className={classes.margin} variant='body2' component='div' gutterBottom>
-      
+
       {message === 'Connecting.' &&
         <span className={classes.loading}>
           <CircularProgress className={classes.progress} size={15} />&nbsp;
@@ -44,7 +44,7 @@ let Download = (props) => {
       }
 
       {message}&nbsp;
-      
+
       <a
         className={classes.link}
         onClick={download}>

@@ -6,7 +6,7 @@ const {
   objectToIpfsBuffer,
   noProvider,
   fileToIpfsBuffer,
-  stringToIpfsBuffer,
+  stringToIpfsBuffer
 } = require('./util')
 
 const uploadObject = async (object) => {
@@ -78,5 +78,5 @@ export {
   uploadIpfsBuffer,
   uploadFilePath,
   uploadIpfsBufferWrappedWithDirectory,
-  uploadFilePathWrappedWithDirectory,
+  uploadFilePathWrappedWithDirectory
 }

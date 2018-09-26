@@ -1,3 +1,5 @@
+/* global postMessage, addEventListener */
+
 const {getBlobFromStream, setProvider} = require('../lib')
 
 let killStream
@@ -5,7 +7,6 @@ let streamIsKilled = false
 
 // Respond to message from parent thread
 addEventListener('message', async ({data}) => {
-
   if (data.ipfsHash) {
     setProvider(data.ipfsProvider)
 
@@ -25,7 +26,6 @@ addEventListener('message', async ({data}) => {
   }
 
   if (data.killStream) {
-
     if (typeof killStream !== 'function') {
       return
     }

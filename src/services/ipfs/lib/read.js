@@ -1,3 +1,5 @@
+/* global self */
+
 const getFileTypeFromBuffer = require('file-type')
 const debug = require('debug')('services:ipfs:read')
 const state = require('./state')
@@ -157,12 +159,11 @@ const getBlobFromStream = async (ipfsHash, progressCallback) => {
       const arrayBuffer = typedArrayToArrayBuffer(entireBuffer)
       let blob
 
-      // self is needed to work with the web worker, 
+      // self is needed to work with the web worker,
       // it might cause bugs when used in other places
       try {
         blob = new self.Blob(arrayBuffer)
-      }
-      catch (e) {
+      } catch (e) {
         blob = new window.Blob(arrayBuffer)
       }
 
@@ -230,7 +231,36 @@ const getStringFromStream = async (ipfsHash, {maxLength}) => {
   })
 }
 
+const getMediaSourceFromStream = async (ipfsHash, cb) => {
+  debug('getMediaSourceFromStream', ipfsHash)
+  if (!state.ipfs) noProvider()
+
+  return new Promise(async resolve => {
+    let entireBuffer
+
+    const s = await getReadableStream(ipfsHash)
+
+    s.on('data', buffer => {
+      if (!entireBuffer) {
+        entireBuffer = buffer
+      } else {
+        entireBuffer = concatTypedArrays(entireBuffer, buffer)
+      }
+      cb(buffer)
+    })
+
+    s.on('end', () => {
+      const arrayBuffer = typedArrayToArrayBuffer(entireBuffer)
+
+      const blob = new window.Blob(arrayBuffer)
+
+      resolve(blob)
+    })
+  })
+}
+
 export {
+  getMediaSourceFromStream,
   getFileTypeFromBuffer,
   getFileTypeFromHash,
   getJson,
@@ -241,5 +271,5 @@ export {
   getTypedArray,
   getBlob,
   getBlobFromStream,
-  getReadableStream,
+  getReadableStream
 }

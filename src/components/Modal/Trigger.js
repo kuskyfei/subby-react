@@ -1,9 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core/styles'
+import {withStyles} from '@material-ui/core/styles'
 import Modal from '@material-ui/core/Modal'
-import Button from '@material-ui/core/Button'
-import CloudUploadIcon from '@material-ui/icons/CloudUpload'
 
 const styles = theme => ({
   modal: {
@@ -22,20 +20,7 @@ const styles = theme => ({
   },
 
   container: {
-    display: 'inline-block'
-  },
-  publishButton: {
-    margin: theme.spacing.unit
-  },
-  publishButtonText: {
-    [theme.breakpoints.down(1050)]: {
-      display: 'none'
-    }
-  },
-  rightIcon: {
-    [theme.breakpoints.up(1050)]: {
-      marginLeft: theme.spacing.unit
-    }
+    display: 'contents'
   }
 })
 
@@ -45,7 +30,7 @@ const StyledModal = withStyles({
   }
 })(Modal)
 
-class PublishModal extends React.Component {
+class Trigger extends React.Component {
   state = {
     open: false
   }
@@ -58,20 +43,24 @@ class PublishModal extends React.Component {
     this.setState({ open: false })
   }
 
+  componentDidMount = () => {
+    console.log('Trigger mount')
+  }
+
+  componentWillUnmount = () => {
+    console.log('Trigger unmount')
+  }
+
   render () {
-    const { classes } = this.props
+    const {classes, trigger} = this.props
 
     return (
       <div className={classes.container}>
-        <Button
-          variant='contained'
-          color='default'
-          className={classes.publishButton}
-          onClick={this.handleOpen}
-        >
-          <span className={classes.publishButtonText}>Publish</span>
-          <CloudUploadIcon className={classes.rightIcon} />
-        </Button>
+
+        <div className={classes.container} onClick={this.handleOpen}>
+          {trigger}
+        </div>
+
         <StyledModal
           aria-labelledby='simple-modal-title'
           aria-describedby='simple-modal-description'
@@ -87,8 +76,8 @@ class PublishModal extends React.Component {
   }
 }
 
-PublishModal.propTypes = {
+Trigger.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(PublishModal) // eslint-disable-line
+export default withStyles(styles)(Trigger) // eslint-disable-line

@@ -16,6 +16,7 @@ const {
   getBlob,
   getBlobFromStream,
   getReadableStream,
+  getMediaSourceFromStream
 } = require('./read')
 
 const {
@@ -25,7 +26,7 @@ const {
   uploadIpfsBuffer,
   uploadFilePath,
   uploadIpfsBufferWrappedWithDirectory,
-  uploadFilePathWrappedWithDirectory,
+  uploadFilePathWrappedWithDirectory
 } = require('./write')
 
 export {
@@ -51,7 +52,8 @@ export {
   getTypedArray,
   getBlob,
   getBlobFromStream,
-
   getReadableStream,
+  getMediaSourceFromStream,
+
   getIpfs
 }

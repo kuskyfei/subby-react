@@ -16,4 +16,12 @@ const arrayBufferToTypedArray = (buffer) => {
   return bytes
 }
 
-module.exports = {fileToTypedArray}
+const clearDataTransfer = (dataTransfer) => {
+  if (dataTransfer.items) {
+    dataTransfer.items.clear()
+  } else {
+    dataTransfer.clearData()
+  }
+}
+
+module.exports = {fileToTypedArray, clearDataTransfer}

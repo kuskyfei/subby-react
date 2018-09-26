@@ -27,7 +27,7 @@ const Loading = (props) => {
   return (
     <div className={classes.root}>
       <CircularProgress className={classes.progress} size={50} />
-      {progress && 
+      {progress &&
         <Typography className={classes.mb} alivariant='body2' component='div'>
           {progress}
         </Typography>

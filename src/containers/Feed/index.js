@@ -113,9 +113,7 @@ class Feed extends React.Component {
       }
 
       actions.setFeed([post])
-    } 
-
-    else if (isPublisher(location.search)) { // eslint-disable-line
+    } else if (isPublisher(location.search)) { // eslint-disable-line
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length
@@ -129,9 +127,7 @@ class Feed extends React.Component {
 
       const newPosts = await services.getFeed(postQuery)
       actions.setFeed([...feed, ...newPosts])
-    } 
-
-    else if (isProfile(location.search)) { // eslint-disable-line
+    } else if (isProfile(location.search)) { // eslint-disable-line
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length
@@ -145,9 +141,7 @@ class Feed extends React.Component {
 
       const newPosts = await services.getFeed(postQuery)
       actions.setFeed([...feed, ...newPosts])
-    } 
-
-    else if (isFeed(location.search)) { // eslint-disable-line
+    } else if (isFeed(location.search)) { // eslint-disable-line
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length

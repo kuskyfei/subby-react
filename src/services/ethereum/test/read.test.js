@@ -1,16 +1,14 @@
 /* eslint-env jest */
 
 import {
-  getProfile,
-  getAddress,
-  getSubscriptions,
-  getPosts,
-  onCategoryPost
+//  getProfile,
+  getAddress
+  // getSubscriptions,
+  // getPosts,
+  // onCategoryPost
 } from '../index'
 
-import {__private__} from '../read'
-
-const ms = require('ms')
+// import {__private__} from '../read'
 
 describe('ethereum read mocks', () => {
   beforeAll(() => {

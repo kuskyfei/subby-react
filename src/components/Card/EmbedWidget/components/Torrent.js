@@ -64,7 +64,7 @@ class Torrent extends React.Component {
     for (const file of torrent.files) {
       files.push(<p>{file}</p>)
     }
-  
+
     return (
       <Table className={classes.table}>
         <TableBody>

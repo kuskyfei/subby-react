@@ -17,7 +17,7 @@ const styles = theme => ({
     [theme.breakpoints.up(600 + theme.spacing.unit * 2 * 2)]: {
       marginLeft: theme.spacing.unit * 6,
       marginRight: theme.spacing.unit * 6,
-      paddingTop: theme.spacing.unit * 6,
+      paddingTop: theme.spacing.unit * 6
     },
     [theme.breakpoints.up(900 + theme.spacing.unit * 2 * 2)]: {
       paddingTop: theme.spacing.unit * 6,
@@ -37,7 +37,7 @@ const styles = theme => ({
     [theme.breakpoints.down(500 + theme.spacing.unit * 2 * 2)]: {
       fontSize: '3rem'
     },
-    [theme.breakpoints.down(500 + theme.spacing.unit * 2 * 2)]: {
+    [theme.breakpoints.down(400 + theme.spacing.unit * 2 * 2)]: {
       fontSize: '2.7rem'
     }
   },

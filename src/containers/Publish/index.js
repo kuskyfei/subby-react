@@ -11,25 +11,22 @@ import Button from '@material-ui/core/Button'
 import CloudUploadIcon from '@material-ui/icons/CloudUpload'
 import HelpIcon from '@material-ui/icons/Help'
 import Tooltip from '@material-ui/core/Tooltip'
-import Card from '@material-ui/core/Card'
-import CardContent from '@material-ui/core/CardContent'
 
-import {Preview, PublishModal} from './components'
+import {Preview, PublishButton, HelpText} from './components'
+import {Modal} from '../../components'
 import {Post} from '../../containers'
 import styles from './styles'
 
-const {fileToTypedArray} = require('./util')
+const {fileToTypedArray, clearDataTransfer} = require('./util')
 const debug = require('debug')('containers:Publish')
 const services = require('../../services')
-
-const dangerouslySetUploadMessage = 'Drop an image, torrent or paste a link'
 
 class Publish extends React.Component {
   state = {
     isDragging: false,
     isPreviewing: false,
     comment: '',
-    link: null,
+    link: null
   }
 
   componentDidMount = () => {
@@ -68,7 +65,7 @@ class Publish extends React.Component {
     e.preventDefault()
 
     this.setState({...this.state, isDragging: false, isPreviewing: true, link: 'loading:Uploading'})
-    
+
     const {dataTransfer} = e
     const file = dataTransfer.items[0].getAsFile()
 
@@ -77,7 +74,7 @@ class Publish extends React.Component {
     const ipfsHash = res[0].hash
 
     this.setState({...this.state, isDragging: false, isPreviewing: true, link: `ipfs:${ipfsHash}`})
-    
+
     clearDataTransfer(dataTransfer)
     debug('handleLinkDrop ipfs hash', ipfsHash)
   }
@@ -118,126 +115,81 @@ class Publish extends React.Component {
     const {classes, address, profile} = this.props
     const {isDragging, isPreviewing, comment, link} = this.state
 
-    // this is a temporary post to test
-    // const post = {
-    //   username: 'test',
-    //   address: '0x0000000000000000000000000000000000000000',
-    //   // comment: 'This is dope stuff',
-    //   comment: 'ipfs:QmX48d6q3YgSxZjUhoSziw47AcEuUAWN3BPfZtaNkUn6uj', // long string
-    //   link: 'ipfs:QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo', // image
-    //   // link: 'ipfs:QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV', // video
-    //   // link: 'ipfs:QmZbp9u6yMDW94mfxTYe8hMaomBLr2NfckUhYf3J7ax7zM/dog-loves-baby.mp4',
-    //   // link: 'ipfs:QmQ747r7eLfsVtBFBSRwfXsPK6tADJpQzJxz4uFdoZb9XJ', // big video
-    //   // link: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
-    //   timestamp: Date.now()
-    // }
-
     const post = {
       thumbnail: profile && profile.thumbnail,
       comment,
       link,
-      username: profile && profile.username || address,
+      username: (profile && profile.username) || address,
       address,
       id: 0
     }
 
     return (
-      <PublishModal>
-        <Card className={classes.card}>
+      <Modal trigger={<PublishButton />}>
 
-          <CardContent>
-
-            {!isPreviewing &&
-              <Typography
-                className={
-                  classnames(
-                    classes.upload,
-                    !isDragging && classes.uploadNotDragging,
-                    isDragging && classes.uploadDragging
-                  )
-                }
-                onDragEnter={this.handleLinkDragEnter.bind(this)}
-                onDragOver={this.handleLinkDragOver.bind(this)}
-                onDragLeave={this.handleLinkDragLeave.bind(this)}
-                onDrop={this.handleLinkDrop.bind(this)}
-                onPaste={this.handleLinkPaste.bind(this)}
-                contentEditable
-                suppressContentEditableWarning
-                variant='title'
-                component='div'
-                onInput={this.blockRegularTypingInLinkInput.bind(this)}
-              >
-                {dangerouslySetUploadMessage}
-              </Typography>
+        {!isPreviewing &&
+          <Typography
+            className={
+              classnames(
+                classes.upload,
+                !isDragging && classes.uploadNotDragging,
+                isDragging && classes.uploadDragging
+              )
             }
+            onDragEnter={this.handleLinkDragEnter.bind(this)}
+            onDragOver={this.handleLinkDragOver.bind(this)}
+            onDragLeave={this.handleLinkDragLeave.bind(this)}
+            onDrop={this.handleLinkDrop.bind(this)}
+            onPaste={this.handleLinkPaste.bind(this)}
+            contentEditable
+            suppressContentEditableWarning
+            variant='title'
+            component='div'
+            onInput={this.blockRegularTypingInLinkInput.bind(this)}
+          >
+            {dangerouslySetUploadMessage}
+          </Typography>
+        }
 
-            {isPreviewing &&
-              <Preview>
-                <Post post={post} preview onPreviewClose={this.cancelPostPreview.bind(this)} />
-              </Preview>
-            }
+        {isPreviewing &&
+          <Preview>
+            <Post post={post} preview onPreviewClose={this.cancelPostPreview.bind(this)} />
+          </Preview>
+        }
 
-            <TextField
-              className={classes.textField}
-              fullWidth
-              rows={3}
-              multiline
-              placeholder={`What?`}
-              value={comment}
-              onChange={this.handleCommentChange.bind(this)}
-            />
+        <TextField
+          className={classes.textField}
+          fullWidth
+          rows={3}
+          multiline
+          placeholder={`What?`}
+          value={comment}
+          onChange={this.handleCommentChange.bind(this)}
+        />
 
-            <div className={classes.buttonsContainer}>
+        <div className={classes.buttonsContainer}>
 
-              <Tooltip title={<HelpText />} placement='top-start'>
-                <HelpIcon className={classes.greyIcon} />
-              </Tooltip>
+          <Tooltip title={<HelpText />} placement='top-start'>
+            <HelpIcon className={classes.greyIcon} />
+          </Tooltip>
 
-              <Button
-                variant='contained'
-                color='default'
-                className={classes.publishButton}
-                onClick={this.handlePublish.bind(this)}
-              >
-                <span className={classes.publishButtonText}>Publish</span>
-                <CloudUploadIcon className={classes.rightIcon} />
-              </Button>
-            </div>
+          <Button
+            variant='contained'
+            color='default'
+            className={classes.publishButton}
+            onClick={this.handlePublish.bind(this)}
+          >
+            <span className={classes.publishButtonText}>Publish</span>
+            <CloudUploadIcon className={classes.rightIcon} />
+          </Button>
+        </div>
 
-          </CardContent>
-
-        </Card>
-      </PublishModal>
+      </Modal>
     )
   }
 }
 
-const clearDataTransfer = (dataTransfer) => {
-  if (dataTransfer.items) {
-    dataTransfer.items.clear()
-  } else {
-    dataTransfer.clearData()
-  }
-}
-
-const HelpText = () =>
-  <div>
-    <p>
-      Drop files: JPG, JPEG, PNG, GIF, TORRENT (e.g. example.jpg)
-    </p>
-    <p>
-      Media links: JPG, JPEG, PNG, GIF, WebM, MP4, Ogg, WAV, MP3, FLAC (e.g. https://example.com/something.mp4)
-    </p>
-    <p>
-      Social links: Youtube, Vimeo, Reddit, Twitter, Facebook, Instagram (e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ)
-    </p>
-    <p>
-      IPFS hashes: (e.g. QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo) embed supported for images and fMP4 videos
-    </p>
-    <p>
-      Torrent magnets: (e.g. magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df67...) must include tracker and have web torrent seeds for embed
-    </p>
-  </div>
+const dangerouslySetUploadMessage = 'Drop an image, torrent or paste a link'
 
 Publish.propTypes = {
   classes: PropTypes.object.isRequired
