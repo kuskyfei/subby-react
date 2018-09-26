@@ -30,9 +30,12 @@ possibl bug with twitter and IG cards
 take car of web worker and video fmp4
 
 
-identify torrent file on drop
+handles torrent file on drop
 add torrent load icon
 
+add check for username chosen when typing
+
+design donate button with min price
 
 make publish pop up
 make card option pop up

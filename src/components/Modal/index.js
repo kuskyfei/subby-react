@@ -10,11 +10,9 @@ import styles from './styles'
 
 class Modal extends React.Component {
   componentDidMount = () => {
-    console.log('Modal mount')
   }
 
   componentWillUnmount = () => {
-    console.log('Modal unmount')
   }
 
   render () {

@@ -169,9 +169,10 @@ class Feed extends React.Component {
       posts.push(<Post key={post.username + post.address + post.id} post={post} />)
     }
 
-    let profile
+    let profile, editable
     if (isProfile(location.search)) {
       profile = this.props.profile
+      editable = true
     } else {
       profile = this.props.publisherProfile
     }
@@ -179,7 +180,7 @@ class Feed extends React.Component {
     return (
       <div className={classes.layout}>
 
-        {profile && <Profile profile={profile} />}
+        {profile && <Profile profile={profile} editable={editable} />}
 
         <FeedComponent postCount={posts.length} addPostsToFeed={this.addPostsToFeed.bind(this)} >
           {posts}

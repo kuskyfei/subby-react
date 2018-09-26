@@ -44,11 +44,9 @@ class Trigger extends React.Component {
   }
 
   componentDidMount = () => {
-    console.log('Trigger mount')
   }
 
   componentWillUnmount = () => {
-    console.log('Trigger unmount')
   }
 
   render () {
