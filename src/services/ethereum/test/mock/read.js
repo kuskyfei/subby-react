@@ -31,8 +31,7 @@ const getProfile = async ({username, address}) => {
     thumbnail: urls.imageUrls[fake(seed).random.number() % (urls.imageUrls.length - 1)],
     bio: fake(seed).lorem.paragraph() + ' ' + fake(seed).internet.domainName(),
     subscriberCount: fake(seed).random.number(),
-    subscriptionCount: fake(seed + 1).random.number(),
-    tipCount: fake(seed + 2).random.number(),
+    minimumTextDonation: fake(seed + 1).random.number() % 1000 / 1000,
     address: address
   }
 
@@ -45,6 +44,9 @@ const getProfile = async ({username, address}) => {
   }
   if (!username && fake(seed + 2).random.number() % 10 < 5) {
     profile.bio = null
+  }
+  if (!username && fake(seed + 3).random.number() % 10 < 5) {
+    profile.minimumTextDonation = 0
   }
 
   return profile

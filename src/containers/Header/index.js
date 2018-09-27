@@ -2,6 +2,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {withRouter, Link} from 'react-router-dom'
+import {compose} from 'redux'
 // import {connect} from 'react-redux'
 
 // material
@@ -11,34 +12,45 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Grid from '@material-ui/core/Grid'
 import Input from '@material-ui/core/Input'
 import SearchIcon from '@material-ui/icons/Search'
-
-import {images} from '../../settings'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 // components
 import Publish from '../Publish'
 import {Menu} from './components'
+import {images} from '../../settings'
 
 import styles from './styles'
 
 // util
-const {getUsernameFromUrlParams} = require('./util')
+const {getUsernameFromUrlParams, onFinishedTyping} = require('./util')
 
 class Header extends React.Component {
   state = {
-    searchBarValue: ''
+    searchBarValue: '',
+    isTyping: false,
+    isLoading: false
   }
 
   handleSearchBarChange = (e) => {
-    this.props.history.push(`?u=${e.target.value}`)
+    const newSearchBarValue = e.target.value
+
+    this.setState({...this.state, isLoading: true, searchBarValue: newSearchBarValue})
+
+    onFinishedTyping.call(this, () => {
+      this.props.history.push(`?u=${newSearchBarValue}`)
+      this.setState({...this.state, isLoading: false})
+    })
   }
 
   componentDidMount = () => {
-
+    const {location} = this.props
+    const urlUsername = getUsernameFromUrlParams(location.search)
+    this.setState({...this.state, searchBarValue: urlUsername})
   }
 
   render () {
-    const { classes, location } = this.props
-    const urlUsername = getUsernameFromUrlParams(location.search)
+    const {classes} = this.props
+    const {searchBarValue, isLoading} =  this.state
 
     return (
       <div className={classes.root}>
@@ -67,9 +79,15 @@ class Header extends React.Component {
                     fullWidth
                     placeholder='Address or Username...'
                     disableUnderline
-                    value={urlUsername}
+                    value={searchBarValue}
                     className={classes.searchInput}
                   />
+
+                  <Grid className={classes.loadingIcon} item>
+                    {isLoading && 
+                      <CircularProgress className='{classes.loadingIcon}' size={20} />
+                    }
+                  </Grid>
 
                 </Grid>
               </div>
@@ -95,4 +113,10 @@ Header.propTypes = {
 // const mapStateToProps = state => ({})
 // const mapDispatchToProps = dispatch => ({})
 
-export default withRouter(withStyles(styles(images))(Header)) // eslint-disable-line
+const enhance = compose(
+  withRouter,
+  // connect(mapStateToProps, mapDispatchToProps),
+  withStyles(styles(images))
+)
+
+export default enhance(Header) // eslint-disable-line

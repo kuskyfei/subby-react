@@ -84,13 +84,14 @@ class App extends Component {
 
   render () {
     const Route = this.state.route
+    const {profile} = this.props
 
     return (
       <div>
 
         <CssBaseline />
 
-        <Header />
+        <Header thumbnail={profile && profile.thumbnail}/>
 
         <main>
 

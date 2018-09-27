@@ -44,6 +44,9 @@ const styles = theme => ({
   },
   button: {
     margin: theme.spacing.unit
+  },
+  contents: {
+    display: 'contents'
   }
 })
 
@@ -72,7 +75,12 @@ const Profile = (props) => {
       {!editable &&
         <Button size='small' variant='contained' color='default' className={classes.button}>
           Donate&nbsp;
-          <MessageIcon className={classes.iconSmall} />
+          {profile.minimumTextDonation &&
+            <span className={classes.contents}>
+              <MessageIcon className={classes.iconSmall} />&nbsp;
+              <span className={classes.count}>{profile.minimumTextDonation}</span>
+            </span>
+          }
         </Button>
       }
 

@@ -28,7 +28,8 @@ const {
   isPermalink,
   isPublisher,
   isProfile,
-  isFeed
+  isFeed,
+  isRouteChange
 } = require('./util')
 const debug = require('debug')('containers:Feed')
 
@@ -59,7 +60,18 @@ class Feed extends React.Component {
     debug('mounted')
   }
 
+  handleRouteChange (prevProps) {
+    if (!isRouteChange(this.props, prevProps)) {
+      return
+    }
+    this.addPostsToFeed()
+    this.handleProfile()
+
+    debug('feed changed')
+  }
+
   componentDidUpdate (prevProps) {
+    this.handleRouteChange(prevProps)
     debug('updated')
   }
 
@@ -81,7 +93,7 @@ class Feed extends React.Component {
     if (!this.state.hasMorePosts) return
     this.setState({...this.state, addingMorePosts: true})
 
-    const {location, actions, feed, subscriptions, address} = this.props
+    let {location, actions, feed, subscriptions, address} = this.props
     const username = getUsernameFromUrlParams(location.search)
 
     if (isPermalink(location.search)) {
@@ -113,12 +125,12 @@ class Feed extends React.Component {
       }
 
       actions.setFeed([post])
-    } else if (isPublisher(location.search)) { // eslint-disable-line
+    } else if (isPublisher(location.search)) {
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length
       const postQuery = {
-        subscriptions: [username],
+        subscriptions: {[username]: username},
         startAt,
         count: 5,
         beforeTimestamp: Date.now(),
@@ -127,12 +139,12 @@ class Feed extends React.Component {
 
       const newPosts = await services.getFeed(postQuery)
       actions.setFeed([...feed, ...newPosts])
-    } else if (isProfile(location.search)) { // eslint-disable-line
+    } else if (isProfile(location.search)) {
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length
       const postQuery = {
-        subscriptions: [address],
+        subscriptions: {[address]: address},
         startAt,
         count: 5,
         beforeTimestamp: Date.now(),
@@ -141,7 +153,7 @@ class Feed extends React.Component {
 
       const newPosts = await services.getFeed(postQuery)
       actions.setFeed([...feed, ...newPosts])
-    } else if (isFeed(location.search)) { // eslint-disable-line
+    } else if (isFeed(location.search)) {
       // this is a temporary query to test
       const day = 1000 * 60 * 60 * 24
       const startAt = feed.length
@@ -166,7 +178,9 @@ class Feed extends React.Component {
 
     const posts = []
     for (const post of feed) {
-      posts.push(<Post key={post.username + post.address + post.id} post={post} />)
+      if (post) {
+        posts.push(<Post key={post.username + post.address + post.id} post={post} />)
+      }
     }
 
     let profile, editable

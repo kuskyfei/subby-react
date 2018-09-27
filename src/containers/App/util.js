@@ -7,16 +7,21 @@ const isRouteChange = (props, prevProps) => {
     return true
   }
 
-  // if the p param has changed, then the
-  // route has changed
   const prevUrlParams = queryString.parse(prevProps.location.search)
   const urlParams = queryString.parse(props.location.search)
 
-  if (urlParams.p === prevUrlParams.p) {
-    return false
+  if (urlParams.p !== prevUrlParams.p) { // page
+    return true
   }
 
-  return true
+  if (urlParams.u !== prevUrlParams.u) { // user
+    return true
+  }
+
+  if (urlParams.id !== prevUrlParams.id) { // post id
+    return true
+  }
+
 }
 
 export {isRouteChange}

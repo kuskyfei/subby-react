@@ -21,11 +21,7 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
-fix search bar speed
-fix page change not triggering on url change
 fix bug with twitter and IG cards
-add support for streaming IPFS videos (need to include codec with hash)
-add support for streaming torrent files (need to include codec with magnet)
 add 'username is taken' error validation
 add minimumTextDonation price to donate button
 make subscribe/unsubscribe button work
@@ -37,7 +33,6 @@ add permalink copy button to card
 add unsub/hide to card
 add thumbnail to header
 make publish edited profile button work
-fix username is "0" in card header bug
 make publish button send data
 make donate/message button popup
 make donate/message button logic
@@ -58,6 +53,10 @@ set up optional embeds
 detect errors with embeds (using height of elements possibly?)
 make setting page save settings to db
 make settings page settings actually do something
+fix contract registering usernames using tx.origin
+
+##fixed
+fix page change not triggering on url change
 
 ##todo unit tests
 
@@ -69,6 +68,8 @@ mock api for IPFS
 
 ##todo long term
 
+add support for streaming IPFS videos (need to include codec with hash)
+add support for streaming torrent files (need to include codec with magnet)
 make sitemap generator
 make indexer / search engine
 add transalations (put all english into a JSON file and use the file to translate)

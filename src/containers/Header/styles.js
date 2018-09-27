@@ -43,7 +43,7 @@ const styles = images => theme => {
     searchIcon: {
       marginLeft: 20,
       marginRight: 20,
-      [theme.breakpoints.down(325)]: {
+      [theme.breakpoints.down(500)]: {
         marginLeft: 10,
         marginRight: 10
       }
@@ -51,8 +51,17 @@ const styles = images => theme => {
     searchInput: {
       color: 'white',
       marginRight: 20,
-      [theme.breakpoints.down(325)]: {
+      [theme.breakpoints.down(500)]: {
         marginRight: 10
+      }
+    },
+
+    loadingIcon: {
+      minWidth: 20,
+      transform: 'translateY(-2px)',
+      marginRight: 20,
+      [theme.breakpoints.down(500)]: {
+        marginRight: 11
       }
     },
 

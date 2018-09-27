@@ -72,9 +72,13 @@ const prepareMagnetForEthereum = (magnet) => {
 
   let preparedMagnet = `magnet:?xt=urn:btih:${torrent.infoHash}`
 
+  let maxTrackers = 3 // we need a low number here or the magnet link will be too big and it will cost too much gas
   for (const tracker of torrent.announce) {
     if (isWebSocket(tracker)) {
       preparedMagnet += `&tr=${tracker}`
+    }
+    if (!--maxTrackers) {
+      break
     }
   }
 
