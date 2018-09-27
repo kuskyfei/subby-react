@@ -17,7 +17,7 @@ import {Modal} from '../../components'
 import {Post} from '../../containers'
 import styles from './styles'
 
-const {fileToTypedArray, clearDataTransfer} = require('./util')
+const {fileToTypedArray, clearDataTransfer, isMagnet, isIpfsHash} = require('./util')
 const debug = require('debug')('containers:Publish')
 const services = require('../../services')
 
@@ -69,21 +69,47 @@ class Publish extends React.Component {
     const {dataTransfer} = e
     const file = dataTransfer.items[0].getAsFile()
 
+    if (file.type === 'application/x-bittorrent') {
+      await this.handleTorrentFile(file)
+    }
+
+    else {
+      await this.handleIpfsFile(file)
+    }
+
+    clearDataTransfer(dataTransfer)
+    debug('handleLinkDrop end')
+  }
+
+  handleTorrentFile = async (file) => {
+    const magnet = await services.getMagnetFromTorrentFile(file)
+    this.setState({...this.state, isDragging: false, isPreviewing: true, link: magnet})
+    debug('handleTorrentFile', magnet)
+  }
+
+  handleIpfsFile = async (file) => {
     const typedArray = await fileToTypedArray(file)
     const res = await services.ipfs.uploadTypedArray(typedArray)
     const ipfsHash = res[0].hash
 
     this.setState({...this.state, isDragging: false, isPreviewing: true, link: `ipfs:${ipfsHash}`})
-
-    clearDataTransfer(dataTransfer)
-    debug('handleLinkDrop ipfs hash', ipfsHash)
   }
 
   handleLinkPaste = (e) => {
     const pastedValue = e.clipboardData.getData('text/plain')
     debug('handleLinkPaste', pastedValue)
 
-    this.setState({...this.state, isPreviewing: true, link: pastedValue})
+    let link = pastedValue.trim()
+
+    if (isMagnet(link)) {
+      link = services.prepareMagnetForEthereum(link)
+    }
+
+    if (isIpfsHash(link)) {
+      link = 'ipfs:' + link
+    }
+
+    this.setState({...this.state, isPreviewing: true, link: link})
   }
 
   handleGlobalClipboardPasting = (e) => {

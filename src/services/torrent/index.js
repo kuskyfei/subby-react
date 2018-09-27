@@ -1,12 +1,27 @@
 const WebTorrent = require('webtorrent')
+const parseTorrent = require('parse-torrent')
 const client = new WebTorrent()
 const debug = require('debug')('services:torrent')
 
-const getTorrent = (magnetURI) => {
-  debug('getTorrent', magnetURI)
+const getTorrent = (input) => {
+  // input can be an info hash, torrent file buffer (blob in browser) or magnet uri
+  debug('getTorrent', input)
 
   return new Promise((resolve) => {
-    client.add(magnetURI, (torrent) => {
+
+    try {
+      client.add(input, (torrent) => {
+        handleTorrent(torrent)
+      })
+    }
+    catch (e) {
+      debug(e)
+      client.get(input, (torrent) => {
+        handleTorrent(torrent)
+      })
+    }
+
+    const handleTorrent = (torrent) => {
       debug('torrent', torrent)
 
       const {numPeers, infoHash, magnetURI, length} = torrent
@@ -27,7 +42,7 @@ const getTorrent = (magnetURI) => {
 
       resolve(parsedTorrent)
       torrent.destroy()
-    })
+    }
   })
 }
 
@@ -40,4 +55,34 @@ const bytesToMbs = (number) => {
   return (number / mb).toFixed(2)
 }
 
-export {getTorrent}
+const getMagnetFromTorrentFile = (torrentId) => new Promise((resolve, reject) => {
+  parseTorrent.remote(torrentId, (err, parsedTorrent) => {
+    if (err) return reject(err)
+    debug('parsedTorrent', parsedTorrent)
+
+    let magnet = parseTorrent.toMagnetURI(parsedTorrent)
+    magnet = prepareMagnetForEthereum(magnet)
+
+    resolve(magnet)
+  })
+})
+
+const prepareMagnetForEthereum = (magnet) => {
+  const torrent = parseTorrent(magnet)
+
+  let preparedMagnet = `magnet:?xt=urn:btih:${torrent.infoHash}`
+
+  for (const tracker of torrent.announce) {
+    if (isWebSocket(tracker)) {
+      preparedMagnet += `&tr=${tracker}`
+    }
+  }
+
+  return preparedMagnet
+}
+
+const isWebSocket = (tracker) => {
+  return !!tracker.match(/^wss?:\/\//)
+}
+
+export {getTorrent, getMagnetFromTorrentFile, prepareMagnetForEthereum}

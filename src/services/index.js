@@ -31,4 +31,4 @@ export {
   updateCache
 } from './cache'
 
-export {getTorrent} from './torrent'
+export {getTorrent, getMagnetFromTorrentFile, prepareMagnetForEthereum} from './torrent'

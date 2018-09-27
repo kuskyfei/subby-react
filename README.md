@@ -21,124 +21,60 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
-
-add download to web worker
-add support for streaming videos https://github.com/gpac/mp4box.js/
-
-possibl bug with twitter and IG cards
-
-take car of web worker and video fmp4
-
-
-handles torrent file on drop
-add torrent load icon
-
-add check for username chosen when typing
-
-design donate button with min price
-
-make publish pop up
-make card option pop up
-make edit pop up
-
-idb in browser
-idb in jest
-torrent card
-video card
-audio card
-ipfs card
-
-
-- make ipfs card
-- make card buttons
-- make publish pop up
-- make profile edit page 
-- make drag and drop torrent upload
-
+fix search bar speed
+fix page change not triggering on url change
+fix bug with twitter and IG cards
+add support for streaming IPFS videos (need to include codec with hash)
+add support for streaming torrent files (need to include codec with magnet)
+add 'username is taken' error validation
+add minimumTextDonation price to donate button
 make subscribe/unsubscribe button work
-fix bug with cache
+make subscription page buttons work
+thoroughly test cache
 modify mock ethereum API to match new api
 add donate button to cards
 add permalink copy button to card
-add unsub button to cards
+add unsub/hide to card
 add thumbnail to header
-join profile and profile edit cmponent
-make profile edit form
-fix bug that doesnt detect url changes
-fix username headr bug
-make publish button send the right data to api
-add ipfs loading icon
-make preview show correct username and icon
-make donate pop up
+make publish edited profile button work
+fix username is "0" in card header bug
+make publish button send data
+make donate/message button popup
 make donate/message button logic
-make subscribtions page work, all buttons and cache/db
 make settings page work, all buttons and settings, link with db
-add terminat account button
-add web torrent loading icon
-make subby npm module
+add terminate account button to settings
+add a "your metamask is locked page"
+add subby.js to npm
 make publishing content guide
 make find accounts to follow post
-add warning before quitting post
+add use default settings to settings
+add warning to use chrome
+add donation page
+add donation event mesages
+add show donation event messags to settings
+add react-helmet for SEO and social media shares
+set up analytics events
+set up optional embeds
+detect errors with embeds (using height of elements possibly?)
+make setting page save settings to db
+make settings page settings actually do something
 
+##todo unit tests
+
+idb in browser
+idb in jest
+cache test
 make puppeteer tests
+mock api for IPFS
 
+##todo long term
 
-- fix user profile cache and reducers
-- setFeedCache needs to b updated when final get Post design is decided
-- get indexdb working in browser
-- get indexDb working in jest
+make sitemap generator
+make indexer / search engine
+add transalations (put all english into a JSON file and use the file to translate)
+add interface for ledger nano
 
-- move ipfs download to web worker
-- fix username and postid of file download
-- add image / letter to header avatar
-- add use default settings to settings
-- fix the slow typing for user search
-- add mute / unsub option to posts
-- add warning to use chrome
-- add translations
-- react-helmet for SEO and social media shares
-- optimize queuing for ethereum requests
-- make profile page
-- set up optional embeds
-- set up analytics events
-- add torrent card
-- add video and audio card (direct link to file)
-- do redux stuff
-- make edit profile page (some kind of hover if you own the profile)
-- make subscribtions page
-- make settings page
-- add tests for navigation and footer
-- set up mock API
-- set up mock API for ipfs
-- add global options like provider, no google analytics, etc.
-- test mock api and make sure it doesn't block the main thread, maybe use web workers.
-- pages
-  - feeds
-    - your feed ----> /feed
-    - category feed ----> /category/:name
-    - user profile and feed ----> /user/:username and /address/:address
-    - an arbitrary user's feed ----> /user-feed/:username and /address-feed/:address
-  - about / social media / team / contact ----> /about
-  - disclaimer / privacy / terms
-  - bulk subscribe/unsub & bulk sync ----> /bulk
-  - set/view your profile ----> /profile
-  - manage/import/export your subscribtions ----> /manage
-  - new post
-
-long term todos:
-
-creates indexer
-make ledger nano interface
-
-##code for db
-
-## username rules
-min 3 characters
-maximum 39 characters
-cannot start or end with 1 or more spaces or tabs
-unicode (utf-8) to accept asian characters and stuff
-
-##versions
+##env versions
 tested on node v10.9.0 and npm v6.2.0
 
 ##Supported content:
@@ -384,8 +320,6 @@ components
   header
   profile
 
-
-
   new state
 
 - user.profile
@@ -397,28 +331,4 @@ components
 - view.profile
 - view.address
 
-problems with smart contracts
 
-commentsLinksNamesThumbnails -> change to username
-
-
-yo a just relaaized getPostsFromPublisher also needs some kind of cursor to prevent new posts from fucking shit up, it needs a before / aftertime stamp
-
-i think we need to have a single setProfile function
-
-
-if (_address == 0x0000000000000000000000000000000000000000) {
-            _address = getAddressFromUsername(username);
-        } --> username should be the default value
-        
-        
-        get subscriptions is only returning addresses, has to return usernames
-        
-
-change minDonations to minimumDonations
-
-getPostFromIdAsync doesnt return minimumDonation
-
-getPostsFromPublisher needs to return minimumDonation
-
-use startAt and limit instead of start and amount

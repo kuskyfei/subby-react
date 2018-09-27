@@ -22,7 +22,7 @@ const styles = theme => ({
     height: 34
   },
   filesRow: {
-    height: 200,
+    maxHeight: 200,
     overflow: 'scroll'
   },
   nameCell: {
@@ -62,7 +62,7 @@ class Torrent extends React.Component {
     const files = []
 
     for (const file of torrent.files) {
-      files.push(<p>{file}</p>)
+      files.push(<p key={file}>{file}</p>)
     }
 
     return (

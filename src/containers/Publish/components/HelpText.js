@@ -15,7 +15,7 @@ const HelpText = () =>
       IPFS hashes: (e.g. QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo) embed supported for images and fMP4 videos
     </p>
     <p>
-      Torrent magnets: (e.g. magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df67...) must include tracker and have web torrent seeds for embed
+      Torrent magnets: (e.g. magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df67...) must include WebSocket (wss://) tracker for embed
     </p>
   </div>
 

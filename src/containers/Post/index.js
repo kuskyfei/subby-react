@@ -37,6 +37,7 @@ class Post extends React.Component {
 
     if (prevPost.link !== post.link) {
       this.handleIpfsLink()
+      this.handleTorrent()
     }
     debug('updated')
   }
