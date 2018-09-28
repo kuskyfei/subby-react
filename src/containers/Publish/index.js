@@ -29,6 +29,11 @@ class Publish extends React.Component {
     link: null
   }
 
+  constructor(props) {
+    super(props)
+    this.handleGlobalClipboardPasting = this.handleGlobalClipboardPasting.bind(this)
+  }
+
   componentDidMount = () => {
     this.addGlobalClipboardPastingListener()
   }
@@ -38,11 +43,11 @@ class Publish extends React.Component {
   }
 
   addGlobalClipboardPastingListener = () => {
-    document.querySelector('body').addEventListener('paste', this.handleGlobalClipboardPasting.bind(this))
+    document.querySelector('body').addEventListener('paste', this.handleGlobalClipboardPasting)
   }
 
   removeGlobalClipboardPastingListener = () => {
-    document.querySelector('body').removeEventListener('paste', this.handleGlobalClipboardPasting.bind(this))
+    document.querySelector('body').removeEventListener('paste', this.handleGlobalClipboardPasting)
   }
 
   handleLinkDragEnter = (e) => {

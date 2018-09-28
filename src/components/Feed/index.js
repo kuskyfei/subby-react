@@ -21,11 +21,16 @@ const styles = theme => ({
 class Feed extends React.Component {
   state = {addingMorePosts: false}
 
+  constructor(props) {
+    super(props)
+    this.handleScroll = this.handleScroll.bind(this)
+  }
+
   componentDidMount () {
     const {addPostsToFeed} = this.props
 
     if (addPostsToFeed) {
-      window.addEventListener('scroll', this.handleScroll.bind(this))
+      window.addEventListener('scroll', this.handleScroll)
     }
 
     debug('mounted')
@@ -36,7 +41,8 @@ class Feed extends React.Component {
   }
 
   componentWillUnmount () {
-    window.removeEventListener('scroll', this.handleScroll.bind(this))
+    debug('unmount')
+    window.removeEventListener('scroll', this.handleScroll)
   }
 
   async handleScroll (event) {

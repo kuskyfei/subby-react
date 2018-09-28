@@ -7,8 +7,9 @@ import Typography from '@material-ui/core/Typography'
 import MessageIcon from '@material-ui/icons/Message'
 import EditIcon from '@material-ui/icons/Edit'
 
-import {Modal} from '../../components'
+import {Modal, Donate} from '../../components'
 import EditForm from './EditForm'
+import Loading from './Loading'
 
 const styles = theme => ({
   profile: {
@@ -18,7 +19,8 @@ const styles = theme => ({
       marginTop: theme.spacing.unit * 6,
       marginBottom: theme.spacing.unit * 6
     },
-    textAlign: 'center'
+    textAlign: 'center',
+    animation: 'fadeIn ease 1s'
   },
   username: {
     margin: theme.spacing.unit
@@ -38,12 +40,18 @@ const styles = theme => ({
   count: {
     opacity: 0.5
   },
+  leftNudge: {
+    transform: 'translateX(-1px)'
+  },
   iconSmall: {
     fontSize: 16,
     opacity: 0.5
   },
   button: {
-    margin: theme.spacing.unit
+    margin: theme.spacing.unit,
+    '& > span': {
+      transform: 'translateX(1px)'
+    }
   },
   contents: {
     display: 'contents'
@@ -51,9 +59,14 @@ const styles = theme => ({
 })
 
 const Profile = (props) => {
-  const {classes, profile, editable} = props
+  const {classes, profile, editable, isLoading} = props
 
   if (!profile.username) profile.username = profile.address
+
+  // not sure why this is needed, the 0 isn't being converted to null for some reason
+  if (profile.minimumTextDonation === 0) profile.minimumTextDonation = null
+
+  if (isLoading) return <Loading />
 
   return (
     <div className={classes.profile}>
@@ -73,15 +86,21 @@ const Profile = (props) => {
       </Button>
 
       {!editable &&
-        <Button size='small' variant='contained' color='default' className={classes.button}>
-          Donate&nbsp;
-          {profile.minimumTextDonation &&
-            <span className={classes.contents}>
-              <MessageIcon className={classes.iconSmall} />&nbsp;
-              <span className={classes.count}>{profile.minimumTextDonation}</span>
-            </span>
-          }
-        </Button>
+        <Modal maxWidth={400} trigger={
+          <Button size='small' variant='contained' color='default' className={classes.button}>
+            Donate&nbsp;
+            {profile.minimumTextDonation &&
+              <span className={classes.contents}>
+                <MessageIcon className={classes.iconSmall} />
+                &nbsp;
+                <span className={classNames(classes.count, classes.leftNudge)}>{profile.minimumTextDonation}</span>
+              </span>
+            }
+          </Button>}>
+
+          <Donate profile={profile} />
+
+        </Modal>
       }
 
       {editable &&
@@ -90,7 +109,7 @@ const Profile = (props) => {
               Edit&nbsp;
             <EditIcon className={classes.iconSmall} />
           </Button>}>
-          
+
           <EditForm profile={profile} />
 
         </Modal>

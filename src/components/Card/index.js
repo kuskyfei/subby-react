@@ -47,7 +47,8 @@ const styles = theme => ({
       marginTop: theme.spacing.unit * 6,
       marginBottom: theme.spacing.unit * 6,
       padding: theme.spacing.unit * 3
-    }
+    },
+    animation: 'fadeIn ease 0.5s'
   },
   media: {
     height: 0,

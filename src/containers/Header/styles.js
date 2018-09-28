@@ -1,7 +1,4 @@
 const styles = images => theme => {
-  const debug = require('debug')('theme')
-  debug(theme)
-
   return {
     logo: {
       height: 55,

@@ -1,15 +1,29 @@
 const queryString = require('query-string')
 
 const isRouteChange = (props, prevProps) => {
-  // if there is no previous props, it
-  // automatically means this is a new page
-  if (!prevProps) {
-    return true
+  if (!prevProps) return true
+
+  const urlParams = getUrlParamsFromProps(props)
+  const prevUrlParams = getUrlParamsFromProps(prevProps)
+
+  if (!isUrlParamsChange(urlParams, prevUrlParams)) {
+    return
   }
 
-  const prevUrlParams = queryString.parse(prevProps.location.search)
+  const route = getRouteFromUrlParams(urlParams)
+  const prevRoute = getRouteFromUrlParams(prevUrlParams)
+
+  if (route !== prevRoute) return true
+}
+
+const getUrlParamsFromProps = (props) => {
+  if (!props) return {}
   const urlParams = queryString.parse(props.location.search)
 
+  return urlParams
+}
+
+const isUrlParamsChange = (urlParams, prevUrlParams) => {
   if (urlParams.p !== prevUrlParams.p) { // page
     return true
   }
@@ -21,7 +35,32 @@ const isRouteChange = (props, prevProps) => {
   if (urlParams.id !== prevUrlParams.id) { // post id
     return true
   }
-
 }
 
-export {isRouteChange}
+const getRouteFromUrlParams = (urlParams) => {
+  const page = urlParams.p
+  const isProfile = urlParams.u
+
+  if (isProfile) {
+    return 'feed'
+  }
+
+  switch (page) {
+    case 'feed':
+      return 'feed'
+
+    case 'subscriptions':
+      return 'subscriptions'
+
+    case 'settings':
+      return 'settings'
+
+    case 'profile':
+      return 'feed'
+
+    default:
+      return 'help'
+  }
+}
+
+export {isRouteChange, getRouteFromUrlParams}

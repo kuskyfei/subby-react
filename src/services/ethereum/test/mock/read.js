@@ -37,15 +37,15 @@ const getProfile = async ({username, address}) => {
 
   // remove some parts of the profiles randomly
   if (fake(seed).random.number() % 10 < 5) {
-    profile.subscriberCount = null
+    profile.subscriberCount = 0
   }
   if (!username && fake(seed + 1).random.number() % 10 < 5) {
     profile.username = null
   }
-  if (!username && fake(seed + 2).random.number() % 10 < 5) {
+  if (fake(seed + 2).random.number() % 10 < 5) {
     profile.bio = null
   }
-  if (!username && fake(seed + 3).random.number() % 10 < 5) {
+  if (fake(seed + 3).random.number() % 10 < 5) {
     profile.minimumTextDonation = 0
   }
 
@@ -127,7 +127,7 @@ const getPosts = async ({userSubscriptions, addressSubscriptions, startAt, count
 const getMockPosts = (seed) => {
   const posts = []
 
-  let counter = fake(seed).random.number() % 50
+  let counter = fake(seed).random.number() % 10 + 10
   while (counter--) {
     const urlsArrays = Object.values(urls)
 

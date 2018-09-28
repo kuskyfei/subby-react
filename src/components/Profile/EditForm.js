@@ -17,8 +17,6 @@ import Button from '@material-ui/core/Button'
 import CloudUploadIcon from '@material-ui/icons/CloudUpload'
 import HelpIcon from '@material-ui/icons/Help'
 
-import {isValidImage} from './util'
-
 const styles = theme => ({
   profile: {
     marginTop: theme.spacing.unit * 3,
@@ -89,7 +87,7 @@ class EditForm extends React.Component {
     usernameError: '', 
     bio: '', 
     thumbnail: '', 
-    textDonation: '', 
+    textDonationEnabled: '', 
     minimumTextDonation: '', 
     address: '',
     usernameIsEditable: true
@@ -101,17 +99,16 @@ class EditForm extends React.Component {
     this.setState({
       ...this.state,
       ...profile,
-      usernameIsEditable: !profile.username
+      usernameIsEditable: !profile.username,
+      textDonationEnabled: !!profile.minimumTextDonation
     })
 
   }
 
   handleChange = name => event => {
-    console.log(name, event.target.value, event.target)
     this.setState({
       [name]: event.target.value
     })
-    console.log()
   }
 
   handleSwitch = name => event => {
@@ -143,10 +140,7 @@ class EditForm extends React.Component {
 
   render() {
     const {classes} = this.props
-    let {username, usernameError, bio, thumbnail, textDonation, minimumTextDonation, address, usernameIsEditable} = this.state
-
-    address = '0x123456789012345678901234567890'
-    //thumbnail = 'https://i.imgur.com/8QiPUrs.jpg'
+    const {username, usernameError, bio, thumbnail, textDonationEnabled, minimumTextDonation, address, usernameIsEditable} = this.state
 
     return (
       <form className={classes.container} noValidate autoComplete='off'>
@@ -158,8 +152,8 @@ class EditForm extends React.Component {
           placeholder=''
           label={usernameError || 'Username'}
           className={classes.firstTextField}
-          value={username}
-          defaultValue={username}
+          value={username || ''}
+          defaultValue={username || ''}
           onChange={this.handleUsernameChange.bind(this)}
           margin='normal'
         />
@@ -191,8 +185,8 @@ class EditForm extends React.Component {
           placeholder='https://example.com/image.jpg'
           label='Thumbnail'
           className={classes.firstTextField}
-          value={thumbnail}
-          defaultValue={thumbnail}
+          value={thumbnail || ''}
+          defaultValue={thumbnail || ''}
           onChange={this.handleChange('thumbnail')}
           margin='normal'
         />
@@ -206,8 +200,8 @@ class EditForm extends React.Component {
           placeholder=''
           label='Bio'
           className={classes.textField}
-          value={bio}
-          defaultValue={bio}
+          value={bio || ''}
+          defaultValue={bio || ''}
           onChange={this.handleChange('bio')}
           margin='normal'
           multiline
@@ -220,9 +214,9 @@ class EditForm extends React.Component {
         <FormControlLabel
           control={
             <Switch
-              checked={textDonation}
-              onChange={this.handleSwitch('textDonation')}
-              value={textDonation}
+              checked={textDonationEnabled}
+              onChange={this.handleSwitch('textDonationEnabled')}
+              value={textDonationEnabled}
               color='primary'
             />
           }
@@ -232,11 +226,11 @@ class EditForm extends React.Component {
         <FormControl fullWidth className={classes.margin}>
           <InputLabel>Minimum Text Donation</InputLabel>
           <Input
-            disabled={!textDonation}
+            disabled={!textDonationEnabled}
             className={classes.input}
             id="adornment-amount"
-            value={minimumTextDonation}
-            defaultValue={minimumTextDonation}
+            value={minimumTextDonation || ''}
+            defaultValue={minimumTextDonation || ''}
             onChange={this.handleChange('minimumTextDonation')}
             startAdornment={<InputAdornment position="start">Ξ</InputAdornment>}
           />
@@ -266,12 +260,6 @@ class EditForm extends React.Component {
       </form>
     )
   }
-}
-
-const getRowCount = (bio) => {
-  if (!bio) return 1
-  const count = Math.ceil(bio.length / 65)
-  return count < 5 ? count : 5
 }
 
 const HelpText = () =>

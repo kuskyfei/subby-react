@@ -23,7 +23,6 @@ localStorage.debug = 'containers:Feed'
 
 fix bug with twitter and IG cards
 add 'username is taken' error validation
-add minimumTextDonation price to donate button
 make subscribe/unsubscribe button work
 make subscription page buttons work
 thoroughly test cache
@@ -34,8 +33,6 @@ add unsub/hide to card
 add thumbnail to header
 make publish edited profile button work
 make publish button send data
-make donate/message button popup
-make donate/message button logic
 make settings page work, all buttons and settings, link with db
 add terminate account button to settings
 add a "your metamask is locked page"
@@ -53,7 +50,9 @@ set up optional embeds
 detect errors with embeds (using height of elements possibly?)
 make setting page save settings to db
 make settings page settings actually do something
-fix contract registering usernames using tx.origin
+fix profile remounting when going to same profile
+fix end of feed behavior
+fix possible bug with posts displaying addresses instead of usernames
 
 ##fixed
 fix page change not triggering on url change

@@ -6,6 +6,8 @@ import {bindActionCreators, compose} from 'redux'
 
 // material
 import CssBaseline from '@material-ui/core/CssBaseline'
+import LinearProgress from '@material-ui/core/LinearProgress'
+import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
 import {Pages} from '../../components'
@@ -25,8 +27,18 @@ window.SUBBY_DEBUG_SERVICES = services
 
 // util
 const queryString = require('query-string')
-const {isRouteChange} = require('./util')
+const {isRouteChange, getRouteFromUrlParams} = require('./util')
 const debug = require('debug')('containers:App')
+
+const styles = images => theme => {
+  debug(theme)
+
+  return {
+    main: {
+      animation: 'fadeIn ease 2s'
+    },
+  }
+}
 
 class App extends Component {
   state = {route: () => ''}
@@ -75,7 +87,7 @@ class App extends Component {
       return
     }
     const urlParams = queryString.parse(this.props.location.search)
-    const Route = getRouteFromUrlParams(urlParams)
+    const Route = getRouteComponentFromUrlParams(urlParams)
     this.setState({...this.state, route: Route})
 
     debug('urlParams', urlParams)
@@ -84,35 +96,34 @@ class App extends Component {
 
   render () {
     const Route = this.state.route
-    const {profile} = this.props
+    const {profile, headerIsLoading, classes} = this.props
+
+    const isLoading = headerIsLoading
 
     return (
       <div>
-
         <CssBaseline />
 
         <Header thumbnail={profile && profile.thumbnail}/>
 
-        <main>
+        {isLoading &&
+          <LinearProgress />
+        }
 
-          <Route />
-
-        </main>
-
+        {!isLoading &&
+          <main className={classes.main}>
+            <Route />
+          </main>
+        }
       </div>
     )
   }
 }
 
-const getRouteFromUrlParams = (urlParams) => {
-  const page = urlParams.p
-  const isProfile = urlParams.u
+const getRouteComponentFromUrlParams = (urlParams) => {
+  const route = getRouteFromUrlParams(urlParams)
 
-  if (isProfile) {
-    return Feed
-  }
-
-  switch (page) {
+  switch (route) {
     case 'feed':
       return Feed
 
@@ -122,8 +133,8 @@ const getRouteFromUrlParams = (urlParams) => {
     case 'settings':
       return Settings
 
-    case 'profile':
-      return Feed
+    case 'help':
+      return Pages.Help
 
     default:
       return Pages.Help
@@ -133,7 +144,8 @@ const getRouteFromUrlParams = (urlParams) => {
 const mapStateToProps = state => ({
   profile: state.profile,
   address: state.address,
-  subscriptions: state.subscriptions
+  subscriptions: state.subscriptions,
+  headerIsLoading: state.header.isLoading
 })
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch)
@@ -141,6 +153,7 @@ const mapDispatchToProps = dispatch => ({
 
 const enhance = compose(
   withRouter,
+  withStyles(styles),
   connect(mapStateToProps, mapDispatchToProps)
 )
 

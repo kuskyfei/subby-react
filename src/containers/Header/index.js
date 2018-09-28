@@ -2,17 +2,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {withRouter, Link} from 'react-router-dom'
-import {compose} from 'redux'
-// import {connect} from 'react-redux'
+import {compose, bindActionCreators} from 'redux'
+import {connect} from 'react-redux'
 
 // material
-import { withStyles } from '@material-ui/core/styles'
+import {withStyles} from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Grid from '@material-ui/core/Grid'
 import Input from '@material-ui/core/Input'
 import SearchIcon from '@material-ui/icons/Search'
 import CircularProgress from '@material-ui/core/CircularProgress'
+
+// actions
+import actions from './reducers/actions'
 
 // components
 import Publish from '../Publish'
@@ -22,7 +25,8 @@ import {images} from '../../settings'
 import styles from './styles'
 
 // util
-const {getUsernameFromUrlParams, onFinishedTyping} = require('./util')
+const {getUsernameFromUrlParams, onFinishedTyping, isRouteChange} = require('./util')
+const debug = require('debug')('containers:Header')
 
 class Header extends React.Component {
   state = {
@@ -32,20 +36,39 @@ class Header extends React.Component {
   }
 
   handleSearchBarChange = (e) => {
+    const {actions} =  this.props
     const newSearchBarValue = e.target.value
 
     this.setState({...this.state, isLoading: true, searchBarValue: newSearchBarValue})
+    actions.setIsLoading(true)
 
     onFinishedTyping.call(this, () => {
       this.props.history.push(`?u=${newSearchBarValue}`)
       this.setState({...this.state, isLoading: false})
+      actions.setIsLoading(false)
     })
   }
 
   componentDidMount = () => {
     const {location} = this.props
     const urlUsername = getUsernameFromUrlParams(location.search)
-    this.setState({...this.state, searchBarValue: urlUsername})
+    this.setState({...this.state, searchBarValue: urlUsername || ''})
+  }
+
+  componentDidUpdate (prevProps) {
+    this.handleRouteChange(prevProps)
+  }
+
+  handleRouteChange (prevProps) {
+    debug('handleRouteChange', {props:this.props, prevProps})
+    if (!isRouteChange(this.props, prevProps)) {
+      return
+    }
+
+    const {location} = this.props
+    const urlUsername = getUsernameFromUrlParams(location.search)
+    this.setState({...this.state, searchBarValue: urlUsername || ''})
+    debug('handleRouteChange end', {props:this.props, prevProps})
   }
 
   render () {
@@ -82,13 +105,13 @@ class Header extends React.Component {
                     value={searchBarValue}
                     className={classes.searchInput}
                   />
-
+{/* this is the search loading icon, it doesn't seem necessary right now
                   <Grid className={classes.loadingIcon} item>
                     {isLoading && 
-                      <CircularProgress className='{classes.loadingIcon}' size={20} />
+                      <CircularProgress size={20} />
                     }
                   </Grid>
-
+*/}
                 </Grid>
               </div>
 
@@ -110,12 +133,15 @@ Header.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-// const mapStateToProps = state => ({})
-// const mapDispatchToProps = dispatch => ({})
+const mapStateToProps = state => ({
+})
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(actions, dispatch)
+})
 
 const enhance = compose(
   withRouter,
-  // connect(mapStateToProps, mapDispatchToProps),
+  connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles(images))
 )
 

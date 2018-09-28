@@ -52,20 +52,25 @@ class Feed extends React.Component {
     addingMorePosts: false
   }
 
-  componentDidMount () {
-    this.addPostsToFeed()
-    this.handleProfile()
+  componentWillMount () {
+    debug('componentWillMount')
+  }
 
+  componentDidMount () {
+    this.addPostsToFeed({reset: true})
+    this.handleProfile({reset: true})
     debug('props', this.props)
     debug('mounted')
   }
 
   handleRouteChange (prevProps) {
+    const {actions} = this.props
     if (!isRouteChange(this.props, prevProps)) {
       return
     }
-    this.addPostsToFeed()
-    this.handleProfile()
+
+    this.addPostsToFeed({reset: true})
+    this.handleProfile({reset: true})
 
     debug('feed changed')
   }
@@ -79,25 +84,46 @@ class Feed extends React.Component {
     debug('unmounted')
   }
 
-  async handleProfile () {
+  async handleProfile ({reset} = {}) {
     const {location, address, actions} = this.props
+    debug('handleProfile start', location)
+
+    if (reset) actions.setPublisherProfile(null)
 
     if (!isPublisher(location.search)) return
 
+    if (reset) this.setState((state, props) => ({...state, profileIsLoading: true}))
     const profileQuery = getProfileQueryFromUrlParams(location.search, address)
     const profile = await services.getProfile(profileQuery)
     actions.setPublisherProfile(profile)
+    setTimeout( () => {
+      this.setState((state, props) => ({...state, profileIsLoading: false}))
+    }, 5000)
+    
+    debug('handleProfile end', profileQuery)
   }
 
-  async addPostsToFeed () {
-    if (!this.state.hasMorePosts) return
-    this.setState({...this.state, addingMorePosts: true})
-
+  async addPostsToFeed ({reset} = {}) {
+    debug('addPostsToFeed start', this.props, this.state)
     let {location, actions, feed, subscriptions, address} = this.props
+    let {hasMorePosts} = this.state
     const username = getUsernameFromUrlParams(location.search)
 
+    // need to reset when switching page
+    // the state and props are set async so 
+    // they need to be overwritten
+    if (reset) {
+      actions.setFeed([])
+      feed = []
+      this.setState((state, props) => ({...state, hasMorePosts: true}))
+      hasMorePosts = true
+    }
+
+    if (!hasMorePosts) return
+    this.setState((state, props) => ({...state, addingMorePosts: true}))
+
     if (isPermalink(location.search)) {
-      this.setState({...this.state, hasMorePosts: false})
+      this.setState((state, props) => ({...state, hasMorePosts: false}))
 
       // this is a temporary post to test
       const post = {
@@ -169,12 +195,13 @@ class Feed extends React.Component {
       actions.setFeed([...feed, ...newPosts])
     }
 
-    this.setState({...this.state, addingMorePosts: false})
+    this.setState((state, props) => ({...state, addingMorePosts: false}))
+    debug('addPostsToFeed end', this.props, this.state)
   }
 
   render () {
     const {classes, feed, location} = this.props
-    const {addingMorePosts} = this.state
+    const {addingMorePosts, profileIsLoading} = this.state
 
     const posts = []
     for (const post of feed) {
@@ -187,14 +214,15 @@ class Feed extends React.Component {
     if (isProfile(location.search)) {
       profile = this.props.profile
       editable = true
-    } else {
+    }
+    if (isPublisher(location.search)) {
       profile = this.props.publisherProfile
     }
 
     return (
       <div className={classes.layout}>
 
-        {profile && <Profile profile={profile} editable={editable} />}
+        {profile && <Profile isLoading={profileIsLoading} profile={profile} editable={editable} />}
 
         <FeedComponent postCount={posts.length} addPostsToFeed={this.addPostsToFeed.bind(this)} >
           {posts}
@@ -204,10 +232,6 @@ class Feed extends React.Component {
       </div>
     )
   }
-}
-
-Profile.propTypes = {
-  classes: PropTypes.object.isRequired
 }
 
 const mapStateToProps = state => ({
