@@ -28,16 +28,9 @@ const filterSubscriptions = (subscriptions) => {
 }
 
 const formatSubscriptions = (subscriptions) => {
-  const formated = {
-    userSubscriptions: [],
-    addressSubscriptions: []
-  }
+  const formated = []
   for (const key in subscriptions) {
-    if (key.length === 42) {
-      formated.addressSubscriptions.push(key)
-    } else {
-      formated.userSubscriptions.push(key)
-    }
+    formated.push(key)
   }
   return formated
 }

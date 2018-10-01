@@ -7,7 +7,7 @@ const styles = {
     '&::before': {
       content: `' '`,
       display: 'block',
-      border: '3px solid white',
+      border: '4px solid white',
       height: '100%',
       width: '100%',
       position: 'absolute',

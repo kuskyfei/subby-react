@@ -48,10 +48,8 @@ const setFeedCache = async ({posts, hasMorePostsOnEthereum, lastFeedCacheCursor}
   return tx.complete
 }
 
-const setLoggedInSubscriptionsCache = async ({address, username, loggedInSubscriptions}) => {
-  debug('setLoggedInSubscriptionsCache', {address, username, loggedInSubscriptions})
-
-  if (!username) username = address
+const setLoggedInSubscriptionsCache = async ({account, loggedInSubscriptions}) => {
+  debug('setLoggedInSubscriptionsCache', {account, loggedInSubscriptions})
 
   const req = {
     subscriptions: loggedInSubscriptions,
@@ -62,7 +60,7 @@ const setLoggedInSubscriptionsCache = async ({address, username, loggedInSubscri
     .db
     .transaction(['loggedInSubscriptions'], 'readwrite')
     .objectStore('loggedInSubscriptions')
-    .put(req, username)
+    .put(req, account)
 
   return tx.complete
 }

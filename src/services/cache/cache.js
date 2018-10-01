@@ -1,4 +1,4 @@
-const ethereum = require('../ethereum')
+const subbyJs = require('subby.js')
 const indexedDb = require('../indexedDb')
 
 const debug = require('debug')('services:cache:cache')
@@ -9,14 +9,14 @@ const feedCacheTime = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_TIME
 // const feedCachedPreemptivelyCount = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHED_PREEMPTIVELY_COUNT
 const minimumUnreadFeedCachedCount = window.SUBBY_GLOBAL_SETTINGS.MINIMUM_UNREAD_FEED_CACHED_COUNT
 
-const updateCache = async ({username, address}) => {
+const updateCache = async (account) => {
   debug('updateCache')
 
-  if (await profileCacheIsExpired({username, address})) {
-    await updateProfileCache({username, address})
+  if (await profileCacheIsExpired(account)) {
+    await updateProfileCache(account)
   }
-  if (await loggedInSubscriptionsCacheIsExpired({username, address})) {
-    await updateSubscriptionsCache({username, address})
+  if (await loggedInSubscriptionsCacheIsExpired(account)) {
+    await updateSubscriptionsCache(account)
   }
   if (await feedCacheIsExpired()) {
     await updateFeedCache()
@@ -35,10 +35,10 @@ const updateFeedCache = () => {
   debug('updateFeedCache')
 }
 
-const profileCacheIsExpired = async ({username, address}) => {
-  debug('profileCacheIsExpired', {username, address})
+const profileCacheIsExpired = async (account) => {
+  debug('profileCacheIsExpired', {account})
 
-  const lastProfileCacheTimeStamp = await indexedDb.getLastProfileCacheTimeStamp({username, address})
+  const lastProfileCacheTimeStamp = await indexedDb.getLastProfileCacheTimeStamp(account)
   if (!lastProfileCacheTimeStamp) return true
 
   const expiresAtTimestamp = Date.now() - profileCacheTime
@@ -49,10 +49,10 @@ const profileCacheIsExpired = async ({username, address}) => {
   return profileCacheIsExpired
 }
 
-const loggedInSubscriptionsCacheIsExpired = async ({username, address}) => {
-  debug('loggedInSubscriptionsCacheIsExpired', {username, address})
+const loggedInSubscriptionsCacheIsExpired = async (account) => {
+  debug('loggedInSubscriptionsCacheIsExpired', {account})
 
-  const lastLoggedInSubscriptionsCacheTimeStamp = await indexedDb.getLastLoggedInSubscriptionsCacheTimeStamp({username, address})
+  const lastLoggedInSubscriptionsCacheTimeStamp = await indexedDb.getLastLoggedInSubscriptionsCacheTimeStamp(account)
   if (!lastLoggedInSubscriptionsCacheTimeStamp) return true
 
   const expiresAtTimestamp = Date.now() - lastLoggedSubscriptionsCacheTime
@@ -94,7 +94,7 @@ const addPostsToFeedCache = async ({userSubscriptions, addressSubscriptions, sta
   debug('addPostsToFeedCache', {userSubscriptions, addressSubscriptions, startAt, count, cursor, beforeTimestamp, afterTimestamp})
 
   const postQuery = {userSubscriptions, addressSubscriptions, startAt, count, cursor, beforeTimestamp, afterTimestamp}
-  const posts = await ethereum.getPosts(postQuery)
+  const posts = await subbyJs.getPostsFromPublishers(postQuery)
   // this needs to be updated when the final cursor design is decided
   await indexedDb.setFeedCache({posts, hasMorePostsOnEthereum: true, lastFeedCacheCursor: null})
 }

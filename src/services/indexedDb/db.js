@@ -59,9 +59,21 @@ let init = async ({version}) => {
   })
 }
 
-const deleteEverything = () => {
-  return idb.deleteDatabase('subby')
-}
+const deleteEverything = () => new Promise(async resolve =>{
+  await state.db.close()
+
+  const req = window.indexedDB.deleteDatabase('subby')
+  req.onsuccess = () => {
+    resolve()
+  }
+  req.onerror = () => {
+    console.error("Couldn't delete database")
+  }
+  req.onblocked = () => {
+    console.error("Couldn't delete database due to the operation being blocked")
+  }
+})
+
 window.SUBBY_DEBUG_DELETE_INDEXEDDB = deleteEverything
 
 state.init = init

@@ -10,6 +10,9 @@ const previewStyles = theme => ({
       boxShadow: 'none',
       padding: 0,
       animation: 'fadeIn ease 1s'
+    },
+    '& div::before': {
+      borderColor: theme.palette.background.default
     }
   }
 })

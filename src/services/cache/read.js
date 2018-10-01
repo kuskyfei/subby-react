@@ -1,4 +1,4 @@
-const ethereum = require('../ethereum')
+const subbyJs = require('subby.js')
 const indexedDb = require('../indexedDb')
 const cache = require('./cache')
 const {mergeSubscriptionsLoggedInSubscriptions, mergeSubscriptions, filterSubscriptions, formatSubscriptions} = require('./util')
@@ -7,22 +7,24 @@ const debug = require('debug')('services:cache:read')
 const getAddress = async () => {
   debug('getAddress')
 
-  const ethereumAddress = await ethereum.getAddress()
+  const ethereumAddress = await subbyJs.getAddress()
 
   debug('getAddress returns', ethereumAddress)
 
   return ethereumAddress
 }
 
-const getProfile = async ({username, address}) => {
-  debug('getProfile', {username, address})
+// accounts are either addresses or usernames
 
-  let profile = await indexedDb.getProfileCache({username, address})
+const getProfile = async (account) => {
+  debug('getProfile', account)
+
+  let profile = await indexedDb.getProfileCache(account)
 
   // if cache is empty or expired, fetch from ethereum
   // and set the cache
-  if (!profile || await cache.profileCacheIsExpired({username, address})) {
-    profile = await ethereum.getProfile({username, address})
+  if (!profile || await cache.profileCacheIsExpired(account)) {
+    profile = await subbyJs.getProfile(account)
 
     indexedDb.setProfileCache(profile)
   }
@@ -34,18 +36,18 @@ const getProfile = async ({username, address}) => {
 
 // this will need a lot of testing to make sure the 3 lists of subscribtions don't
 // overwrite each other in the wrong way
-const getSubscriptions = async ({username, address}) => {
-  debug('getSubscriptions', {username, address})
+const getSubscriptions = async (account) => {
+  debug('getSubscriptions', account)
 
-  let loggedInSubscriptions = await indexedDb.getLoggedInSubscriptionsCache({username, address})
+  let loggedInSubscriptions = await indexedDb.getLoggedInSubscriptionsCache(account)
   const loggedOutSubscriptions = await indexedDb.getLoggedOutSubscriptions()
 
-  if (await cache.loggedInSubscriptionsCacheIsExpired({username, address})) {
-    const ethereumSubscriptions = await ethereum.getSubscriptions({username, address})
+  if (await cache.loggedInSubscriptionsCacheIsExpired(account)) {
+    const ethereumSubscriptions = await subbyJs.getSubscriptions(account)
     loggedInSubscriptions = mergeSubscriptionsLoggedInSubscriptions({ethereumSubscriptions, loggedInSubscriptions})
 
     // indexedDbLoggedInSubscriptions have a "muted" status which the ethereumSubscriptions should not overwrite
-    await indexedDb.setLoggedInSubscriptionsCache({username, address, loggedInSubscriptions})
+    await indexedDb.setLoggedInSubscriptionsCache({account, loggedInSubscriptions})
   }
 
   const subscriptions = mergeSubscriptions({loggedInSubscriptions, loggedOutSubscriptions})
@@ -65,25 +67,22 @@ const getSettings = async () => {
   return settings
 }
 
-const getFeed = async ({subscriptions, startAt, count, beforeTimestamp, afterTimestamp, cursor}) => {
-  debug('getFeed', {subscriptions, startAt, count, beforeTimestamp, afterTimestamp, cursor})
+const getFeed = async ({subscriptions, startAt, limit, beforeTimestamp, afterTimestamp, cursor}) => {
+  debug('getFeed', {subscriptions, startAt, limit, beforeTimestamp, afterTimestamp, cursor})
 
   subscriptions = filterSubscriptions(subscriptions) // remove muted or limited subscriptions
-  const {userSubscriptions, addressSubscriptions} = formatSubscriptions(subscriptions)
+  subscriptions = formatSubscriptions(subscriptions)
 
   const postQuery = {
+    publishers: subscriptions,
     startAt,
-    count,
-    beforeTimestamp,
-    afterTimestamp,
-    userSubscriptions,
-    addressSubscriptions
+    limit
   }
 
   let posts = await indexedDb.getFeedCache(postQuery)
 
   if (await cache.feedCacheIsExpired()) {
-    posts = await ethereum.getPosts(postQuery)
+    posts = await subbyJs.getPostsFromPublishers(subscriptions)
     // this needs to be updated when the final cursor design is decided
     await indexedDb.setFeedCache({posts, hasMorePostsOnEthereum: true, lastFeedCacheCursor: null})
   }
@@ -98,13 +97,13 @@ const getFeed = async ({subscriptions, startAt, count, beforeTimestamp, afterTim
   // if there is more posts on ethereum and
   // the post count received is smaller than
   // query count, it should be fetched again
-  if (posts.count < count) {
-    posts = await ethereum.getPosts(postQuery)
+  if (posts.limit < limit) {
+    posts = await subbyJs.getPostsFromPublishers(postQuery)
     // this needs to be updated when the final cursor design is decided
     await indexedDb.setFeedCache({posts, hasMorePostsOnEthereum: true, lastFeedCacheCursor: null})
   }
 
-  if (cache.feedCacheNeedsMorePosts({startAt, count})) {
+  if (cache.feedCacheNeedsMorePosts({startAt, limit})) {
     const cursor = indexedDb.getLastFeedCacheCursor()
 
     debug('postQuery', postQuery)
@@ -117,7 +116,7 @@ const getFeed = async ({subscriptions, startAt, count, beforeTimestamp, afterTim
   return posts
 }
 
-const getPosts = ethereum.getPosts
+const getPosts = subbyJs.getPosts
 
 export {
   getAddress,

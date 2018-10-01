@@ -41,32 +41,28 @@ const getEverything = async () => {
 // getEverything method is used for debugging
 window.SUBBY_DEBUG_INDEXEDDB = getEverything
 
-const getProfileCache = async ({username, address}) => {
-  debug('getProfileCache', {username, address})
-
-  if (!username) username = address
+const getProfileCache = async (account) => {
+  debug('getProfileCache', {account})
 
   const profile = await db
     .db
     .transaction(['profiles'])
     .objectStore('profiles')
-    .get(username)
+    .get(account)
 
   debug('getProfileCache returns', profile)
 
   return profile
 }
 
-const getLastProfileCacheTimeStamp = async ({username, address}) => {
-  debug('getLastProfileCacheTimeStamp', {username, address})
-
-  if (!username) username = address
+const getLastProfileCacheTimeStamp = async (account) => {
+  debug('getLastProfileCacheTimeStamp', {account})
 
   const profile = await db
     .db
     .transaction(['profiles'])
     .objectStore('profiles')
-    .get(username)
+    .get(account)
 
   const lastProfileCacheTimeStamp = profile.lastProfileCacheTimeStamp
 
@@ -75,16 +71,14 @@ const getLastProfileCacheTimeStamp = async ({username, address}) => {
   return lastProfileCacheTimeStamp
 }
 
-const getLoggedInSubscriptionsCache = async ({username, address}) => {
-  debug('getLoggedInSubscriptionsCache', {username, address})
-
-  if (!username) username = address
+const getLoggedInSubscriptionsCache = async (account) => {
+  debug('getLoggedInSubscriptionsCache', {account})
 
   const res = await db
     .db
     .transaction(['loggedInSubscriptions'])
     .objectStore('loggedInSubscriptions')
-    .get(username)
+    .get(account)
 
   const subscriptions = res && res.subscriptions
 
@@ -93,16 +87,14 @@ const getLoggedInSubscriptionsCache = async ({username, address}) => {
   return subscriptions
 }
 
-const getLastLoggedInSubscriptionsCacheTimeStamp = async ({username, address}) => {
-  debug('getLastLoggedInSubscriptionsCacheTimeStamp', {username, address})
-
-  if (!username) username = address
+const getLastLoggedInSubscriptionsCacheTimeStamp = async (account) => {
+  debug('getLastLoggedInSubscriptionsCacheTimeStamp', {account})
 
   const res = await db
     .db
     .transaction(['loggedInSubscriptions'])
     .objectStore('loggedInSubscriptions')
-    .get(username)
+    .get(account)
 
   const lastLoggedInSubscriptionsCacheTimeStamp = res && res.lastLoggedInSubscriptionsCacheTimeStamp
 

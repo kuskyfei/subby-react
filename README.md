@@ -53,6 +53,10 @@ make settings page settings actually do something
 fix profile remounting when going to same profile
 fix end of feed behavior
 fix possible bug with posts displaying addresses instead of usernames
+add blacklist
+add video, audio, torrent and ipfs urls to mock
+fix line bug in preview with iframes
+remove delay timeout from profile load in component
 
 ##fixed
 fix page change not triggering on url change
@@ -73,6 +77,7 @@ make sitemap generator
 make indexer / search engine
 add transalations (put all english into a JSON file and use the file to translate)
 add interface for ledger nano
+add text to speech donations
 
 ##env versions
 tested on node v10.9.0 and npm v6.2.0

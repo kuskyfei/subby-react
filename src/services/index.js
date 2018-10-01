@@ -1,17 +1,24 @@
 const indexedDb = require('./indexedDb')
-const ethereum = require('./ethereum')
+const subbyJs = require('subby.js')
 const {settings} = require('../settings')
 const ipfs = require('./ipfs').default
 
 const init = async () => {
   await indexedDb.init({version: settings.INDEXEDDB_VERSION})
-  await ethereum.init({provider: window.SUBBY_GLOBAL_SETTINGS.WEB3_PROVIDER})
-  ipfs.setProvider(window.SUBBY_GLOBAL_SETTINGS.IPFS_PROVIDER)
+  await subbyJs.init({provider: window.SUBBY_GLOBAL_SETTINGS.WEB3_PROVIDER, mnemonic: 'no mnemonic'})
+  await subbyJs.init({provider: window.SUBBY_GLOBAL_SETTINGS.WEB3_PROVIDER, mnemonic: 'no mnemonic'})
+  ipfs.setProvider(window.SUBBY_GLOBAL_SETTINGS.IPFS_PROVIDER)  
+}
+
+const mockSmartContracts = () => {
+  const smartContractsMock = require('subby.js/test/mock')
+  subbyJs.mockSmartContracts(smartContractsMock)
 }
 
 export {
   init,
-  ipfs
+  ipfs,
+  mockSmartContracts
 }
 
 export {

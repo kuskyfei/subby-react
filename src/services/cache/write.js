@@ -9,19 +9,19 @@ const setSettings = async (settings) => {
   await indexedDb.setSettings(settings)
 }
 
-const subscribe = async ({username, address}) => {
-  debug('subscribe', {username, address})
+const subscribe = async (account) => {
+  debug('subscribe', account)
 }
 
-const setSubscriptions = async ({username, address, loggedInSubscriptions, loggedOutSubscriptions}) => {
-  debug('setSubscriptions', {username, address, loggedInSubscriptions, loggedOutSubscriptions})
+const setSubscriptions = async ({account, loggedInSubscriptions, loggedOutSubscriptions}) => {
+  debug('setSubscriptions', {account, loggedInSubscriptions, loggedOutSubscriptions})
 
-  await indexedDb.setLoggedInSubscriptionsCache({address, username, loggedInSubscriptions})
+  await indexedDb.setLoggedInSubscriptionsCache({account, loggedInSubscriptions})
   await indexedDb.setLoggedOutSubscriptions(loggedOutSubscriptions)
 }
 
-const tip = async ({username, address}) => {
-  debug('tip', {username, address})
+const donate = async (account, value, message) => {
+  debug('tip', {account, value, message})
 }
 
 const publish = async (post) => {
@@ -32,6 +32,6 @@ export {
   setSettings,
   setSubscriptions,
   subscribe,
-  tip,
+  donate,
   publish
 }

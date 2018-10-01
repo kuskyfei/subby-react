@@ -20,8 +20,6 @@ class Modal extends React.Component {
 
     if (typeof maxWidth === 'number') maxWidth += 'px'
 
-    console.log(maxWidth)
-
     return (
       <Trigger trigger={trigger}>
 
