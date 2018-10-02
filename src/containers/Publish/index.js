@@ -29,7 +29,7 @@ class Publish extends React.Component {
     link: null
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.handleGlobalClipboardPasting = this.handleGlobalClipboardPasting.bind(this)
   }
@@ -76,9 +76,7 @@ class Publish extends React.Component {
 
     if (file.type === 'application/x-bittorrent') {
       await this.handleTorrentFile(file)
-    }
-
-    else {
+    } else {
       await this.handleIpfsFile(file)
     }
 

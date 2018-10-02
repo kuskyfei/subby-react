@@ -8,7 +8,7 @@
       - subscriberCount
       - subscribtionCount
       - tipCount
-      - lastProfileCacheTimeStamp
+      - lastProfileCacheTimestamp
     - usernameOrAddress2
     - etc...
   - feed // object store
@@ -18,14 +18,14 @@
       - etc...
     - hasMorePostsOnEthereum
     - lastFeedCacheCursor
-    - lastFeedCacheTimeStamp
+    - lastFeedCacheTimestamp
   - loggedInSubscriptions // object store
     - usernameOrAddress
       - subscriptions
         - subscription1
         - subscription2
         - etc...
-      - lastLoggedInSubscriptionsCacheTimeStamp
+      - lastLoggedInSubscriptionsCacheTimestamp
   - loggedOutSubscriptions // object store
     - subscription1
     - subscription2
@@ -59,7 +59,7 @@ let init = async ({version}) => {
   })
 }
 
-const deleteEverything = () => new Promise(async resolve =>{
+const deleteEverything = () => new Promise(async resolve => {
   await state.db.close()
 
   const req = window.indexedDB.deleteDatabase('subby')
@@ -78,4 +78,4 @@ window.SUBBY_DEBUG_DELETE_INDEXEDDB = deleteEverything
 
 state.init = init
 
-export default state
+module.exports = state

@@ -1,4 +1,4 @@
-import db from './db'
+const db = require('./db')
 const {isObjectStoreName} = require('./util')
 const debug = require('debug')('services:indexedDb:read')
 
@@ -55,8 +55,8 @@ const getProfileCache = async (account) => {
   return profile
 }
 
-const getLastProfileCacheTimeStamp = async (account) => {
-  debug('getLastProfileCacheTimeStamp', {account})
+const getLastProfileCacheTimestamp = async (account) => {
+  debug('getLastProfileCacheTimestamp', {account})
 
   const profile = await db
     .db
@@ -64,11 +64,11 @@ const getLastProfileCacheTimeStamp = async (account) => {
     .objectStore('profiles')
     .get(account)
 
-  const lastProfileCacheTimeStamp = profile.lastProfileCacheTimeStamp
+  const lastProfileCacheTimestamp = profile.lastProfileCacheTimestamp
 
-  debug('getLastProfileCacheTimeStamp returns', lastProfileCacheTimeStamp)
+  debug('getLastProfileCacheTimestamp returns', lastProfileCacheTimestamp)
 
-  return lastProfileCacheTimeStamp
+  return lastProfileCacheTimestamp
 }
 
 const getLoggedInSubscriptionsCache = async (account) => {
@@ -87,8 +87,8 @@ const getLoggedInSubscriptionsCache = async (account) => {
   return subscriptions
 }
 
-const getLastLoggedInSubscriptionsCacheTimeStamp = async (account) => {
-  debug('getLastLoggedInSubscriptionsCacheTimeStamp', {account})
+const getLastLoggedInSubscriptionsCacheTimestamp = async (account) => {
+  debug('getLastLoggedInSubscriptionsCacheTimestamp', {account})
 
   const res = await db
     .db
@@ -96,11 +96,11 @@ const getLastLoggedInSubscriptionsCacheTimeStamp = async (account) => {
     .objectStore('loggedInSubscriptions')
     .get(account)
 
-  const lastLoggedInSubscriptionsCacheTimeStamp = res && res.lastLoggedInSubscriptionsCacheTimeStamp
+  const lastLoggedInSubscriptionsCacheTimestamp = res && res.lastLoggedInSubscriptionsCacheTimestamp
 
-  debug('getLastLoggedInSubscriptionsCacheTimeStamp returns', lastLoggedInSubscriptionsCacheTimeStamp)
+  debug('getLastLoggedInSubscriptionsCacheTimestamp returns', lastLoggedInSubscriptionsCacheTimestamp)
 
-  return lastLoggedInSubscriptionsCacheTimeStamp
+  return lastLoggedInSubscriptionsCacheTimestamp
 }
 
 const getLoggedOutSubscriptions = async () => {
@@ -161,18 +161,18 @@ const hasMorePostsOnEthereum = async () => {
   return hasMorePostsOnEthereum
 }
 
-const getLastFeedCacheTimeStamp = async () => {
-  debug('getLastFeedCacheTimeStamp')
+const getLastFeedCacheTimestamp = async () => {
+  debug('getLastFeedCacheTimestamp')
 
-  const lastFeedCacheTimeStamp = await db
+  const lastFeedCacheTimestamp = await db
     .db
     .transaction(['feed'])
     .objectStore('feed')
-    .get('lastFeedCacheTimeStamp')
+    .get('lastFeedCacheTimestamp')
 
-  debug('getLastFeedCacheTimeStamp returns', lastFeedCacheTimeStamp)
+  debug('getLastFeedCacheTimestamp returns', lastFeedCacheTimestamp)
 
-  return lastFeedCacheTimeStamp
+  return lastFeedCacheTimestamp
 }
 
 const getLastFeedCacheCursor = async () => {
@@ -203,13 +203,13 @@ const getSettings = async () => {
   return settings
 }
 
-export {
+module.exports = {
   getProfileCache,
   getLoggedInSubscriptionsCache,
   getLoggedOutSubscriptions,
-  getLastFeedCacheTimeStamp,
-  getLastLoggedInSubscriptionsCacheTimeStamp,
-  getLastProfileCacheTimeStamp,
+  getLastFeedCacheTimestamp,
+  getLastLoggedInSubscriptionsCacheTimestamp,
+  getLastProfileCacheTimestamp,
   getFeedCache,
   getFeedCacheCount,
   getLastFeedCacheCursor,

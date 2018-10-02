@@ -1,7 +1,7 @@
 const subbyJs = require('subby.js')
 const indexedDb = require('../indexedDb')
 const cache = require('./cache')
-const {mergeSubscriptionsLoggedInSubscriptions, mergeSubscriptions, filterSubscriptions, formatSubscriptions} = require('./util')
+const {arrayToObjectWithItemsAsProps, mergeSubscriptionsLoggedInSubscriptions, mergeSubscriptions, filterSubscriptions, formatSubscriptions} = require('./util')
 const debug = require('debug')('services:cache:read')
 
 const getAddress = async () => {
@@ -29,6 +29,8 @@ const getProfile = async (account) => {
     indexedDb.setProfileCache(profile)
   }
 
+  delete profile.lastProfileCacheTimestamp
+
   debug('getProfile returns', profile)
 
   return profile
@@ -43,7 +45,8 @@ const getSubscriptions = async (account) => {
   const loggedOutSubscriptions = await indexedDb.getLoggedOutSubscriptions()
 
   if (await cache.loggedInSubscriptionsCacheIsExpired(account)) {
-    const ethereumSubscriptions = await subbyJs.getSubscriptions(account)
+    let ethereumSubscriptions = await subbyJs.getSubscriptions(account)
+    ethereumSubscriptions = arrayToObjectWithItemsAsProps(ethereumSubscriptions) 
     loggedInSubscriptions = mergeSubscriptionsLoggedInSubscriptions({ethereumSubscriptions, loggedInSubscriptions})
 
     // indexedDbLoggedInSubscriptions have a "muted" status which the ethereumSubscriptions should not overwrite
@@ -118,7 +121,7 @@ const getFeed = async ({subscriptions, startAt, limit, beforeTimestamp, afterTim
 
 const getPosts = subbyJs.getPosts
 
-export {
+module.exports = {
   getAddress,
   getProfile,
   getSubscriptions,

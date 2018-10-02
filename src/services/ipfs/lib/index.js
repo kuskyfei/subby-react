@@ -1,5 +1,5 @@
 const {
-  setIpfsApi,
+  mockIpfsApi,
   setProvider,
   getIpfs
 } = require('./init')
@@ -29,8 +29,8 @@ const {
   uploadFilePathWrappedWithDirectory
 } = require('./write')
 
-export {
-  setIpfsApi,
+module.exports = {
+  mockIpfsApi,
   setProvider,
 
   uploadObject,

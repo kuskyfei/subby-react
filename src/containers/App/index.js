@@ -36,7 +36,7 @@ const styles = images => theme => {
   return {
     main: {
       animation: 'fadeIn ease 2s'
-    },
+    }
   }
 }
 
@@ -50,12 +50,9 @@ class App extends Component {
 
       // const settings = await services.getSettings()
 
-      //const address = await services.getAddress()
-      //const address = '0xBD6d79F3f02584cfcB754437Ac6776c4C6E0a0eC'
-      //const profile = await services.getProfile(address)
-
-      /*
-      const subscriptions = await services.getSubscriptions({address})
+      const address = await services.getAddress()
+      const profile = await services.getProfile(address)  
+      const subscriptions = await services.getSubscriptions(address)
 
       const {setAddress, setProfile, setSubscriptions} = this.props.actions
       setAddress(address)
@@ -72,7 +69,6 @@ class App extends Component {
       debug('address', address)
       debug('profile', profile)
       debug('subscriptions', subscriptions)
-      */
       debug('mounted')
     })()
   }
@@ -101,14 +97,9 @@ class App extends Component {
 
   render () {
     const Route = this.state.route
-    const {profile, headerIsLoading, classes, location} = this.props
+    const {headerIsLoading, classes, location} = this.props
 
     const isLoading = headerIsLoading
-
-    // this blank page is useful for testing
-    if (location.pathname === 'blankPage') {
-      return <div />
-    }
 
     return (
       <div>

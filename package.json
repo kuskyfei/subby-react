@@ -35,6 +35,7 @@
     "lint-fix": "./node_modules/.bin/standard --fix"
   },
   "devDependencies": {
+    "add-module-exports-webpack-plugin": "^0.1.0",
     "babel": "^6.3.26",
     "babel-core": "^6.26.3",
     "babel-eslint": "^9.0.0",

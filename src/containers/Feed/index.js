@@ -3,7 +3,6 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators, compose} from 'redux'
 import {withRouter} from 'react-router-dom'
-import PropTypes from 'prop-types'
 
 // material
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -64,7 +63,6 @@ class Feed extends React.Component {
   }
 
   handleRouteChange (prevProps) {
-    const {actions} = this.props
     if (!isRouteChange(this.props, prevProps)) {
       return
     }
@@ -96,10 +94,10 @@ class Feed extends React.Component {
     const profileQuery = getProfileQueryFromUrlParams(location.search, address)
     const profile = await services.getProfile(profileQuery)
     actions.setPublisherProfile(profile)
-    setTimeout( () => {
+    setTimeout(() => {
       this.setState((state, props) => ({...state, profileIsLoading: false}))
     }, 5000)
-    
+
     debug('handleProfile end', profileQuery)
   }
 
@@ -110,7 +108,7 @@ class Feed extends React.Component {
     const username = getUsernameFromUrlParams(location.search)
 
     // need to reset when switching page
-    // the state and props are set async so 
+    // the state and props are set async so
     // they need to be overwritten
     if (reset) {
       actions.setFeed([])

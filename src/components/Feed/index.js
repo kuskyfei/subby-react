@@ -21,7 +21,7 @@ const styles = theme => ({
 class Feed extends React.Component {
   state = {addingMorePosts: false}
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.handleScroll = this.handleScroll.bind(this)
   }

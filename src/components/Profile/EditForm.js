@@ -1,6 +1,5 @@
 // react
 import React from 'react'
-import {withRouter} from 'react-router-dom'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import Switch from '@material-ui/core/Switch'
@@ -38,10 +37,10 @@ const styles = theme => ({
   },
 
   textField: {
-    marginTop: theme.spacing.unit / 2,
+    marginTop: theme.spacing.unit / 2
   },
   firstTextField: {
-    marginTop: 0,
+    marginTop: 0
   },
   input: {
     marginBottom: theme.spacing.unit
@@ -51,7 +50,7 @@ const styles = theme => ({
     marginTop: theme.spacing.unit * 3,
     marginBottom: theme.spacing.unit / 2,
     '& img': {
-      animation: 'fadeIn ease 1.5s',
+      animation: 'fadeIn ease 1.5s'
     }
   },
   bigAvatar: {
@@ -59,14 +58,14 @@ const styles = theme => ({
     height: 70
   },
   fadeIn: {
-    animation: 'fadeIn ease 1.5s',
+    animation: 'fadeIn ease 1.5s'
   },
 
   buttonsContainer: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing.unit * 3
   },
   publishButton: {
     marginLeft: 'auto'
@@ -77,18 +76,17 @@ const styles = theme => ({
   greyIcon: {
     color: theme.palette.grey['300'],
     fontSize: 36
-  },
+  }
 })
 
 class EditForm extends React.Component {
-
   state = {
-    username: '', 
-    usernameError: '', 
-    bio: '', 
-    thumbnail: '', 
-    textDonationEnabled: '', 
-    minimumTextDonation: '', 
+    username: '',
+    usernameError: '',
+    bio: '',
+    thumbnail: '',
+    textDonationEnabled: '',
+    minimumTextDonation: '',
     address: '',
     usernameIsEditable: true
   }
@@ -102,7 +100,6 @@ class EditForm extends React.Component {
       usernameIsEditable: !profile.username,
       textDonationEnabled: !!profile.minimumTextDonation
     })
-
   }
 
   handleChange = name => event => {
@@ -135,10 +132,10 @@ class EditForm extends React.Component {
   }
 
   handlePublish = () => {
- 
+
   }
 
-  render() {
+  render () {
     const {classes} = this.props
     const {username, usernameError, bio, thumbnail, textDonationEnabled, minimumTextDonation, address, usernameIsEditable} = this.state
 
@@ -173,7 +170,7 @@ class EditForm extends React.Component {
           <Typography className={classes.username} variant='title' noWrap gutterBottom>
             {username || address}
           </Typography>
-          {bio && 
+          {bio &&
             <Typography className={classes.bio} variant='body1' gutterBottom>
               {bio}
             </Typography>
@@ -228,11 +225,11 @@ class EditForm extends React.Component {
           <Input
             disabled={!textDonationEnabled}
             className={classes.input}
-            id="adornment-amount"
+            id='adornment-amount'
             value={minimumTextDonation || ''}
             defaultValue={minimumTextDonation || ''}
             onChange={this.handleChange('minimumTextDonation')}
-            startAdornment={<InputAdornment position="start">Ξ</InputAdornment>}
+            startAdornment={<InputAdornment position='start'>Ξ</InputAdornment>}
           />
         </FormControl>
 

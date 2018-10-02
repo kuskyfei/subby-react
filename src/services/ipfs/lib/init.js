@@ -13,17 +13,18 @@ const setProvider = (provider) => {
   state.ipfs = new IPFS(provider)
 }
 
-// useful for mocking
-const setIpfsApi = (ipfsApi) => {
+// useful for testing
+const mockIpfsApi = () => {
   if (!state.ipfs) noProvider()
-  state.ipfs = {...state.ipfs, ...ipfsApi}
+  const ipfsMock = require('../test/mock')
+  state.ipfs = {...state.ipfs, ...ipfsMock}
 }
 
 // use this to call the ipfs methods directly
 const getIpfs = () => state.ipfs
 
-export {
-  setIpfsApi,
+module.exports = {
+  mockIpfsApi,
   setProvider,
   getIpfs
 }

@@ -1,11 +1,12 @@
-import db from './db'
+const db = require('./db')
 
 const debug = require('debug')('services:indexedDb:write')
 
 const setProfileCache = async (profile) => {
   debug('setProfileCache', profile)
 
-  profile.lastProfileCacheTimeStamp = Date.now()
+  profile = {...profile}
+  profile.lastProfileCacheTimestamp = Date.now()
 
   if (profile.username) {
     const key = profile.username
@@ -30,8 +31,8 @@ const setProfileCache = async (profile) => {
 const setFeedCache = async ({posts, hasMorePostsOnEthereum, lastFeedCacheCursor}) => {
   debug('setFeedCache', {posts, hasMorePostsOnEthereum, lastFeedCacheCursor})
 
-  const cacheTimeStampKey = (!lastFeedCacheCursor) ? 'lastFeedCacheTimeStamp' : 'lastFeedCacheTimeStampUsingACursor'
-  const lastFeedCacheTimeStamp = Date.now()
+  const cacheTimestampKey = (!lastFeedCacheCursor) ? 'lastFeedCacheTimestamp' : 'lastFeedCacheTimestampUsingACursor'
+  const lastFeedCacheTimestamp = Date.now()
 
   const tx = db
     .db
@@ -41,7 +42,7 @@ const setFeedCache = async ({posts, hasMorePostsOnEthereum, lastFeedCacheCursor}
   tx.put(posts, 'posts')
   tx.put(hasMorePostsOnEthereum, 'hasMorePostsOnEthereum')
   tx.put(lastFeedCacheCursor, 'lastFeedCacheCursor')
-  tx.put(lastFeedCacheTimeStamp, cacheTimeStampKey)
+  tx.put(lastFeedCacheTimestamp, cacheTimestampKey)
 
   await tx
 
@@ -53,7 +54,7 @@ const setLoggedInSubscriptionsCache = async ({account, loggedInSubscriptions}) =
 
   const req = {
     subscriptions: loggedInSubscriptions,
-    lastLoggedInSubscriptionsCacheTimeStamp: Date.now()
+    lastLoggedInSubscriptionsCacheTimestamp: Date.now()
   }
 
   const tx = await db
@@ -89,7 +90,7 @@ const setSettings = async (settings) => {
   return tx.complete
 }
 
-export {
+module.exports = {
   setProfileCache,
   setFeedCache,
   setLoggedInSubscriptionsCache,

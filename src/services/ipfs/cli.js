@@ -3,7 +3,7 @@
 // to start. Then use ipfs.method in the
 // cli.
 
-const ipfs = require('./index').default
+const ipfs = require('./index')
 ipfs.setProvider('https://ipfs.infura.io:5001')
 
 // init CLI

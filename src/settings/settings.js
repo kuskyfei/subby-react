@@ -1,4 +1,4 @@
-const minute = 60000
+const minute = 1000*60
 
 // these are the default recommended settings that get
 // transpiled into the subby.html file.
@@ -20,7 +20,7 @@ const settings = {
 
   UPDATE_NOTIFICATIONS: true,
 
-  PROFILE_CACHE_TIME: 5 * minute,
+  PROFILE_CACHE_TIME: 60 * minute,
   FEED_CACHE_TIME: 5 * minute,
   LOGGED_IN_SUBSCRIPTIONS_CACHE_TIME: 5 * minute,
   FEED_CACHED_PREEMPTIVELY_COUNT: 500,
@@ -30,12 +30,10 @@ const settings = {
   // deterministically without depending on
   // external apis. Thia should be set to false
   // in production.
-  MOCK_ETHEREUM: true,
-  MOCK_ETHEREUM_NETWORK_DELAY: 2000,
+  MOCK_SMART_CONTRACTS: true,
 
   // IndexedDb is Chrome's local database that Subby
   // uses to cache posts as well as store your subscriptions.
-  MOCK_INDEXEDDB: false,
   INDEXEDDB_VERSION: 1
 }
 

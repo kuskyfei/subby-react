@@ -42,11 +42,10 @@ const onFinishedTyping = (cb) => {
 
   clearInterval(this.onFinishedTypingInterval)
 
-  this.onFinishedTypingInterval = setInterval( ()=> {
+  this.onFinishedTypingInterval = setInterval(() => {
     if (this.onFinishedTypingCounter > 1) {
       cb()
       clearInterval(this.onFinishedTypingInterval)
-
     }
     this.onFinishedTypingCounter++
   }, 700)

@@ -1,10 +1,7 @@
 // react
 import React from 'react'
-import {withRouter} from 'react-router-dom'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
-import Switch from '@material-ui/core/Switch'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Input from '@material-ui/core/Input'
 import InputLabel from '@material-ui/core/InputLabel'
 import InputAdornment from '@material-ui/core/InputAdornment'
@@ -20,7 +17,7 @@ import HelpIcon from '@material-ui/icons/Help'
 const styles = theme => ({
   container: {
     marginLeft: theme.spacing.unit * 2,
-    marginRight: theme.spacing.unit * 2,
+    marginRight: theme.spacing.unit * 2
   },
   profile: {
     marginTop: theme.spacing.unit * 3,
@@ -44,7 +41,7 @@ const styles = theme => ({
     marginTop: theme.spacing.unit * 3,
     marginBottom: theme.spacing.unit / 2,
     '& img': {
-      animation: 'fadeIn ease 1.5s',
+      animation: 'fadeIn ease 1.5s'
     }
   },
   bigAvatar: {
@@ -52,14 +49,14 @@ const styles = theme => ({
     height: 70
   },
   fadeIn: {
-    animation: 'fadeIn ease 1.5s',
+    animation: 'fadeIn ease 1.5s'
   },
 
   buttonsContainer: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing.unit * 3
   },
   publishButton: {
     marginLeft: 'auto'
@@ -111,8 +108,8 @@ class Donate extends React.Component {
   }
 
   componentDidMount = () => {
-    const {classes, profile} = this.props
-    let {minimumTextDonation, username, address, thumbnail} = profile
+    const {profile} = this.props
+    let {minimumTextDonation} = profile
 
     if (minimumTextDonation === 0) minimumTextDonation = 0.01
 
@@ -126,15 +123,15 @@ class Donate extends React.Component {
   }
 
   handleDonate = () => {
- 
+
   }
 
-  render() {
+  render () {
     const {classes, profile} = this.props
     const {donationText, donationAmount} = this.state
     const {minimumTextDonation, username, address, thumbnail} = profile
 
-    const textDonationEnabled = (minimumTextDonation === 0) ? false : true
+    const textDonationEnabled = minimumTextDonation !== 0
 
     return (
       <form className={classes.container} noValidate autoComplete='off'>
@@ -156,11 +153,11 @@ class Donate extends React.Component {
           <InputLabel>Donation</InputLabel>
           <Input
             className={classes.input}
-            id="adornment-amount"
+            id='adornment-amount'
             value={donationAmount}
             defaultValue={donationAmount}
             onChange={this.handleChange('donationAmount')}
-            startAdornment={<InputAdornment position="start">Ξ</InputAdornment>}
+            startAdornment={<InputAdornment position='start'>Ξ</InputAdornment>}
           />
         </FormControl>
 

@@ -8,7 +8,7 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     marginTop: theme.spacing.unit * 10,
-    marginBottom: theme.spacing.unit * 10,
+    marginBottom: theme.spacing.unit * 10
   }
 })
 

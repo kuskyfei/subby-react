@@ -81,7 +81,7 @@ const arrayBufferToTypedArray = (buffer) => {
   return bytes
 }
 
-export {
+module.exports = {
   arrayBufferToTypedArray,
   urlToProviderObject,
   typedArrayToIpfsBuffer,

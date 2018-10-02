@@ -2,6 +2,7 @@ const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const DelWebpackPlugin = require('del-webpack-plugin')
+const AddModuleExportsPlugin = require('add-module-exports-webpack-plugin')
 const {manifest, images, settingsMessage} = require('./src/settings')
 
 // debug
@@ -77,6 +78,8 @@ module.exports = function override (config, env) {
     }))
   }
 
+  config.plugins.push(new AddModuleExportsPlugin())
+
   // replace default create-react-app ESLint with Standard.js
   config.module.rules[0] = {
     enforce: 'pre',
@@ -87,6 +90,7 @@ module.exports = function override (config, env) {
       parser: 'babel-eslint'
     }
   }
+  config.output.libraryTarget = 'commonjs2'
 
   // enable inline web workers as .worker.js files
   // config.module.rules.push({

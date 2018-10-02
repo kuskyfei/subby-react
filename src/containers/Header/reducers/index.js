@@ -1,7 +1,7 @@
 import A from './type'
 
 const initialState = {
-  isLoading: false,
+  isLoading: false
 }
 
 const reducer = (state = initialState, action) => {

@@ -11,7 +11,6 @@ const {
 
 const uploadObject = async (object) => {
   if (!state.ipfs) noProvider()
-
   const buffer = objectToIpfsBuffer(object)
   return state.ipfs.add(buffer)
 }
@@ -71,7 +70,7 @@ const uploadFilePathWrappedWithDirectory = (fileName, path) => {
   return state.ipfs.add(files, {wrapWithDirectory: true})
 }
 
-export {
+module.exports = {
   uploadObject,
   uploadString,
   uploadTypedArray,

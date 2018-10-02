@@ -35,9 +35,26 @@ const formatSubscriptions = (subscriptions) => {
   return formated
 }
 
-export {
+const cacheIsExpired = (lastCacheTimestamp, cacheTime) => {
+  if (!lastCacheTimestamp) return true
+  const expiresAtTimestamp = lastCacheTimestamp + cacheTime
+  const cacheIsExpired = Date.now() > expiresAtTimestamp
+  return cacheIsExpired
+}
+
+const arrayToObjectWithItemsAsProps = (array) => {
+  const obj = {}
+  for (const item of array) {
+    obj[item] = {}
+  }
+  return obj
+}
+
+module.exports = {
+  arrayToObjectWithItemsAsProps,
   mergeSubscriptions,
   mergeSubscriptionsLoggedInSubscriptions,
   filterSubscriptions,
-  formatSubscriptions
+  formatSubscriptions,
+  cacheIsExpired
 }

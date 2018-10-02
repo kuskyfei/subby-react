@@ -94,7 +94,6 @@ const isRouteChange = (props, prevProps) => {
   if (urlParams.id !== prevUrlParams.id) { // post id
     return true
   }
-
 }
 
 module.exports = {

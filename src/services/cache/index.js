@@ -1,20 +1,37 @@
-export {
+const {
   setSettings,
   setSubscriptions,
   subscribe,
   tip,
   publish
-} from './write'
+} = require('./write')
 
-export {
+const {
   getAddress,
   getProfile,
   getSubscriptions,
   getSettings,
   getFeed,
   getPosts
-} from './read'
+} = require('./read')
 
-export {
+const {
   updateCache
-} from './cache'
+} = require('./cache')
+
+module.exports = {
+  setSettings,
+  setSubscriptions,
+  subscribe,
+  tip,
+  publish,
+
+  getAddress,
+  getProfile,
+  getSubscriptions,
+  getSettings,
+  getFeed,
+  getPosts,
+
+  updateCache
+}

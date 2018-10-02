@@ -1,20 +1,29 @@
-const WebTorrent = require('webtorrent')
 const parseTorrent = require('parse-torrent')
-const client = new WebTorrent()
 const debug = require('debug')('services:torrent')
+
+let WebTorrent = require('webtorrent')
+const mockWebTorrent = () => {
+  WebTorrent = function () {
+    this.add = () => {}
+    this.get = () => {}
+  }
+}
+
+let client
+const init = () => {
+  client = new WebTorrent()
+}
 
 const getTorrent = (input) => {
   // input can be an info hash, torrent file buffer (blob in browser) or magnet uri
   debug('getTorrent', input)
 
   return new Promise((resolve) => {
-
     try {
       client.add(input, (torrent) => {
         handleTorrent(torrent)
       })
-    }
-    catch (e) {
+    } catch (e) {
       debug(e)
       client.get(input, (torrent) => {
         handleTorrent(torrent)
@@ -89,4 +98,4 @@ const isWebSocket = (tracker) => {
   return !!tracker.match(/^wss?:\/\//)
 }
 
-export {getTorrent, getMagnetFromTorrentFile, prepareMagnetForEthereum}
+module.exports = {getTorrent, getMagnetFromTorrentFile, prepareMagnetForEthereum, init, mockWebTorrent}

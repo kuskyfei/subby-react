@@ -10,15 +10,15 @@ const getLoggedOutSubscriptions = () => {
 
 }
 
-const getLastFeedCacheTimeStamp = () => {
+const getLastFeedCacheTimestamp = () => {
 
 }
 
-const getLastLoggedInSubscriptionsCacheTimeStamp = () => {
+const getLastLoggedInSubscriptionsCacheTimestamp = () => {
 
 }
 
-const getLastProfileCacheTimeStamp = () => {
+const getLastProfileCacheTimestamp = () => {
 
 }
 
@@ -42,13 +42,13 @@ const hasMorePostsOnEthereum = () => {
 
 }
 
-export {
+module.exports = {
   getProfileCache,
   getLoggedInSubscriptionsCache,
   getLoggedOutSubscriptions,
-  getLastFeedCacheTimeStamp,
-  getLastLoggedInSubscriptionsCacheTimeStamp,
-  getLastProfileCacheTimeStamp,
+  getLastFeedCacheTimestamp,
+  getLastLoggedInSubscriptionsCacheTimestamp,
+  getLastProfileCacheTimestamp,
   getFeedCache,
   getFeedCacheCount,
   getLastFeedCacheCursor,

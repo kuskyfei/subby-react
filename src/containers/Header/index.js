@@ -12,7 +12,6 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Grid from '@material-ui/core/Grid'
 import Input from '@material-ui/core/Input'
 import SearchIcon from '@material-ui/icons/Search'
-import CircularProgress from '@material-ui/core/CircularProgress'
 
 // actions
 import actions from './reducers/actions'
@@ -36,7 +35,7 @@ class Header extends React.Component {
   }
 
   handleSearchBarChange = (e) => {
-    const {actions} =  this.props
+    const {actions} = this.props
     const newSearchBarValue = e.target.value
 
     this.setState({...this.state, isLoading: true, searchBarValue: newSearchBarValue})
@@ -60,7 +59,7 @@ class Header extends React.Component {
   }
 
   handleRouteChange (prevProps) {
-    debug('handleRouteChange', {props:this.props, prevProps})
+    debug('handleRouteChange', {props: this.props, prevProps})
     if (!isRouteChange(this.props, prevProps)) {
       return
     }
@@ -68,12 +67,12 @@ class Header extends React.Component {
     const {location} = this.props
     const urlUsername = getUsernameFromUrlParams(location.search)
     this.setState({...this.state, searchBarValue: urlUsername || ''})
-    debug('handleRouteChange end', {props:this.props, prevProps})
+    debug('handleRouteChange end', {props: this.props, prevProps})
   }
 
   render () {
     const {classes} = this.props
-    const {searchBarValue, isLoading} =  this.state
+    const {searchBarValue} = this.state
 
     return (
       <div className={classes.root}>
@@ -105,9 +104,9 @@ class Header extends React.Component {
                     value={searchBarValue}
                     className={classes.searchInput}
                   />
-{/* this is the search loading icon, it doesn't seem necessary right now
+                  {/* this is the search loading icon, it doesn't seem necessary right now
                   <Grid className={classes.loadingIcon} item>
-                    {isLoading && 
+                    {this.state.isLoading &&
                       <CircularProgress size={20} />
                     }
                   </Grid>

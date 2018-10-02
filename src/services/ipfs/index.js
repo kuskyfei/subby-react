@@ -1,5 +1,5 @@
 const {
-  setIpfsApi,
+  mockIpfsApi,
   setProvider,
 
   uploadObject,
@@ -29,8 +29,8 @@ const {
 
 const webWorkers = require('./webWorkers')
 
-export default {
-  setIpfsApi,
+module.exports = {
+  mockIpfsApi,
   setProvider,
 
   uploadObject,

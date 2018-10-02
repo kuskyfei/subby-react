@@ -18,15 +18,23 @@ window.TextDecoder = () => ({
   }
 })
 
-window.indexedDB = require("fake-indexeddb")
-window.IDBIndex = require("fake-indexeddb/lib/FDBIndex")
-window.IDBCursor = require("fake-indexeddb/lib/FDBCursor")
-window.IDBCursorWithValue = require("fake-indexeddb/lib/FDBCursorWithValue")
-window.IDBDatabase = require("fake-indexeddb/lib/FDBDatabase")
-window.IDBFactory = require("fake-indexeddb/lib/FDBFactory")
-window.IDBKeyRange = require("fake-indexeddb/lib/FDBKeyRange")
-window.IDBObjectStore = require("fake-indexeddb/lib/FDBObjectStore")
-window.IDBOpenDBRequest = require("fake-indexeddb/lib/FDBOpenDBRequest")
-window.IDBRequest = require("fake-indexeddb/lib/FDBRequest")
-window.IDBTransaction = require("fake-indexeddb/lib/FDBTransaction")
-window.IDBVersionChangeEvent = require("fake-indexeddb/lib/FDBVersionChangeEvent")
+window.indexedDB = require('fake-indexeddb')
+window.IDBIndex = require('fake-indexeddb/lib/FDBIndex')
+window.IDBCursor = require('fake-indexeddb/lib/FDBCursor')
+window.IDBCursorWithValue = require('fake-indexeddb/lib/FDBCursorWithValue')
+window.IDBDatabase = require('fake-indexeddb/lib/FDBDatabase')
+window.IDBFactory = require('fake-indexeddb/lib/FDBFactory')
+window.IDBKeyRange = require('fake-indexeddb/lib/FDBKeyRange')
+window.IDBObjectStore = require('fake-indexeddb/lib/FDBObjectStore')
+window.IDBOpenDBRequest = require('fake-indexeddb/lib/FDBOpenDBRequest')
+window.IDBRequest = require('fake-indexeddb/lib/FDBRequest')
+window.IDBTransaction = require('fake-indexeddb/lib/FDBTransaction')
+window.IDBVersionChangeEvent = require('fake-indexeddb/lib/FDBVersionChangeEvent')
+
+// useful for debugging
+const util = require('util')
+console.logFull = (...args) => {
+	for (const arg of args) {
+		console.log(util.inspect(arg, {showHidden: false, depth: null}))
+	}
+}
