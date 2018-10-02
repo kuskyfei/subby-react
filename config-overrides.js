@@ -78,7 +78,9 @@ module.exports = function override (config, env) {
     }))
   }
 
+  // add module.exports
   config.plugins.push(new AddModuleExportsPlugin())
+  config.output.libraryTarget = 'commonjs2'
 
   // replace default create-react-app ESLint with Standard.js
   config.module.rules[0] = {
@@ -90,7 +92,7 @@ module.exports = function override (config, env) {
       parser: 'babel-eslint'
     }
   }
-  config.output.libraryTarget = 'commonjs2'
+  
 
   // enable inline web workers as .worker.js files
   // config.module.rules.push({
