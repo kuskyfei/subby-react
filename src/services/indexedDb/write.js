@@ -49,18 +49,18 @@ const setFeedCache = async ({posts, hasMorePostsOnEthereum, lastFeedCacheCursor}
   return tx.complete
 }
 
-const setLoggedInSubscriptionsCache = async ({account, loggedInSubscriptions}) => {
-  debug('setLoggedInSubscriptionsCache', {account, loggedInSubscriptions})
+const setEthereumSubscriptionsCache = async ({account, ethereumSubscriptions}) => {
+  debug('setEthereumSubscriptionsCache', {account, ethereumSubscriptions})
 
   const req = {
-    subscriptions: loggedInSubscriptions,
-    lastLoggedInSubscriptionsCacheTimestamp: Date.now()
+    subscriptions: ethereumSubscriptions,
+    lastEthereumSubscriptionsCacheTimestamp: Date.now()
   }
 
   const tx = await db
     .db
-    .transaction(['loggedInSubscriptions'], 'readwrite')
-    .objectStore('loggedInSubscriptions')
+    .transaction(['ethereumSubscriptions'], 'readwrite')
+    .objectStore('ethereumSubscriptions')
     .put(req, account)
 
   return tx.complete
@@ -74,6 +74,18 @@ const setLoggedOutSubscriptions = async (loggedOutSubscriptions) => {
     .transaction(['loggedOutSubscriptions'], 'readwrite')
     .objectStore('loggedOutSubscriptions')
     .put(loggedOutSubscriptions, 'subscriptions')
+
+  return tx.complete
+}
+
+const setLoggedInSubscriptions = async ({account, loggedInSubscriptions}) => {
+  debug('setLoggedInSubscriptions', {account, loggedInSubscriptions})
+
+  const tx = await db
+    .db
+    .transaction(['loggedInSubscriptions'], 'readwrite')
+    .objectStore('loggedInSubscriptions')
+    .put(loggedInSubscriptions, account)
 
   return tx.complete
 }
@@ -93,7 +105,8 @@ const setSettings = async (settings) => {
 module.exports = {
   setProfileCache,
   setFeedCache,
-  setLoggedInSubscriptionsCache,
+  setEthereumSubscriptionsCache,
   setLoggedOutSubscriptions,
+  setLoggedInSubscriptions,
   setSettings
 }

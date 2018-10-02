@@ -4,7 +4,7 @@ const {cacheIsExpired} = require('./util')
 const debug = require('debug')('services:cache:cache')
 
 const profileCacheTime = window.SUBBY_GLOBAL_SETTINGS.PROFILE_CACHE_TIME
-const lastLoggedSubscriptionsCacheTime = window.SUBBY_GLOBAL_SETTINGS.LOGGED_IN_SUBSCRIPTIONS_CACHE_TIME
+const ethereumSubscriptionsCacheTime = window.SUBBY_GLOBAL_SETTINGS.ETHEREUM_SUBSCRIPTIONS_CACHE_TIME
 const feedCacheTime = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_TIME
 // const feedCachedPreemptivelyCount = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHED_PREEMPTIVELY_COUNT
 const minimumUnreadFeedCachedCount = window.SUBBY_GLOBAL_SETTINGS.MINIMUM_UNREAD_FEED_CACHED_COUNT
@@ -15,7 +15,7 @@ const updateCache = async (account) => {
   if (await profileCacheIsExpired(account)) {
     await updateProfileCache(account)
   }
-  if (await loggedInSubscriptionsCacheIsExpired(account)) {
+  if (await ethereumSubscriptionsCacheIsExpired(account)) {
     await updateSubscriptionsCache(account)
   }
   if (await feedCacheIsExpired()) {
@@ -47,16 +47,16 @@ const profileCacheIsExpired = async (account) => {
   return profileCacheIsExpired
 }
 
-const loggedInSubscriptionsCacheIsExpired = async (account) => {
-  debug('loggedInSubscriptionsCacheIsExpired', {account})
+const ethereumSubscriptionsCacheIsExpired = async (account) => {
+  debug('ethereumSubscriptionsCacheIsExpired', {account})
 
-  const lastLoggedInSubscriptionsCacheTimestamp = await indexedDb.getLastLoggedInSubscriptionsCacheTimestamp(account)
+  const lastEthereumSubscriptionsCacheTimestamp = await indexedDb.getLastEthereumSubscriptionsCacheTimestamp(account)
 
-  const loggedInSubscriptionsCacheIsExpired = cacheIsExpired(lastLoggedInSubscriptionsCacheTimestamp, lastLoggedSubscriptionsCacheTime)
+  const ethereumSubscriptionsCacheIsExpired = cacheIsExpired(lastEthereumSubscriptionsCacheTimestamp, ethereumSubscriptionsCacheTime)
 
-  debug('loggedInSubscriptionsCacheIsExpired returns', loggedInSubscriptionsCacheIsExpired)
+  debug('ethereumSubscriptionsCacheIsExpired returns', ethereumSubscriptionsCacheIsExpired)
 
-  return loggedInSubscriptionsCacheIsExpired
+  return ethereumSubscriptionsCacheIsExpired
 }
 
 const feedCacheIsExpired = async () => {
@@ -99,7 +99,7 @@ module.exports = {
   updateSubscriptionsCache,
   updateFeedCache,
   profileCacheIsExpired,
-  loggedInSubscriptionsCacheIsExpired,
+  ethereumSubscriptionsCacheIsExpired,
   feedCacheIsExpired,
   feedCacheNeedsMorePosts,
   addPostsToFeedCache

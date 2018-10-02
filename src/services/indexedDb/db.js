@@ -25,7 +25,7 @@
         - subscription1
         - subscription2
         - etc...
-      - lastLoggedInSubscriptionsCacheTimestamp
+      - lastEthereumSubscriptionsCacheTimestamp
   - loggedOutSubscriptions // object store
     - subscription1
     - subscription2
@@ -49,6 +49,9 @@ let init = async ({version}) => {
     }
     if (!upgradeDb.objectStoreNames.contains('loggedInSubscriptions')) {
       upgradeDb.createObjectStore('loggedInSubscriptions')
+    }
+    if (!upgradeDb.objectStoreNames.contains('ethereumSubscriptions')) {
+      upgradeDb.createObjectStore('ethereumSubscriptions')
     }
     if (!upgradeDb.objectStoreNames.contains('loggedOutSubscriptions')) {
       upgradeDb.createObjectStore('loggedOutSubscriptions')

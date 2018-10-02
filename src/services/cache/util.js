@@ -1,32 +1,3 @@
-const mergeSubscriptionsLoggedInSubscriptions = ({ethereumSubscriptions = {}, loggedInSubscriptions = {}}) => {
-  for (const key in ethereumSubscriptions) {
-    if (!loggedInSubscriptions[key]) {
-      loggedInSubscriptions[key] = ethereumSubscriptions[key]
-    }
-  }
-
-  return loggedInSubscriptions
-}
-
-const mergeSubscriptions = ({loggedInSubscriptions = {}, loggedOutSubscriptions = {}}) => {
-  for (const key in loggedOutSubscriptions) {
-    if (!loggedInSubscriptions[key]) {
-      loggedInSubscriptions[key] = loggedOutSubscriptions[key]
-    }
-  }
-
-  return loggedInSubscriptions
-}
-
-const filterSubscriptions = (subscriptions) => {
-  const filtered = {}
-  for (const key in subscriptions) {
-    if (!subscriptions[key].muted) filtered[key] = subscriptions[key]
-  }
-
-  return filtered
-}
-
 const formatSubscriptions = (subscriptions) => {
   const formated = []
   for (const key in subscriptions) {
@@ -50,11 +21,30 @@ const arrayToObjectWithItemsAsProps = (array) => {
   return obj
 }
 
+const mergeEthereumSubscriptionsCache = (ethereumSubscriptions, ethereumSubscriptionsCache) => {
+  for (const account in ethereumSubscriptionsCache) {
+    if (!ethereumSubscriptionsCache[account].pendingDeletion) {
+      continue
+    }
+
+    if (account in ethereumSubscriptions) {
+      ethereumSubscriptions[account].pendingDeletion = true
+    }
+  }
+  return ethereumSubscriptions
+}
+
+const getActiveSubscriptions = ({loggedInSubscriptions, loggedOutSubscriptions, ethereumSubscriptions}) => {
+  // it's important that ethereumSubscriptions is at the end, because it contains pending deletion statuses
+  // whereas the others can overwrite each other as much as they want
+  const activeSubscriptions = {...loggedInSubscriptions, ...loggedOutSubscriptions, ...ethereumSubscriptions}
+  return activeSubscriptions
+}
+
 module.exports = {
   arrayToObjectWithItemsAsProps,
-  mergeSubscriptions,
-  mergeSubscriptionsLoggedInSubscriptions,
-  filterSubscriptions,
+  getActiveSubscriptions,
+  mergeEthereumSubscriptionsCache,
   formatSubscriptions,
   cacheIsExpired
 }

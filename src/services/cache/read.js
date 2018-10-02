@@ -1,7 +1,12 @@
 const subbyJs = require('subby.js')
 const indexedDb = require('../indexedDb')
 const cache = require('./cache')
-const {arrayToObjectWithItemsAsProps, mergeSubscriptionsLoggedInSubscriptions, mergeSubscriptions, filterSubscriptions, formatSubscriptions} = require('./util')
+const {
+  arrayToObjectWithItemsAsProps, 
+  mergeEthereumSubscriptionsCache,
+  getActiveSubscriptions,
+  formatSubscriptions
+} = require('./util')
 const debug = require('debug')('services:cache:read')
 
 const getAddress = async () => {
@@ -36,25 +41,37 @@ const getProfile = async (account) => {
   return profile
 }
 
-// this will need a lot of testing to make sure the 3 lists of subscribtions don't
-// overwrite each other in the wrong way
 const getSubscriptions = async (account) => {
   debug('getSubscriptions', account)
 
-  let loggedInSubscriptions = await indexedDb.getLoggedInSubscriptionsCache(account)
   const loggedOutSubscriptions = await indexedDb.getLoggedOutSubscriptions()
+  const loggedInSubscriptions = await indexedDb.getLoggedInSubscriptions(account)
+  const ethereumSubscriptionsCache = await indexedDb.getEthereumSubscriptionsCache(account)
+  let ethereumSubscriptions = ethereumSubscriptionsCache
 
-  if (await cache.loggedInSubscriptionsCacheIsExpired(account)) {
-    let ethereumSubscriptions = await subbyJs.getSubscriptions(account)
-    ethereumSubscriptions = arrayToObjectWithItemsAsProps(ethereumSubscriptions) 
-    loggedInSubscriptions = mergeSubscriptionsLoggedInSubscriptions({ethereumSubscriptions, loggedInSubscriptions})
+  if (!ethereumSubscriptionsCache || await cache.ethereumSubscriptionsCacheIsExpired(account)) {
+    ethereumSubscriptions = await subbyJs.getSubscriptions(account)
+    ethereumSubscriptions = arrayToObjectWithItemsAsProps(ethereumSubscriptions)
 
-    // indexedDbLoggedInSubscriptions have a "muted" status which the ethereumSubscriptions should not overwrite
-    await indexedDb.setLoggedInSubscriptionsCache({account, loggedInSubscriptions})
+    // ethereumSubscriptionsCache have a "pending deletion" status that
+    // prevents them from appearing in the active subscriptions
+    // these pending deletion should not be deleted when the cache
+    // gets updated with fresh data from Ethereum
+    if (ethereumSubscriptionsCache) {
+      ethereumSubscriptions = mergeEthereumSubscriptionsCache(ethereumSubscriptions, ethereumSubscriptionsCache)
+    }
+
+    await indexedDb.setEthereumSubscriptionsCache({account, ethereumSubscriptions})
   }
 
-  const subscriptions = mergeSubscriptions({loggedInSubscriptions, loggedOutSubscriptions})
+  const activeSubscriptions = getActiveSubscriptions({loggedInSubscriptions, loggedOutSubscriptions, ethereumSubscriptions})
 
+  const subscriptions = {
+    activeSubscriptions,
+    loggedInSubscriptions,
+    loggedOutSubscriptions,
+    ethereumSubscriptions
+  }
   debug('getSubscriptions returns', subscriptions)
 
   return subscriptions
@@ -73,7 +90,6 @@ const getSettings = async () => {
 const getFeed = async ({subscriptions, startAt, limit, beforeTimestamp, afterTimestamp, cursor}) => {
   debug('getFeed', {subscriptions, startAt, limit, beforeTimestamp, afterTimestamp, cursor})
 
-  subscriptions = filterSubscriptions(subscriptions) // remove muted or limited subscriptions
   subscriptions = formatSubscriptions(subscriptions)
 
   const postQuery = {

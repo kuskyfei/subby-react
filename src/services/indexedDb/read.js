@@ -71,36 +71,36 @@ const getLastProfileCacheTimestamp = async (account) => {
   return lastProfileCacheTimestamp
 }
 
-const getLoggedInSubscriptionsCache = async (account) => {
-  debug('getLoggedInSubscriptionsCache', {account})
+const getEthereumSubscriptionsCache = async (account) => {
+  debug('getEthereumSubscriptionsCache', {account})
 
   const res = await db
     .db
-    .transaction(['loggedInSubscriptions'])
-    .objectStore('loggedInSubscriptions')
+    .transaction(['ethereumSubscriptions'])
+    .objectStore('ethereumSubscriptions')
     .get(account)
 
   const subscriptions = res && res.subscriptions
 
-  debug('getLoggedInSubscriptionsCache returns', subscriptions)
+  debug('getEthereumSubscriptionsCache returns', subscriptions)
 
   return subscriptions
 }
 
-const getLastLoggedInSubscriptionsCacheTimestamp = async (account) => {
-  debug('getLastLoggedInSubscriptionsCacheTimestamp', {account})
+const getLastEthereumSubscriptionsCacheTimestamp = async (account) => {
+  debug('getLastEthereumSubscriptionsCacheTimestamp', {account})
 
   const res = await db
     .db
-    .transaction(['loggedInSubscriptions'])
-    .objectStore('loggedInSubscriptions')
+    .transaction(['ethereumSubscriptions'])
+    .objectStore('ethereumSubscriptions')
     .get(account)
 
-  const lastLoggedInSubscriptionsCacheTimestamp = res && res.lastLoggedInSubscriptionsCacheTimestamp
+  const lastEthereumSubscriptionsCacheTimestamp = res && res.lastEthereumSubscriptionsCacheTimestamp
 
-  debug('getLastLoggedInSubscriptionsCacheTimestamp returns', lastLoggedInSubscriptionsCacheTimestamp)
+  debug('getLastEthereumSubscriptionsCacheTimestamp returns', lastEthereumSubscriptionsCacheTimestamp)
 
-  return lastLoggedInSubscriptionsCacheTimestamp
+  return lastEthereumSubscriptionsCacheTimestamp
 }
 
 const getLoggedOutSubscriptions = async () => {
@@ -113,6 +113,22 @@ const getLoggedOutSubscriptions = async () => {
     .get('subscriptions')
 
   debug('getLoggedOutSubscriptions returns', subscriptions)
+
+  return subscriptions
+}
+
+const getLoggedInSubscriptions = async (account) => {
+  debug('getLoggedInSubscriptions', {account})
+
+  const res = await db
+    .db
+    .transaction(['loggedInSubscriptions'])
+    .objectStore('loggedInSubscriptions')
+    .get(account)
+
+  const subscriptions = res && res.subscriptions
+
+  debug('getLoggedInSubscriptions returns', subscriptions)
 
   return subscriptions
 }
@@ -205,10 +221,11 @@ const getSettings = async () => {
 
 module.exports = {
   getProfileCache,
-  getLoggedInSubscriptionsCache,
+  getEthereumSubscriptionsCache,
+  getLoggedInSubscriptions,
   getLoggedOutSubscriptions,
   getLastFeedCacheTimestamp,
-  getLastLoggedInSubscriptionsCacheTimestamp,
+  getLastEthereumSubscriptionsCacheTimestamp,
   getLastProfileCacheTimestamp,
   getFeedCache,
   getFeedCacheCount,

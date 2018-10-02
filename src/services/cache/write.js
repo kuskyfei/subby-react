@@ -9,18 +9,23 @@ const setSettings = async (settings) => {
   await indexedDb.setSettings(settings)
 }
 
-const subscribe = async (account) => {
+const subscribe = async ({account, publisher}) => {
   debug('subscribe', account)
 }
 
-const setSubscriptions = async ({account, loggedInSubscriptions, loggedOutSubscriptions}) => {
-  debug('setSubscriptions', {account, loggedInSubscriptions, loggedOutSubscriptions})
+const unsubscribe = async ({account, publisher}) => {
+  debug('subscribe', account)
+}
 
-  await indexedDb.setLoggedInSubscriptionsCache({account, loggedInSubscriptions})
+const setSubscriptions = async ({account, loggedInSubscriptions, loggedOutSubscriptions, ethereumSubscriptions}) => {
+  debug('setSubscriptions', {account, loggedInSubscriptions, loggedOutSubscriptions, ethereumSubscriptions})
+
+  await indexedDb.setEthereumSubscriptionsCache({account, ethereumSubscriptions})
+  await indexedDb.setLoggedInSubscriptions({account, loggedInSubscriptions})
   await indexedDb.setLoggedOutSubscriptions(loggedOutSubscriptions)
 }
 
-const donate = async (account, value, message) => {
+const donate = async ({account, value, message}) => {
   debug('tip', {account, value, message})
 }
 
