@@ -49,7 +49,6 @@ const {
   prepareMagnetForEthereum
 } = require('./torrent')
 
-/*
 module.exports = {
   init,
   ipfs,
@@ -75,11 +74,4 @@ module.exports = {
   getTorrent,
   getMagnetFromTorrentFile,
   prepareMagnetForEthereum
-}
-*/
-
-const something = {}
-
-export {
-  something
 }
