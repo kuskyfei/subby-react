@@ -1,4 +1,4 @@
-const db = require('./db')
+const db = require('./db').default
 
 const debug = require('debug')('services:indexedDb:write')
 
@@ -27,11 +27,9 @@ const setProfileCache = async (profile) => {
   }
 }
 
-// this needs to be updated when the final cursor design is decided
-const setFeedCache = async ({posts, hasMorePostsOnEthereum, lastFeedCacheCursor}) => {
-  debug('setFeedCache', {posts, hasMorePostsOnEthereum, lastFeedCacheCursor})
+const setFeedCache = async ({posts, nextStartAts, nextPublishers, hasMorePosts}) => {
+  debug('setFeedCache', {posts, nextStartAts, nextPublishers, hasMorePosts})
 
-  const cacheTimestampKey = (!lastFeedCacheCursor) ? 'lastFeedCacheTimestamp' : 'lastFeedCacheTimestampUsingACursor'
   const lastFeedCacheTimestamp = Date.now()
 
   const tx = db
@@ -40,9 +38,10 @@ const setFeedCache = async ({posts, hasMorePostsOnEthereum, lastFeedCacheCursor}
     .objectStore('feed')
 
   tx.put(posts, 'posts')
-  tx.put(hasMorePostsOnEthereum, 'hasMorePostsOnEthereum')
-  tx.put(lastFeedCacheCursor, 'lastFeedCacheCursor')
-  tx.put(lastFeedCacheTimestamp, cacheTimestampKey)
+  tx.put(hasMorePosts, 'hasMorePosts')
+  tx.put(nextStartAts, 'nextStartAts')
+  tx.put(nextPublishers, 'nextPublishers')
+  tx.put(lastFeedCacheTimestamp, 'lastFeedCacheTimestamp')
 
   await tx
 
@@ -102,7 +101,7 @@ const setSettings = async (settings) => {
   return tx.complete
 }
 
-module.exports = {
+export {
   setProfileCache,
   setFeedCache,
   setEthereumSubscriptionsCache,

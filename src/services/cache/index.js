@@ -19,7 +19,7 @@ const {
   updateCache
 } = require('./cache')
 
-module.exports = {
+export {
   setSettings,
   setSubscriptions,
   subscribe,

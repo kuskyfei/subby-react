@@ -259,7 +259,7 @@ const getMediaSourceFromStream = async (ipfsHash, cb) => {
   })
 }
 
-module.exports = {
+export {
   getMediaSourceFromStream,
   getFileTypeFromBuffer,
   getFileTypeFromHash,

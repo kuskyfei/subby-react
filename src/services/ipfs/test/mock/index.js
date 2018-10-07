@@ -23,4 +23,4 @@ const files = {
   getReadableStream: getReadableStreamMock
 }
 
-module.exports = {get, add, files}
+export {get, add, files}

@@ -1,5 +1,5 @@
-const write = require('./write')
-const read = require('./read')
-const {init} = require('./db')
+const {init} = require('./db').default
 
-module.exports = {...read, ...write, init}
+export {init}
+export * from './write'
+export * from './read'

@@ -16,7 +16,7 @@
       - post1
       - post2
       - etc...
-    - hasMorePostsOnEthereum
+    - hasMorePosts
     - lastFeedCacheCursor
     - lastFeedCacheTimestamp
   - loggedInSubscriptions // object store
@@ -81,4 +81,4 @@ window.SUBBY_DEBUG_DELETE_INDEXEDDB = deleteEverything
 
 state.init = init
 
-module.exports = state
+export default state

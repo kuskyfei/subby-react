@@ -70,7 +70,7 @@ const uploadFilePathWrappedWithDirectory = (fileName, path) => {
   return state.ipfs.add(files, {wrapWithDirectory: true})
 }
 
-module.exports = {
+export {
   uploadObject,
   uploadString,
   uploadTypedArray,

@@ -1,4 +1,4 @@
-const db = require('./db')
+const db = require('./db').default
 const {isObjectStoreName} = require('./util')
 const debug = require('debug')('services:indexedDb:read')
 
@@ -64,7 +64,7 @@ const getLastProfileCacheTimestamp = async (account) => {
     .objectStore('profiles')
     .get(account)
 
-  const lastProfileCacheTimestamp = profile.lastProfileCacheTimestamp
+  const lastProfileCacheTimestamp = profile && profile.lastProfileCacheTimestamp
 
   debug('getLastProfileCacheTimestamp returns', lastProfileCacheTimestamp)
 
@@ -136,15 +136,26 @@ const getLoggedInSubscriptions = async (account) => {
 const getFeedCache = async () => {
   debug('getFeedCache')
 
-  const posts = await db
+  const tx = db
     .db
     .transaction(['feed'])
     .objectStore('feed')
-    .get('posts')
 
-  debug('getFeedCache returns', posts)
+  const posts = await tx.get('posts')
+  const nextStartAts = await tx.get('nextStartAts')
+  const hasMorePosts = await tx.get('hasMorePosts')
+  const nextPublishers = await tx.get('nextPublishers')
 
-  return posts
+  const feedCache = {
+    posts,
+    nextStartAts,
+    hasMorePosts,
+    nextPublishers
+  }
+
+  debug('getFeedCache returns', feedCache)
+
+  return feedCache
 }
 
 const getFeedCacheCount = async () => {
@@ -163,18 +174,18 @@ const getFeedCacheCount = async () => {
   return count
 }
 
-const hasMorePostsOnEthereum = async () => {
-  debug('hasMorePostsOnEthereum')
+const hasMorePosts = async () => {
+  debug('hasMorePosts')
 
-  const hasMorePostsOnEthereum = await db
+  const hasMorePosts = await db
     .db
     .transaction(['feed'])
     .objectStore('feed')
-    .get('hasMorePostsOnEthereum')
+    .get('hasMorePosts')
 
-  debug('hasMorePostsOnEthereum returns', hasMorePostsOnEthereum)
+  debug('hasMorePosts returns', hasMorePosts)
 
-  return hasMorePostsOnEthereum
+  return hasMorePosts
 }
 
 const getLastFeedCacheTimestamp = async () => {
@@ -191,20 +202,6 @@ const getLastFeedCacheTimestamp = async () => {
   return lastFeedCacheTimestamp
 }
 
-const getLastFeedCacheCursor = async () => {
-  debug('getLastFeedCacheCursor')
-
-  const lastFeedCacheCursor = await db
-    .db
-    .transaction(['feed'])
-    .objectStore('feed')
-    .get('lastFeedCacheCursor')
-
-  debug('getLastFeedCacheCursor returns', lastFeedCacheCursor)
-
-  return lastFeedCacheCursor
-}
-
 const getSettings = async () => {
   debug('getSettings')
 
@@ -219,7 +216,7 @@ const getSettings = async () => {
   return settings
 }
 
-module.exports = {
+export {
   getProfileCache,
   getEthereumSubscriptionsCache,
   getLoggedInSubscriptions,
@@ -229,7 +226,6 @@ module.exports = {
   getLastProfileCacheTimestamp,
   getFeedCache,
   getFeedCacheCount,
-  getLastFeedCacheCursor,
   getSettings,
-  hasMorePostsOnEthereum
+  hasMorePosts
 }

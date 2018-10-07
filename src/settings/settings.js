@@ -21,10 +21,9 @@ const settings = {
   UPDATE_NOTIFICATIONS: true,
 
   PROFILE_CACHE_TIME: 60 * minute,
-  FEED_CACHE_TIME: 5 * minute,
   ETHEREUM_SUBSCRIPTIONS_CACHE_TIME: 5 * minute,
-  FEED_CACHED_PREEMPTIVELY_COUNT: 500,
-  MINIMUM_UNREAD_FEED_CACHED_COUNT: 200,
+  FEED_CACHE_TIME: 5 * minute,
+  FEED_CACHE_BUFFER_SIZE: 500,
 
   // The mock settings allow you to test Subby
   // deterministically without depending on

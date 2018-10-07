@@ -1,4 +1,7 @@
 const formatSubscriptions = (subscriptions) => {
+  if (Array.isArray(subscriptions)) {
+    return subscriptions
+  }
   const formated = []
   for (const key in subscriptions) {
     formated.push(key)
@@ -41,7 +44,7 @@ const getActiveSubscriptions = ({loggedInSubscriptions, loggedOutSubscriptions, 
   return activeSubscriptions
 }
 
-module.exports = {
+export {
   arrayToObjectWithItemsAsProps,
   getActiveSubscriptions,
   mergeEthereumSubscriptionsCache,

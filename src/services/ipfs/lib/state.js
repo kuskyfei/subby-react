@@ -1,3 +1,3 @@
 const state = {}
 
-module.exports = {state}
+export {state}

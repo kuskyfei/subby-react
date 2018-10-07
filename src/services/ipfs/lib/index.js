@@ -29,7 +29,7 @@ const {
   uploadFilePathWrappedWithDirectory
 } = require('./write')
 
-module.exports = {
+export {
   mockIpfsApi,
   setProvider,
 

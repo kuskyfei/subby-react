@@ -6,4 +6,4 @@ try {
   console.warn(`getBlobFromStream webWorker couldn't run`)
 }
 
-module.exports = {GetBlobFromStream}
+export {GetBlobFromStream}

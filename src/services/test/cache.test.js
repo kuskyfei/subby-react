@@ -6,8 +6,9 @@ const minute = 1000*60
 const profileCacheTime = window.SUBBY_GLOBAL_SETTINGS.PROFILE_CACHE_TIME
 const ethereumSubscriptionsCacheTime = window.SUBBY_GLOBAL_SETTINGS.ETHEREUM_SUBSCRIPTIONS_CACHE_TIME
 const feedCacheTime = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_TIME
-const feedCachedPreemptivelyCount = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHED_PREEMPTIVELY_COUNT
-const minimumUnreadFeedCachedCount = window.SUBBY_GLOBAL_SETTINGS.MINIMUM_UNREAD_FEED_CACHED_COUNT
+const feedCacheBufferSize = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_BUFFER_SIZE
+
+const {testPost} = require('./util')
 
 const resetDb = async () => {
   await window.SUBBY_DEBUG_DELETE_INDEXEDDB()
@@ -109,7 +110,7 @@ describe('services', () => {
 
       const db1EthereumSubscriptions = Object.keys(db1.ethereumSubscriptions[ADDRESSES[0]].subscriptions)
       const db1LastEthereumSubscriptionsCacheTimestamp = db1.ethereumSubscriptions[ADDRESSES[0]].lastEthereumSubscriptionsCacheTimestamp
-      expect(db1EthereumSubscriptions.length).toEqual(172)
+      expect(db1EthereumSubscriptions.length).toEqual(325)
       expect(db1LastEthereumSubscriptionsCacheTimestamp).toEqual(firstRequestTime)
 
       // second request with non-expired cache 1 minute later
@@ -137,10 +138,30 @@ describe('services', () => {
     })
   })
 
-  describe('get feed', () => {
-    test('cache expires', async () => {
-      const firstRequestTime = 1000000000
+  // describe.only('get feed', () => {
+  //   test('cache expires', async () => {
+  //     const firstRequestTime = 1000000000
 
-    })
-  })
+  //     // first request with empty cache
+  //     mockTime(firstRequestTime)
+
+  //     let res1
+  //     // getFeed has a callback that triggers when the cache is fully updated, 
+  //     // there's no reason to use it usually but here we need to tell jest
+  //     // to wait until it's fully resolved otherwise the test ends early
+  //     await new Promise(async resolve => {
+  //       res1 = await services.getFeed({subscriptions: ['john', 'john2', 'john3', 'john4', 'john5', 'john6', 'john7', 'john8', 'john9', 'john10', 'john11', 'john12', 'john13', 'john14', 'john15', 'john16', 'john17', 'john18', 'john19', 'john20'], startAt: 0, limit: 20}, resolve)
+  //       //res1 = await services.getFeed({subscriptions: ['john18'], startAt: 0, limit: 20}, resolve)
+      
+  //     })
+  //     const db1 = await getDb()
+
+  //     expect(res1.length).toEqual(20)
+  //     for (const post of res1) {
+  //       testPost(post)
+  //     }
+  //     console.logFull(db1)
+
+  //   })
+  // })
 })

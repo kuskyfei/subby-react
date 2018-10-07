@@ -49,7 +49,7 @@ const {
   prepareMagnetForEthereum
 } = require('./torrent')
 
-module.exports = {
+export {
   init,
   ipfs,
   mockSmartContracts,

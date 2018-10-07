@@ -38,11 +38,11 @@ const getSettings = () => {
 
 }
 
-const hasMorePostsOnEthereum = () => {
+const hasMorePosts = () => {
 
 }
 
-module.exports = {
+export {
   getProfileCache,
   getEthereumSubscriptionsCache,
   getLoggedOutSubscriptions,
@@ -53,5 +53,5 @@ module.exports = {
   getFeedCacheCount,
   getLastFeedCacheCursor,
   getSettings,
-  hasMorePostsOnEthereum
+  hasMorePosts
 }

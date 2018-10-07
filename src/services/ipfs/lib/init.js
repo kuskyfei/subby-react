@@ -23,7 +23,7 @@ const mockIpfsApi = () => {
 // use this to call the ipfs methods directly
 const getIpfs = () => state.ipfs
 
-module.exports = {
+export {
   mockIpfsApi,
   setProvider,
   getIpfs

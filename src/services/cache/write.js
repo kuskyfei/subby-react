@@ -33,7 +33,7 @@ const publish = async (post) => {
   debug('publish', post)
 }
 
-module.exports = {
+export {
   setSettings,
   setSubscriptions,
   subscribe,

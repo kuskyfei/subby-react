@@ -19,8 +19,6 @@ const getAddress = async () => {
   return ethereumAddress
 }
 
-// accounts are either addresses or usernames
-
 const getProfile = async (account) => {
   debug('getProfile', account)
 
@@ -28,7 +26,7 @@ const getProfile = async (account) => {
 
   // if cache is empty or expired, fetch from ethereum
   // and set the cache
-  if (!profile || await cache.profileCacheIsExpired(account)) {
+  if (await cache.profileCacheIsExpired(account)) {
     profile = await subbyJs.getProfile(account)
 
     indexedDb.setProfileCache(profile)
@@ -49,7 +47,7 @@ const getSubscriptions = async (account) => {
   const ethereumSubscriptionsCache = await indexedDb.getEthereumSubscriptionsCache(account)
   let ethereumSubscriptions = ethereumSubscriptionsCache
 
-  if (!ethereumSubscriptionsCache || await cache.ethereumSubscriptionsCacheIsExpired(account)) {
+  if (await cache.ethereumSubscriptionsCacheIsExpired(account)) {
     ethereumSubscriptions = await subbyJs.getSubscriptions(account)
     ethereumSubscriptions = arrayToObjectWithItemsAsProps(ethereumSubscriptions)
 
@@ -87,57 +85,82 @@ const getSettings = async () => {
   return settings
 }
 
-const getFeed = async ({subscriptions, startAt, limit, beforeTimestamp, afterTimestamp, cursor}) => {
-  debug('getFeed', {subscriptions, startAt, limit, beforeTimestamp, afterTimestamp, cursor})
-
+const getFeed = async ({subscriptions, startAt = 0, limit = 20}, cb) => {
+  debug('getFeed', {subscriptions, startAt, limit})
+  // subscriptions can either be an array or object with publishers as keys
+  // but needs to be converted to array
   subscriptions = formatSubscriptions(subscriptions)
 
-  const postQuery = {
-    publishers: subscriptions,
-    startAt,
-    limit
+  const feedCacheIsExpired = await cache.feedCacheIsExpired()
+  const feedCache = await indexedDb.getFeedCache()
+  const feedCacheContainsNeededPosts = feedCache.posts && feedCache.posts.length >= startAt + limit
+  // IMPORTANT TODO need to add buffer size to calculation
+  const feedCacheBufferTooSmall = (feedCache.posts) ? feedCache.posts.length >= (startAt + limit) : true 
+
+  let posts, nextStartAts, nextPublishers, hasMorePosts
+  // if cache is expired or doesn't have the needed posts,
+  // fetch from ethereum, otherwise use cache
+  if (feedCacheIsExpired || !feedCacheContainsNeededPosts) {
+    const res = await subbyJs.getPostsFromPublishers(subscriptions, {limit: 100})
+    posts = res.posts
+    nextStartAts = res.nextStartAts
+    nextPublishers = res.nextPublishers
+    hasMorePosts = res.hasMorePosts
+  } else {
+    const res = feedCache
+    posts = res.posts
+    nextStartAts = res.nextStartAts
+    nextPublishers = res.nextPublishers
+    hasMorePosts = res.hasMorePosts
   }
 
-  let posts = await indexedDb.getFeedCache(postQuery)
-
-  if (await cache.feedCacheIsExpired()) {
-    posts = await subbyJs.getPostsFromPublishers(subscriptions)
-    // this needs to be updated when the final cursor design is decided
-    await indexedDb.setFeedCache({posts, hasMorePostsOnEthereum: true, lastFeedCacheCursor: null})
+  // check if cache refresh is needed
+  if (feedCacheBufferTooSmall && hasMorePosts) {
+    // increase cache size to fetch the new needed posts
+    // IMPORTANT TODO need to calculate new buffer size
+    const bufferSize = 1000
+    cache.updateFeedCache({subscriptions, bufferSize}, cb)
+  }
+  else if (feedCacheIsExpired) {
+    cache.updateFeedCache({subscriptions}, cb)
+  }
+  else {
+    // the cb will trigger once the async updateFeedCache has finished
+    // or if there is no updateFeedCache launched
+    if (cb) cb()
   }
 
-  // if there is no more posts on ethereum,
-  // there is no point in fetching more
-  // or refilling the cache
-  if (!indexedDb.hasMorePostsOnEthereum()) {
-    return posts
-  }
-
-  // if there is more posts on ethereum and
-  // the post count received is smaller than
-  // query count, it should be fetched again
-  if (posts.limit < limit) {
-    posts = await subbyJs.getPostsFromPublishers(postQuery)
-    // this needs to be updated when the final cursor design is decided
-    await indexedDb.setFeedCache({posts, hasMorePostsOnEthereum: true, lastFeedCacheCursor: null})
-  }
-
-  if (cache.feedCacheNeedsMorePosts({startAt, limit})) {
-    const cursor = indexedDb.getLastFeedCacheCursor()
-
-    debug('postQuery', postQuery)
-
-    cache.addPostsToFeedCache({...postQuery, cursor})
-  }
-
-  debug('getFeed returns', posts)
-
+  posts = getQueriedPostsFromPosts({posts, startAt, limit})
+  
   return posts
+
+  /* getFeed algorithm
+
+    - if not expired 
+      - get feed from cache
+        - if query is smaller than posts in cache
+          - return posts
+          - if query makes the cache buffer too small
+            - replenish cache buffer
+
+      - if query is bigger than posts in cache
+        - get feed from ethereum
+          - return posts
+          - replenish cache buffer
+
+    - if cache is expired
+      - get feed from ethereum
+      - start update cache cycle
+  */
+}
+
+const getQueriedPostsFromPosts = ({posts, startAt, limit}) => {
+  return posts.slice(startAt, limit)
 }
 
 const getPosts = subbyJs.getPosts
 
-module.exports = {
+export {
   getAddress,
   getProfile,
   getSubscriptions,

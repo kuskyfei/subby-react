@@ -98,4 +98,4 @@ const isWebSocket = (tracker) => {
   return !!tracker.match(/^wss?:\/\//)
 }
 
-module.exports = {getTorrent, getMagnetFromTorrentFile, prepareMagnetForEthereum, init, mockWebTorrent}
+export {getTorrent, getMagnetFromTorrentFile, prepareMagnetForEthereum, init, mockWebTorrent}

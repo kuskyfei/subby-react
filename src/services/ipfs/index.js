@@ -29,7 +29,7 @@ const {
 
 const webWorkers = require('./webWorkers')
 
-module.exports = {
+export {
   mockIpfsApi,
   setProvider,
 
