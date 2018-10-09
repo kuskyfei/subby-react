@@ -1,6 +1,6 @@
 const subbyJs = require('subby.js')
 const indexedDb = require('../indexedDb')
-const {cacheIsExpired} = require('./util')
+const {cacheIsExpired, publishersMatch} = require('./util')
 const debug = require('debug')('services:cache:cache')
 
 const profileCacheTime = window.SUBBY_GLOBAL_SETTINGS.PROFILE_CACHE_TIME
@@ -32,47 +32,23 @@ const updateSubscriptionsCache = () => {
   debug('updateSubscriptionsCache')
 }
 
-const updateFeedCache = async ({subscriptions, bufferSize} = {}, cb) => {
-  // a defined bufferSize indicates that the user has scrolled
-  // deep into his feed and more posts should be cached
-  if (!bufferSize) {
-    bufferSize = feedCacheBufferSize
-  }
+const updateFeedCache = async (subscriptions, cb) => {
+  debug('updateFeedCache start', {subscriptions})
 
-  const feedCache = await indexedDb.getFeedCache()
-  const {posts, nextStartAts, hasMorePosts, nextPublishers} = feedCache
-
-  if (hasNewSubscriptions(subscriptions, nextPublishers)) {
-    await getAllPosts(subscriptions)
-  }
-  else {
-    await getMissingPosts()
-  }
+  await getPostsAndSetFeedCache(subscriptions)
 
   // the cb will trigger once the async updateFeedCache has finished
   if (cb) cb()
 
-  debug('updateFeedCache')
+  debug('updateFeedCache end')
 }
 
-const hasNewSubscriptions = (subscriptions, prevSubscriptions) => {
-  if (!prevSubscriptions) {
-    return true
-  }
-  else {
-    throw Error('need to implement this section')
-  }
-}
-
-const getAllPosts = async (subscriptions, {bufferSize, startAt, nextStartAts} = {}) => {
-  // a defined bufferSize indicates that the user has scrolled
-  // deep into his feed and more posts should be cached
-  if (!bufferSize) {
-    bufferSize = feedCacheBufferSize
-  }
+const getPostsAndSetFeedCache = async (subscriptions, {startAt, cache} = {}) => {
+  debug('getPostsAndSetFeedCache start', {subscriptions: subscriptions.length, startAt, cache: cache && {postIds: cache.postIds && cache.postIds.length, nextStartAts: cache.nextStartAts, nextPublishers: cache.nextPublishers && cache.nextPublishers.length}})
 
   // an undefined startAt means a new cycle of updateFeedCache has started
-  // and the current feed cache should be erased
+  // and the current feed cache should be erased, otherwise it is a cursor
+  // to get pages 2 and beyond
   if (!startAt) {
     await resetFeedCache()
   }
@@ -81,11 +57,8 @@ const getAllPosts = async (subscriptions, {bufferSize, startAt, nextStartAts} = 
   // it is a waste of ethereum requests
   const limit = subbyJsPostLimit
 
-  const feed = await subbyJs.getPostsFromPublishers(subscriptions, {startAts: nextStartAts, limit})
-  let {posts, nextPublishers, hasMorePosts} = feed
-  nextStartAts = feed.nextStartAts
-
-  //console.logFull(feed)
+  const feed = await subbyJs.getPostsFromPublishers(subscriptions, {startAt, cache, limit})
+  let {posts, nextCache, hasMorePosts} = feed
 
   // merge the previous posts with the new ones
   const feedCache = await indexedDb.getFeedCache()
@@ -93,37 +66,24 @@ const getAllPosts = async (subscriptions, {bufferSize, startAt, nextStartAts} = 
   posts = [...feedCachePosts, ...posts]
 
   // set the new cache
-  await indexedDb.setFeedCache({posts, nextStartAts, hasMorePosts, nextPublishers})
-
+  await indexedDb.setFeedCache({posts, nextCache, hasMorePosts})
+  
+  const nextStartAt = (startAt) ? (startAt + limit) : limit
   // stop fetching if the buffer is full or if has no more posts on ethereum
+  if (nextStartAt >= feedCacheBufferSize) {
+    return
+  }
   if (!hasMorePosts) {
     return
   }
-  const nextStartAt = (startAt) ? (startAt + limit) : limit
-  if (nextStartAt > bufferSize) {
-    return
-  }
 
-  // nextStartAts is used as a cursor to get the next queries from Ethereum
+  // nextCache contains data that improves the performance of subby.js
   // it should be undefined on the first query to fetch each user's latest posts
-  await getAllPosts(subscriptions, {bufferSize, startAt: nextStartAt, nextStartAts})
-
-  /* updateFeedCache algorithm
-
-    - if no buffer size specified, use the default buffer size
-
-    - get feed cache
-
-    - if subscriptions are the same as feed cache subscriptions
-      - get only missing new posts, and missing posts from potential buffer size increase
-
-    - if subscriptions are not the same as feed cache subscriptions
-      - get all posts from 0 to bufferSize
-  */
+  await getPostsAndSetFeedCache(subscriptions, {startAt: nextStartAt, cache: nextCache})
 }
 
 const resetFeedCache = async () => {
-  await indexedDb.setFeedCache({posts: [], nextStartAts: null, hasMorePosts: true, nextPublishers: null})
+  await indexedDb.setFeedCache({posts: [], nextCache: null, hasMorePosts: true})
 }
 
 const profileCacheIsExpired = async (account) => {

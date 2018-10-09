@@ -92,7 +92,6 @@ module.exports = function override (config, env) {
       parser: 'babel-eslint'
     }
   }
-  
 
   // enable inline web workers as .worker.js files
   // config.module.rules.push({

@@ -142,18 +142,16 @@ const getFeedCache = async () => {
     .objectStore('feed')
 
   const posts = await tx.get('posts')
-  const nextStartAts = await tx.get('nextStartAts')
+  const nextCache = await tx.get('nextCache')
   const hasMorePosts = await tx.get('hasMorePosts')
-  const nextPublishers = await tx.get('nextPublishers')
 
   const feedCache = {
     posts,
-    nextStartAts,
-    hasMorePosts,
-    nextPublishers
+    nextCache,
+    hasMorePosts
   }
 
-  debug('getFeedCache returns', feedCache)
+  debug('getFeedCache returns', {posts: posts && posts.length, nextCache: nextCache && {postIds: nextCache.postIds && nextCache.postIds.length, nextStartAts: nextCache.nextStartAts && nextCache.nextStartAts.length, nextPublishers: nextCache.nextPublishers && nextCache.nextPublishers.length}, hasMorePosts})
 
   return feedCache
 }

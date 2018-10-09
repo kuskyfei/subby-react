@@ -1,14 +1,15 @@
 /* eslint-env jest */
 
 const services = require('../../services')
-const minute = 1000*60
+const {updateFeedCache} = require('../../services/cache/cache')
+const minute = 1000 * 60
 
 const profileCacheTime = window.SUBBY_GLOBAL_SETTINGS.PROFILE_CACHE_TIME
 const ethereumSubscriptionsCacheTime = window.SUBBY_GLOBAL_SETTINGS.ETHEREUM_SUBSCRIPTIONS_CACHE_TIME
 const feedCacheTime = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_TIME
 const feedCacheBufferSize = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_BUFFER_SIZE
 
-const {testPost} = require('./util')
+const {testPost, testPostId} = require('./util')
 
 const resetDb = async () => {
   await window.SUBBY_DEBUG_DELETE_INDEXEDDB()
@@ -138,30 +139,154 @@ describe('services', () => {
     })
   })
 
-  // describe.only('get feed', () => {
-  //   test('cache expires', async () => {
-  //     const firstRequestTime = 1000000000
+  describe('get feed', () => {
+    beforeAll(() => {
+      jest.setTimeout(60000)
+    })
+    afterAll(() => {
+      jest.setTimeout(5000)
+    })
+    
+    test('cache expires', async () => {
+      // first request with empty cache
+      const firstRequestTime = 1000000000
+      const publishers = ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222', 'john', 'john2', 'john3', 'john4', 'john5', 'john6', 'john7', 'john8', 'john9', 'john10', 'john11', 'john12', 'john13', 'john14', 'john15', 'john16', 'john17', 'john18']
+      let startAt = 0
+      const limit = 20
+      mockTime(firstRequestTime)
 
-  //     // first request with empty cache
-  //     mockTime(firstRequestTime)
+      let res1
+      // getFeed has a callback that triggers when the cache is fully updated,
+      // there's no reason to use it usually but here we need to tell jest
+      // to wait until it's fully resolved otherwise the test ends early
+      await new Promise(async resolve => {
+        res1 = await services.getFeed({subscriptions: publishers, startAt, limit}, resolve)
+      })
 
-  //     let res1
-  //     // getFeed has a callback that triggers when the cache is fully updated, 
-  //     // there's no reason to use it usually but here we need to tell jest
-  //     // to wait until it's fully resolved otherwise the test ends early
-  //     await new Promise(async resolve => {
-  //       res1 = await services.getFeed({subscriptions: ['john', 'john2', 'john3', 'john4', 'john5', 'john6', 'john7', 'john8', 'john9', 'john10', 'john11', 'john12', 'john13', 'john14', 'john15', 'john16', 'john17', 'john18', 'john19', 'john20'], startAt: 0, limit: 20}, resolve)
-  //       //res1 = await services.getFeed({subscriptions: ['john18'], startAt: 0, limit: 20}, resolve)
-      
-  //     })
-  //     const db1 = await getDb()
+      expect(res1.length).toEqual(limit)
+      expect(res1[0].timestamp > res1[1].timestamp && res1[0].timestamp > res1[19].timestamp).toEqual(true)
+      for (const post of res1) {
+        testPost(post)
+      }
 
-  //     expect(res1.length).toEqual(20)
-  //     for (const post of res1) {
-  //       testPost(post)
-  //     }
-  //     console.logFull(db1)
+      const db1 = await getDb()
+      const {hasMorePosts: db1HasMorePosts, lastFeedCacheTimestamp: db1LastFeedCacheTimestamp, posts: db1Posts} = db1.feed
+      const {postIds: db1PostIds, nextPublishers: db1NextPublishers, nextStartAts: db1NextStartAts} = db1.feed.nextCache
 
-  //   })
-  // })
+      for (const post of db1Posts) {
+        testPost(post)
+      }
+      for (const postId of db1PostIds) {
+        testPostId(postId)
+      }
+      expect(db1Posts.length).toEqual(feedCacheBufferSize)
+      expect(publishers).toEqual(db1NextPublishers)
+      expect(db1Posts[0].timestamp > db1Posts[1].timestamp && db1Posts[0].timestamp > db1Posts[feedCacheBufferSize-1].timestamp).toEqual(true)
+      expect(db1HasMorePosts).toEqual(true)
+      expect(db1LastFeedCacheTimestamp).toEqual(firstRequestTime)
+
+      // second request with later but unexpired cache
+      mockTime(firstRequestTime + minute)
+
+      let res2
+      await new Promise(async resolve => {
+        res2 = await services.getFeed({subscriptions: publishers, startAt, limit}, resolve)
+      })
+      const db2 = await getDb()
+
+      // both should be exactly the same since it's the same request and should use the cache
+      expect(db2).toEqual(db1)
+      expect(res2).toEqual(res1)
+
+      // third request with later startAt but still unexpired cache
+      let res3
+      startAt += limit
+      await new Promise(async resolve => {
+        res3 = await services.getFeed({subscriptions: publishers, startAt, limit}, resolve)
+      })
+      const db3 = await getDb()
+
+      // res should be different but the db cache should be the same since the cache wasn't expired 
+      // and the requested posts should be in the cache
+      expect(res3).not.toEqual(res1)
+      expect(db3).toEqual(db1)
+
+      // fourth request with expired cache
+      startAt = 0
+      mockTime(firstRequestTime + feedCacheTime + minute)
+
+      let res4
+      await new Promise(async resolve => {
+        res4 = await services.getFeed({subscriptions: publishers, startAt, limit}, resolve)
+      })
+      const db4 = await getDb()
+
+      expect(res4).toEqual(res1)
+
+      expect(db4).not.toEqual(db1)
+
+      const {hasMorePosts: db4HasMorePosts, lastFeedCacheTimestamp: db4LastFeedCacheTimestamp, posts: db4Posts} = db4.feed
+      const {postIds: db4PostIds, nextPublishers: db4NextPublishers, nextStartAts: db4NextStartAts} = db4.feed.nextCache
+
+      for (const post of db4Posts) {
+        testPost(post)
+      }
+      for (const postId of db4PostIds) {
+        testPostId(postId)
+      }
+      expect(db4Posts.length).toEqual(feedCacheBufferSize)
+      expect(publishers).toEqual(db1NextPublishers)
+      expect(db4Posts[0].timestamp > db4Posts[1].timestamp && db4Posts[0].timestamp > db4Posts[feedCacheBufferSize-1].timestamp).toEqual(true)
+      expect(db4HasMorePosts).toEqual(true)
+      expect(db4LastFeedCacheTimestamp).toEqual(firstRequestTime + feedCacheTime + minute)
+    })
+
+    test.only('buffer too small', async () => {
+      const publishers = ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222', 'john', 'john2', 'john3', 'john4', 'john5', 'john6', 'john7', 'john8', 'john9', 'john10', 'john11', 'john12', 'john13', 'john14', 'john15', 'john16', 'john17', 'john18']
+
+      const firstRequestTime = 1000000000
+      mockTime(firstRequestTime)
+
+      // fill cache first
+      await new Promise(async resolve => {
+        await updateFeedCache(publishers, resolve)
+      })
+
+      const db1 = await getDb()
+
+      const {hasMorePosts: db1HasMorePosts, lastFeedCacheTimestamp: db1LastFeedCacheTimestamp, posts: db1Posts} = db1.feed
+      const {postIds: db1PostIds, nextPublishers: db1NextPublishers, nextStartAts: db1NextStartAts} = db1.feed.nextCache
+
+      for (const post of db1Posts) {
+        testPost(post)
+      }
+      for (const postId of db1PostIds) {
+        testPostId(postId)
+      }
+      expect(db1Posts.length).toEqual(feedCacheBufferSize)
+      expect(publishers).toEqual(db1NextPublishers)
+      expect(db1Posts[0].timestamp > db1Posts[1].timestamp && db1Posts[0].timestamp > db1Posts[feedCacheBufferSize-1].timestamp).toEqual(true)
+      expect(db1HasMorePosts).toEqual(true)
+      expect(db1LastFeedCacheTimestamp).toEqual(firstRequestTime)
+
+      const startAt = feedCacheBufferSize
+      const limit = 20
+
+      let res1
+      await new Promise(async resolve => {
+        res1 = await services.getFeed({subscriptions: publishers, startAt, limit}, resolve)
+      })
+
+      console.log(res1)
+
+    })
+
+    test('page 2 with no cache', async () => {
+
+    })
+
+    test('page 2 with expired cache', async () => {
+
+    })
+  })
 })

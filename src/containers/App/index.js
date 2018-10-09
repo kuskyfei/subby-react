@@ -51,7 +51,7 @@ class App extends Component {
       // const settings = await services.getSettings()
 
       const address = await services.getAddress()
-      const profile = await services.getProfile(address)  
+      const profile = await services.getProfile(address)
       const subscriptions = await services.getSubscriptions(address)
 
       const {setAddress, setProfile, setSubscriptions} = this.props.actions

@@ -1,7 +1,7 @@
 /* eslint-env jest */
 
 const services = require('../../services')
-const minute = 1000*60
+const minute = 1000 * 60
 
 const profileCacheTime = window.SUBBY_GLOBAL_SETTINGS.PROFILE_CACHE_TIME
 const ethereumSubscriptionsCacheTime = window.SUBBY_GLOBAL_SETTINGS.ETHEREUM_SUBSCRIPTIONS_CACHE_TIME

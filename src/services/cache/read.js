@@ -2,12 +2,14 @@ const subbyJs = require('subby.js')
 const indexedDb = require('../indexedDb')
 const cache = require('./cache')
 const {
-  arrayToObjectWithItemsAsProps, 
+  arrayToObjectWithItemsAsProps,
   mergeEthereumSubscriptionsCache,
   getActiveSubscriptions,
   formatSubscriptions
 } = require('./util')
 const debug = require('debug')('services:cache:read')
+
+const feedCacheBufferSize = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_BUFFER_SIZE
 
 const getAddress = async () => {
   debug('getAddress')
@@ -91,70 +93,58 @@ const getFeed = async ({subscriptions, startAt = 0, limit = 20}, cb) => {
   // but needs to be converted to array
   subscriptions = formatSubscriptions(subscriptions)
 
-  const feedCacheIsExpired = await cache.feedCacheIsExpired()
   const feedCache = await indexedDb.getFeedCache()
-  const feedCacheContainsNeededPosts = feedCache.posts && feedCache.posts.length >= startAt + limit
-  // IMPORTANT TODO need to add buffer size to calculation
-  const feedCacheBufferTooSmall = (feedCache.posts) ? feedCache.posts.length >= (startAt + limit) : true 
+  const feedCacheIsExpired = await cache.feedCacheIsExpired()
+  const feedCacheContainsRequestedPosts = feedCache.posts && feedCache.posts.length >= startAt + limit
+  const feedCacheBufferExceeded = startAt + limit > feedCacheBufferSize
+  const isFirstPage = startAt === 0
 
-  let posts, nextStartAts, nextPublishers, hasMorePosts
-  // if cache is expired or doesn't have the needed posts,
-  // fetch from ethereum, otherwise use cache
-  if (feedCacheIsExpired || !feedCacheContainsNeededPosts) {
-    const res = await subbyJs.getPostsFromPublishers(subscriptions, {limit: 100})
+  let useCache = false
+  if (feedCacheContainsRequestedPosts) {
+    useCache = true
+  }
+  if (feedCacheBufferExceeded) {
+    useCache = false
+  }
+  if (feedCacheIsExpired && isFirstPage) {
+    // we use an expired cache for page 2 and beyond
+    // because we don't care about new posts beyond page 1
+    useCache = false
+  }
+
+  let posts
+
+  if (useCache) {
+    posts = feedCache.posts
+    posts = getRequestedPostsFromFeedCachePosts({posts, startAt, limit})
+  } else if (feedCacheBufferExceeded) {
+    // if the user is fetching posts above the buffer size, we can assume the feed 
+    // nextCache contains useful data to pass to the ethereum function, so we do
+    const res = await subbyJs.getPostsFromPublishers(subscriptions, {
+      startAt, 
+      limit, 
+      cache: feedCache && feedCache.nextCache
+    })
     posts = res.posts
-    nextStartAts = res.nextStartAts
-    nextPublishers = res.nextPublishers
-    hasMorePosts = res.hasMorePosts
   } else {
-    const res = feedCache
+    // if useCache is false and feedCacheBuffer is not exceeded, we can assume the user 
+    // is making a fresh request and the old next cache should not be passed
+    const res = await subbyJs.getPostsFromPublishers(subscriptions, {startAt, limit})
     posts = res.posts
-    nextStartAts = res.nextStartAts
-    nextPublishers = res.nextPublishers
-    hasMorePosts = res.hasMorePosts
   }
 
-  // check if cache refresh is needed
-  if (feedCacheBufferTooSmall && hasMorePosts) {
-    // increase cache size to fetch the new needed posts
-    // IMPORTANT TODO need to calculate new buffer size
-    const bufferSize = 1000
-    cache.updateFeedCache({subscriptions, bufferSize}, cb)
-  }
-  else if (feedCacheIsExpired) {
-    cache.updateFeedCache({subscriptions}, cb)
-  }
-  else {
-    // the cb will trigger once the async updateFeedCache has finished
-    // or if there is no updateFeedCache launched
-    if (cb) cb()
+  // this triggers a new updateFeedCache cycle that completes asynchronously 
+  // the cb is optional and will trigger once the async updateFeedCache has finished
+  if (feedCacheIsExpired) {
+    cache.updateFeedCache(subscriptions, cb)
+  } else {
+    if (cb) setTimeout(cb, 100)
   }
 
-  posts = getQueriedPostsFromPosts({posts, startAt, limit})
-  
   return posts
-
-  /* getFeed algorithm
-
-    - if not expired 
-      - get feed from cache
-        - if query is smaller than posts in cache
-          - return posts
-          - if query makes the cache buffer too small
-            - replenish cache buffer
-
-      - if query is bigger than posts in cache
-        - get feed from ethereum
-          - return posts
-          - replenish cache buffer
-
-    - if cache is expired
-      - get feed from ethereum
-      - start update cache cycle
-  */
 }
 
-const getQueriedPostsFromPosts = ({posts, startAt, limit}) => {
+const getRequestedPostsFromFeedCachePosts = ({posts, startAt, limit}) => {
   return posts.slice(startAt, limit)
 }
 

@@ -1,4 +1,4 @@
-const minute = 1000*60
+const minute = 1000 * 60
 
 // these are the default recommended settings that get
 // transpiled into the subby.html file.

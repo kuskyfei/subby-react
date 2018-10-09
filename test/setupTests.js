@@ -34,7 +34,7 @@ window.IDBVersionChangeEvent = require('fake-indexeddb/lib/FDBVersionChangeEvent
 // useful for debugging
 const util = require('util')
 console.logFull = (...args) => {
-	for (const arg of args) {
-		console.log(util.inspect(arg, {showHidden: false, depth: null, maxArrayLength: null}))
-	}
+  for (const arg of args) {
+    console.log(util.inspect(arg, {showHidden: false, depth: null, maxArrayLength: null}))
+  }
 }

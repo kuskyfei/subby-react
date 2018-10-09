@@ -1,4 +1,5 @@
 const db = require('./db').default
+const feedCacheBufferSize = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_BUFFER_SIZE
 
 const debug = require('debug')('services:indexedDb:write')
 
@@ -27,8 +28,8 @@ const setProfileCache = async (profile) => {
   }
 }
 
-const setFeedCache = async ({posts, nextStartAts, nextPublishers, hasMorePosts}) => {
-  debug('setFeedCache', {posts, nextStartAts, nextPublishers, hasMorePosts})
+const setFeedCache = async ({posts, nextCache, hasMorePosts}) => {
+  debug('setFeedCache', {posts: posts && posts.length, nextCache: nextCache && {postIds: nextCache.postIds && nextCache.postIds.length, nextStartAts: nextCache.nextStartAts && nextCache.nextStartAts.length, nextPublishers: nextCache.nextPublishers && nextCache.nextPublishers.length}, hasMorePosts})
 
   const lastFeedCacheTimestamp = Date.now()
 
@@ -39,8 +40,7 @@ const setFeedCache = async ({posts, nextStartAts, nextPublishers, hasMorePosts})
 
   tx.put(posts, 'posts')
   tx.put(hasMorePosts, 'hasMorePosts')
-  tx.put(nextStartAts, 'nextStartAts')
-  tx.put(nextPublishers, 'nextPublishers')
+  tx.put(nextCache, 'nextCache')
   tx.put(lastFeedCacheTimestamp, 'lastFeedCacheTimestamp')
 
   await tx

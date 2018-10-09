@@ -20,4 +20,12 @@ const testPost = (post) => {
   expect(typeof post.id).toEqual('number')
 }
 
-module.exports = {testProfile, testPost}
+const testPostId = (postId) => {
+  expect(typeof postId.timestamp).toEqual('number')
+  expect(typeof postId.publisher).toEqual('string')
+  expect(typeof postId.id).toEqual('number')
+  expect(postId.id < 0).toEqual(false)
+  expect(postId.timestamp > 0).toEqual(true)
+}
+
+module.exports = {testProfile, testPost, testPostId}
