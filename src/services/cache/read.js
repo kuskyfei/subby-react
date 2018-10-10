@@ -123,14 +123,12 @@ const getFeed = async ({subscriptions, startAt = 0, limit = 20}, cb) => {
 
   let posts
   if (useBackgroundFeedCache) {
-    posts = backgroundFeedCache.posts
+    posts = getFeedFromBackgroundFeedCache({startAt, limit})
   }
   //
   else {
     posts = await getFeedFromActiveFeedCache({subscriptions, startAt, limit}, cb)
   }
-
-  console.log(posts)
 
   debug('getFeed returns', {posts: posts.length})
   return posts
@@ -140,7 +138,7 @@ const getFeedFromBackgroundFeedCache = async ({startAt, limit}) => {
   const backgroundFeedCache = await indexedDb.getBackgroundFeedCache()
   let {posts} = backgroundFeedCache
 
-  // we need to switch the background cache to now being the active cache
+  // we need to switch the background cache to being the active cache
   await indexedDb.setActiveFeedCache(backgroundFeedCache)
 
   posts = filterRequestedPosts({posts, startAt, limit})
@@ -159,8 +157,8 @@ const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) =
   const activeFeedCache = await indexedDb.getActiveFeedCache()
   const feedCacheContainsRequestedPosts = activeFeedCache.posts && activeFeedCache.posts.length >= startAt + limit
   const feedCacheBufferExceeded = startAt + limit > feedCacheBufferSize
-  const hasNextCache = activeFeedCache && activeFeedCache.nextCache
-  const hasMorePosts = (activeFeedCache && activeFeedCache.hasMorePosts === false) ? false : true
+  const hasNextCache = !!(activeFeedCache && activeFeedCache.nextCache)
+  const hasMorePosts = !(activeFeedCache && activeFeedCache.hasMorePosts === false)
 
   let useCache = false
   if (feedCacheContainsRequestedPosts) {
@@ -214,7 +212,7 @@ const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) =
 }
 
 const filterRequestedPosts = ({posts, startAt, limit}) => {
-  return posts.slice(startAt, limit)
+  return posts.slice(startAt, startAt + limit)
 }
 
 export {
