@@ -44,8 +44,11 @@ let init = async ({version}) => {
     if (!upgradeDb.objectStoreNames.contains('profiles')) {
       upgradeDb.createObjectStore('profiles')
     }
-    if (!upgradeDb.objectStoreNames.contains('feed')) {
-      upgradeDb.createObjectStore('feed')
+    if (!upgradeDb.objectStoreNames.contains('activeFeed')) {
+      upgradeDb.createObjectStore('activeFeed')
+    }
+    if (!upgradeDb.objectStoreNames.contains('backgroundFeed')) {
+      upgradeDb.createObjectStore('backgroundFeed')
     }
     if (!upgradeDb.objectStoreNames.contains('loggedInSubscriptions')) {
       upgradeDb.createObjectStore('loggedInSubscriptions')

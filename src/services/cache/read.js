@@ -41,16 +41,28 @@ const getProfile = async (account) => {
   return profile
 }
 
-const getSubscriptions = async (account) => {
-  debug('getSubscriptions', account)
+const getSubscriptions = async (address) => {
+  debug('getSubscriptions', address)
 
   const loggedOutSubscriptions = await indexedDb.getLoggedOutSubscriptions()
-  const loggedInSubscriptions = await indexedDb.getLoggedInSubscriptions(account)
-  const ethereumSubscriptionsCache = await indexedDb.getEthereumSubscriptionsCache(account)
+
+  if (!address) {
+    const subscriptions = {
+      activeSubscriptions: loggedOutSubscriptions,
+      loggedInSubscriptions,
+      loggedOutSubscriptions: [],
+      ethereumSubscriptions: []
+    }
+    debug('getSubscriptions returns', subscriptions)
+    return subscriptions
+  }
+
+  const loggedInSubscriptions = await indexedDb.getLoggedInSubscriptions(address)
+  const ethereumSubscriptionsCache = await indexedDb.getEthereumSubscriptionsCache(address)
   let ethereumSubscriptions = ethereumSubscriptionsCache
 
-  if (await cache.ethereumSubscriptionsCacheIsExpired(account)) {
-    ethereumSubscriptions = await subbyJs.getSubscriptions(account)
+  if (await cache.ethereumSubscriptionsCacheIsExpired(address)) {
+    ethereumSubscriptions = await subbyJs.getSubscriptions(address)
     ethereumSubscriptions = arrayToObjectWithItemsAsProps(ethereumSubscriptions)
 
     // ethereumSubscriptionsCache have a "pending deletion" status that
@@ -61,7 +73,7 @@ const getSubscriptions = async (account) => {
       ethereumSubscriptions = mergeEthereumSubscriptionsCache(ethereumSubscriptions, ethereumSubscriptionsCache)
     }
 
-    await indexedDb.setEthereumSubscriptionsCache({account, ethereumSubscriptions})
+    await indexedDb.setEthereumSubscriptionsCache({address, ethereumSubscriptions})
   }
 
   const activeSubscriptions = getActiveSubscriptions({loggedInSubscriptions, loggedOutSubscriptions, ethereumSubscriptions})
@@ -93,11 +105,62 @@ const getFeed = async ({subscriptions, startAt = 0, limit = 20}, cb) => {
   // but needs to be converted to array
   subscriptions = formatSubscriptions(subscriptions)
 
-  const feedCache = await indexedDb.getFeedCache()
-  const feedCacheIsExpired = await cache.feedCacheIsExpired()
-  const feedCacheContainsRequestedPosts = feedCache.posts && feedCache.posts.length >= startAt + limit
-  const feedCacheBufferExceeded = startAt + limit > feedCacheBufferSize
   const isFirstPage = startAt === 0
+  const backgroundFeedCacheIsExpired = await cache.backgroundFeedCacheIsExpired()
+  const backgroundFeedCache = await indexedDb.getBackgroundFeedCache()
+  const backgroundFeedCacheContainsRequestedPosts = backgroundFeedCache.posts && backgroundFeedCache.posts.length >= startAt + limit
+
+  let useBackgroundFeedCache = false
+  if (isFirstPage) {
+    useBackgroundFeedCache = true
+  }
+  if (backgroundFeedCacheIsExpired) {
+    useBackgroundFeedCache = false
+  }
+  if (!backgroundFeedCacheContainsRequestedPosts) {
+    useBackgroundFeedCache = false
+  }
+
+  let posts
+  if (useBackgroundFeedCache) {
+    posts = backgroundFeedCache.posts
+  }
+  //
+  else {
+    posts = await getFeedFromActiveFeedCache({subscriptions, startAt, limit}, cb)
+  }
+
+  console.log(posts)
+
+  debug('getFeed returns', {posts: posts.length})
+  return posts
+}
+
+const getFeedFromBackgroundFeedCache = async ({startAt, limit}) => {
+  const backgroundFeedCache = await indexedDb.getBackgroundFeedCache()
+  let {posts} = backgroundFeedCache
+
+  // we need to switch the background cache to now being the active cache
+  await indexedDb.setActiveFeedCache(backgroundFeedCache)
+
+  posts = filterRequestedPosts({posts, startAt, limit})
+
+  return posts
+}
+
+const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) => {
+  debug('getFeedFromActiveFeedCache', {subscriptions, startAt, limit})
+
+  const isFirstPage = startAt === 0
+  if (isFirstPage) {
+    cache.updateActiveFeedCache(subscriptions, cb)
+  }
+
+  const activeFeedCache = await indexedDb.getActiveFeedCache()
+  const feedCacheContainsRequestedPosts = activeFeedCache.posts && activeFeedCache.posts.length >= startAt + limit
+  const feedCacheBufferExceeded = startAt + limit > feedCacheBufferSize
+  const hasNextCache = activeFeedCache && activeFeedCache.nextCache
+  const hasMorePosts = (activeFeedCache && activeFeedCache.hasMorePosts === false) ? false : true
 
   let useCache = false
   if (feedCacheContainsRequestedPosts) {
@@ -106,49 +169,53 @@ const getFeed = async ({subscriptions, startAt = 0, limit = 20}, cb) => {
   if (feedCacheBufferExceeded) {
     useCache = false
   }
-  if (feedCacheIsExpired && isFirstPage) {
-    // we use an expired cache for page 2 and beyond
-    // because we don't care about new posts beyond page 1
+  if (isFirstPage) {
     useCache = false
   }
+
+  debug('getFeedFromActiveFeedCache', {useCache, feedCacheBufferExceeded, hasNextCache, isFirstPage, hasMorePosts})
 
   let posts
 
   if (useCache) {
-    posts = feedCache.posts
-    posts = getRequestedPostsFromFeedCachePosts({posts, startAt, limit})
-  } else if (feedCacheBufferExceeded) {
-    // if the user is fetching posts above the buffer size, we can assume the feed 
-    // nextCache contains useful data to pass to the ethereum function, so we do
-    const res = await subbyJs.getPostsFromPublishers(subscriptions, {
-      startAt, 
-      limit, 
-      cache: feedCache && feedCache.nextCache
-    })
+    posts = activeFeedCache.posts
+    posts = filterRequestedPosts({posts, startAt, limit})
+  }
+  //
+  else if (!hasMorePosts) {
+    posts = []
+  }
+  //
+  else if (feedCacheBufferExceeded && hasNextCache) {
+    const subscriptions = activeFeedCache.nextCache.nextPublishers
+    const cache = activeFeedCache.nextCache
+
+    const res = await subbyJs.getPostsFromPublishers(subscriptions, {startAt, limit, cache})
     posts = res.posts
-  } else {
-    // if useCache is false and feedCacheBuffer is not exceeded, we can assume the user 
-    // is making a fresh request and the old next cache should not be passed
+
+    // set next cache
+    const nextCache = res.nextCache
+    const hasMorePosts = res.hasMorePosts
+    const {posts: feedCachePosts} = activeFeedCache || {}
+    const mergedPosts = [...feedCachePosts, ...posts]
+    await indexedDb.setActiveFeedCache({posts: mergedPosts, nextCache, hasMorePosts})
+  }
+  //
+  else {
+    if (feedCacheBufferExceeded) {
+      console.warn('feedCacheBufferExceeded and no nextCache, this request will be extremely slow and contain unexpected subscriptions.')
+    }
     const res = await subbyJs.getPostsFromPublishers(subscriptions, {startAt, limit})
     posts = res.posts
   }
 
-  // this triggers a new updateFeedCache cycle that completes asynchronously 
-  // the cb is optional and will trigger once the async updateFeedCache has finished
-  if (feedCacheIsExpired) {
-    cache.updateFeedCache(subscriptions, cb)
-  } else {
-    if (cb) setTimeout(cb, 100)
-  }
-
+  debug('getFeedFromActiveFeedCache returns', {posts: posts.length})
   return posts
 }
 
-const getRequestedPostsFromFeedCachePosts = ({posts, startAt, limit}) => {
+const filterRequestedPosts = ({posts, startAt, limit}) => {
   return posts.slice(startAt, limit)
 }
-
-const getPosts = subbyJs.getPosts
 
 export {
   getAddress,
@@ -156,5 +223,4 @@ export {
   getSubscriptions,
   getSettings,
   getFeed,
-  getPosts
 }

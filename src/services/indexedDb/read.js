@@ -133,13 +133,13 @@ const getLoggedInSubscriptions = async (account) => {
   return subscriptions
 }
 
-const getFeedCache = async () => {
-  debug('getFeedCache')
+const getBackgroundFeedCache = async () => {
+  debug('getBackgroundFeedCache')
 
   const tx = db
     .db
-    .transaction(['feed'])
-    .objectStore('feed')
+    .transaction(['backgroundFeed'])
+    .objectStore('backgroundFeed')
 
   const posts = await tx.get('posts')
   const nextCache = await tx.get('nextCache')
@@ -151,53 +151,61 @@ const getFeedCache = async () => {
     hasMorePosts
   }
 
-  debug('getFeedCache returns', {posts: posts && posts.length, nextCache: nextCache && {postIds: nextCache.postIds && nextCache.postIds.length, nextStartAts: nextCache.nextStartAts && nextCache.nextStartAts.length, nextPublishers: nextCache.nextPublishers && nextCache.nextPublishers.length}, hasMorePosts})
+  debug('getBackgroundFeedCache returns', {posts: posts && posts.length, nextCache: nextCache && {postIds: nextCache.postIds && nextCache.postIds.length, nextStartAts: nextCache.nextStartAts && nextCache.nextStartAts.length, nextPublishers: nextCache.nextPublishers && nextCache.nextPublishers.length}, hasMorePosts})
 
   return feedCache
 }
 
-const getFeedCacheCount = async () => {
-  debug('getFeedCacheCount')
+const getLastBackgroundFeedCacheTimestamp = async () => {
+  debug('getLastBackgroundFeedCacheTimestamp')
 
-  const posts = await db
+  const lastBackgroundFeedCacheTimestamp = await db
     .db
-    .transaction(['feed'])
-    .objectStore('feed')
-    .get('posts')
+    .transaction(['backgroundFeed'])
+    .objectStore('backgroundFeed')
+    .get('lastBackgroundFeedCacheTimestamp')
 
-  const count = (posts) ? posts.length : 0
+  debug('getLastBackgroundFeedCacheTimestamp returns', lastBackgroundFeedCacheTimestamp)
 
-  debug('getFeedCacheCount returns', count)
-
-  return count
+  return lastBackgroundFeedCacheTimestamp
 }
 
-const hasMorePosts = async () => {
-  debug('hasMorePosts')
 
-  const hasMorePosts = await db
+const getActiveFeedCache = async () => {
+  debug('getActiveFeedCache')
+
+  const tx = db
     .db
-    .transaction(['feed'])
-    .objectStore('feed')
-    .get('hasMorePosts')
+    .transaction(['activeFeed'])
+    .objectStore('activeFeed')
 
-  debug('hasMorePosts returns', hasMorePosts)
+  const posts = await tx.get('posts')
+  const nextCache = await tx.get('nextCache')
+  const hasMorePosts = await tx.get('hasMorePosts')
 
-  return hasMorePosts
+  const feedCache = {
+    posts,
+    nextCache,
+    hasMorePosts
+  }
+
+  debug('getActiveFeedCache returns', {posts: posts && posts.length, nextCache: nextCache && {postIds: nextCache.postIds && nextCache.postIds.length, nextStartAts: nextCache.nextStartAts && nextCache.nextStartAts.length, nextPublishers: nextCache.nextPublishers && nextCache.nextPublishers.length}, hasMorePosts})
+
+  return feedCache
 }
 
-const getLastFeedCacheTimestamp = async () => {
-  debug('getLastFeedCacheTimestamp')
+const getLastActiveFeedCacheTimestamp = async () => {
+  debug('getLastActiveFeedCacheTimestamp')
 
-  const lastFeedCacheTimestamp = await db
+  const lastActiveFeedCacheTimestamp = await db
     .db
-    .transaction(['feed'])
-    .objectStore('feed')
-    .get('lastFeedCacheTimestamp')
+    .transaction(['backgroundFeed'])
+    .objectStore('backgroundFeed')
+    .get('lastActiveFeedCacheTimestamp')
 
-  debug('getLastFeedCacheTimestamp returns', lastFeedCacheTimestamp)
+  debug('getLastActiveFeedCacheTimestamp returns', lastActiveFeedCacheTimestamp)
 
-  return lastFeedCacheTimestamp
+  return lastActiveFeedCacheTimestamp
 }
 
 const getSettings = async () => {
@@ -219,11 +227,11 @@ export {
   getEthereumSubscriptionsCache,
   getLoggedInSubscriptions,
   getLoggedOutSubscriptions,
-  getLastFeedCacheTimestamp,
   getLastEthereumSubscriptionsCacheTimestamp,
   getLastProfileCacheTimestamp,
-  getFeedCache,
-  getFeedCacheCount,
+  getBackgroundFeedCache,
+  getLastBackgroundFeedCacheTimestamp,
+  getActiveFeedCache,
+  getLastActiveFeedCacheTimestamp,
   getSettings,
-  hasMorePosts
 }

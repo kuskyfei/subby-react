@@ -1,6 +1,7 @@
 const subbyJs = require('subby.js')
 const indexedDb = require('../indexedDb')
 const {cacheIsExpired, publishersMatch} = require('./util')
+const {getSubscriptions} = require('./read')
 const debug = require('debug')('services:cache:cache')
 
 const profileCacheTime = window.SUBBY_GLOBAL_SETTINGS.PROFILE_CACHE_TIME
@@ -19,8 +20,8 @@ const updateCache = async (account) => {
   if (await ethereumSubscriptionsCacheIsExpired(account)) {
     await updateSubscriptionsCache(account)
   }
-  if (await feedCacheIsExpired()) {
-    await updateFeedCache()
+  if (await backgroundFeedCacheIsExpired()) {
+    await updateBackgroundFeedCache()
   }
 }
 
@@ -32,25 +33,41 @@ const updateSubscriptionsCache = () => {
   debug('updateSubscriptionsCache')
 }
 
-const updateFeedCache = async (subscriptions, cb) => {
-  debug('updateFeedCache start', {subscriptions})
+const updateBackgroundFeedCache = async () => {
+  debug('updateBackgroundFeedCache start')
 
-  await getPostsAndSetFeedCache(subscriptions)
+  const address = await subbyJs.getAddress()
+  const subscriptions = await getSubscriptions(address)
+
+  await populateFeedCache({
+    subscriptions, 
+    getFeedCache: indexedDb.getBackgroundFeedCache, 
+    setFeedCache: indexedDb.setBackgroundFeedCache
+  })
+
+  debug('updateBackgroundFeedCache end')
+}
+
+const updateActiveFeedCache = async (subscriptions, cb) => {
+  debug('updateActiveFeedCache start', {subscriptions})
+
+  await populateFeedCache({
+    subscriptions, 
+    getFeedCache: indexedDb.getActiveFeedCache, 
+    setFeedCache: indexedDb.setActiveFeedCache
+  })
 
   // the cb will trigger once the async updateFeedCache has finished
   if (cb) cb()
 
-  debug('updateFeedCache end')
+  debug('updateActiveFeedCache end')
 }
 
-const getPostsAndSetFeedCache = async (subscriptions, {startAt, cache} = {}) => {
+const populateFeedCache = async ({subscriptions, startAt = 0, cache, getFeedCache, setFeedCache} = {}) => {
   debug('getPostsAndSetFeedCache start', {subscriptions: subscriptions.length, startAt, cache: cache && {postIds: cache.postIds && cache.postIds.length, nextStartAts: cache.nextStartAts, nextPublishers: cache.nextPublishers && cache.nextPublishers.length}})
 
-  // an undefined startAt means a new cycle of updateFeedCache has started
-  // and the current feed cache should be erased, otherwise it is a cursor
-  // to get pages 2 and beyond
-  if (!startAt) {
-    await resetFeedCache()
+  if (startAt === 0) {
+    await setFeedCache({posts: [], nextCache: null, hasMorePosts: null})
   }
 
   // if the limit is too high the query will revert, if it's too low
@@ -61,12 +78,12 @@ const getPostsAndSetFeedCache = async (subscriptions, {startAt, cache} = {}) => 
   let {posts, nextCache, hasMorePosts} = feed
 
   // merge the previous posts with the new ones
-  const feedCache = await indexedDb.getFeedCache()
+  const feedCache = await getFeedCache()
   const {posts: feedCachePosts} = feedCache || {}
   posts = [...feedCachePosts, ...posts]
 
   // set the new cache
-  await indexedDb.setFeedCache({posts, nextCache, hasMorePosts})
+  await setFeedCache({posts, nextCache, hasMorePosts})
   
   const nextStartAt = (startAt) ? (startAt + limit) : limit
   // stop fetching if the buffer is full or if has no more posts on ethereum
@@ -79,11 +96,7 @@ const getPostsAndSetFeedCache = async (subscriptions, {startAt, cache} = {}) => 
 
   // nextCache contains data that improves the performance of subby.js
   // it should be undefined on the first query to fetch each user's latest posts
-  await getPostsAndSetFeedCache(subscriptions, {startAt: nextStartAt, cache: nextCache})
-}
-
-const resetFeedCache = async () => {
-  await indexedDb.setFeedCache({posts: [], nextCache: null, hasMorePosts: true})
+  await populateFeedCache({subscriptions, startAt: nextStartAt, cache: nextCache, getFeedCache, setFeedCache})
 }
 
 const profileCacheIsExpired = async (account) => {
@@ -110,38 +123,25 @@ const ethereumSubscriptionsCacheIsExpired = async (account) => {
   return ethereumSubscriptionsCacheIsExpired
 }
 
-const feedCacheIsExpired = async () => {
-  debug('feedCacheIsExpired')
+const backgroundFeedCacheIsExpired = async () => {
+  debug('backgroundFeedCacheIsExpired')
 
-  const lastPostCacheTimestamp = await indexedDb.getLastFeedCacheTimestamp()
+  const lastPostCacheTimestamp = await indexedDb.getLastBackgroundFeedCacheTimestamp()
 
-  const feedCacheIsExpired = cacheIsExpired(lastPostCacheTimestamp, feedCacheTime)
+  const backgroundFeedCacheIsExpired = cacheIsExpired(lastPostCacheTimestamp, feedCacheTime)
 
-  debug('feedCacheIsExpired returns', feedCacheIsExpired)
+  debug('backgroundFeedCacheIsExpired returns', backgroundFeedCacheIsExpired)
 
-  return feedCacheIsExpired
-}
-
-const feedCacheNeedsMorePosts = async ({startAt, count}) => {
-  debug('feedCacheNeedsMorePosts', {startAt, count})
-
-  const postCacheCount = await indexedDb.getFeedCacheCount()
-  const lastPostQueried = startAt + count
-  const remainingPostsInCacheCount = postCacheCount - lastPostQueried
-  const feedCacheNeedsMorePosts = remainingPostsInCacheCount < minimumUnreadFeedCachedCount
-
-  debug('feedCacheNeedsMorePosts returns', feedCacheNeedsMorePosts)
-
-  return feedCacheNeedsMorePosts
+  return backgroundFeedCacheIsExpired
 }
 
 export {
   updateCache,
   updateProfileCache,
   updateSubscriptionsCache,
-  updateFeedCache,
   profileCacheIsExpired,
   ethereumSubscriptionsCacheIsExpired,
-  feedCacheIsExpired,
-  feedCacheNeedsMorePosts
+  backgroundFeedCacheIsExpired,
+  updateBackgroundFeedCache,
+  updateActiveFeedCache
 }

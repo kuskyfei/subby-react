@@ -28,28 +28,48 @@ const setProfileCache = async (profile) => {
   }
 }
 
-const setFeedCache = async ({posts, nextCache, hasMorePosts}) => {
-  debug('setFeedCache', {posts: posts && posts.length, nextCache: nextCache && {postIds: nextCache.postIds && nextCache.postIds.length, nextStartAts: nextCache.nextStartAts && nextCache.nextStartAts.length, nextPublishers: nextCache.nextPublishers && nextCache.nextPublishers.length}, hasMorePosts})
+const setActiveFeedCache = async ({posts, nextCache, hasMorePosts}) => {
+  debug('setActiveFeedCache', {posts: posts && posts.length, nextCache: nextCache && {postIds: nextCache.postIds && nextCache.postIds.length, nextStartAts: nextCache.nextStartAts && nextCache.nextStartAts.length, nextPublishers: nextCache.nextPublishers && nextCache.nextPublishers.length}, hasMorePosts})
 
-  const lastFeedCacheTimestamp = Date.now()
+  const lastActiveFeedCacheTimestamp = Date.now()
 
   const tx = db
     .db
-    .transaction(['feed'], 'readwrite')
-    .objectStore('feed')
+    .transaction(['activeFeed'], 'readwrite')
+    .objectStore('activeFeed')
 
   tx.put(posts, 'posts')
   tx.put(hasMorePosts, 'hasMorePosts')
   tx.put(nextCache, 'nextCache')
-  tx.put(lastFeedCacheTimestamp, 'lastFeedCacheTimestamp')
+  tx.put(lastActiveFeedCacheTimestamp, 'lastActiveFeedCacheTimestamp')
 
   await tx
 
   return tx.complete
 }
 
-const setEthereumSubscriptionsCache = async ({account, ethereumSubscriptions}) => {
-  debug('setEthereumSubscriptionsCache', {account, ethereumSubscriptions})
+const setBackgroundFeedCache = async ({posts, nextCache, hasMorePosts}) => {
+  debug('setBackgroundFeedCache', {posts: posts && posts.length, nextCache: nextCache && {postIds: nextCache.postIds && nextCache.postIds.length, nextStartAts: nextCache.nextStartAts && nextCache.nextStartAts.length, nextPublishers: nextCache.nextPublishers && nextCache.nextPublishers.length}, hasMorePosts})
+
+  const lastBackgroundFeedCacheTimestamp = Date.now()
+
+  const tx = db
+    .db
+    .transaction(['activeFeed'], 'readwrite')
+    .objectStore('activeFeed')
+
+  tx.put(posts, 'posts')
+  tx.put(hasMorePosts, 'hasMorePosts')
+  tx.put(nextCache, 'nextCache')
+  tx.put(lastBackgroundFeedCacheTimestamp, 'lastBackgroundFeedCacheTimestamp')
+
+  await tx
+
+  return tx.complete
+}
+
+const setEthereumSubscriptionsCache = async ({address, ethereumSubscriptions}) => {
+  debug('setEthereumSubscriptionsCache', {address, ethereumSubscriptions})
 
   const req = {
     subscriptions: ethereumSubscriptions,
@@ -60,7 +80,7 @@ const setEthereumSubscriptionsCache = async ({account, ethereumSubscriptions}) =
     .db
     .transaction(['ethereumSubscriptions'], 'readwrite')
     .objectStore('ethereumSubscriptions')
-    .put(req, account)
+    .put(req, address)
 
   return tx.complete
 }
@@ -77,14 +97,14 @@ const setLoggedOutSubscriptions = async (loggedOutSubscriptions) => {
   return tx.complete
 }
 
-const setLoggedInSubscriptions = async ({account, loggedInSubscriptions}) => {
-  debug('setLoggedInSubscriptions', {account, loggedInSubscriptions})
+const setLoggedInSubscriptions = async ({address, loggedInSubscriptions}) => {
+  debug('setLoggedInSubscriptions', {address, loggedInSubscriptions})
 
   const tx = await db
     .db
     .transaction(['loggedInSubscriptions'], 'readwrite')
     .objectStore('loggedInSubscriptions')
-    .put(loggedInSubscriptions, account)
+    .put(loggedInSubscriptions, address)
 
   return tx.complete
 }
@@ -103,7 +123,8 @@ const setSettings = async (settings) => {
 
 export {
   setProfileCache,
-  setFeedCache,
+  setActiveFeedCache,
+  setBackgroundFeedCache,
   setEthereumSubscriptionsCache,
   setLoggedOutSubscriptions,
   setLoggedInSubscriptions,
