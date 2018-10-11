@@ -170,7 +170,6 @@ const getLastBackgroundFeedCacheTimestamp = async () => {
   return lastBackgroundFeedCacheTimestamp
 }
 
-
 const getActiveFeedCache = async () => {
   debug('getActiveFeedCache')
 
@@ -233,5 +232,5 @@ export {
   getLastBackgroundFeedCacheTimestamp,
   getActiveFeedCache,
   getLastActiveFeedCacheTimestamp,
-  getSettings,
+  getSettings
 }

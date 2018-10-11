@@ -97,7 +97,7 @@ class App extends Component {
 
   render () {
     const Route = this.state.route
-    const {headerIsLoading, classes, location} = this.props
+    const {headerIsLoading, classes} = this.props
 
     const isLoading = headerIsLoading
 

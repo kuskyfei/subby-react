@@ -2,6 +2,7 @@ const {
   setSettings,
   setSubscriptions,
   subscribe,
+  unsubscribe,
   donate,
   publish
 } = require('./write')
@@ -24,6 +25,7 @@ export {
   setSettings,
   setSubscriptions,
   subscribe,
+  unsubscribe,
   donate,
   publish,
 

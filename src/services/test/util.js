@@ -28,4 +28,20 @@ const testPostId = (postId) => {
   expect(postId.timestamp > 0).toEqual(true)
 }
 
-module.exports = {testProfile, testPost, testPostId}
+const resetDb = async () => {
+  await timeout(100)
+  await window.SUBBY_DEBUG_DELETE_INDEXEDDB()
+}
+
+const getDb = async () => {
+  const db = await window.SUBBY_DEBUG_INDEXEDDB()
+  return db
+}
+
+const mockTime = (timestamp) => {
+  Date.now = () => timestamp
+}
+
+const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+module.exports = {testProfile, testPost, testPostId, resetDb, getDb, mockTime}

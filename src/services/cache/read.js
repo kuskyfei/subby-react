@@ -1,3 +1,5 @@
+/* eslint brace-style: 0 */
+
 const subbyJs = require('subby.js')
 const indexedDb = require('../indexedDb')
 const cache = require('./cache')
@@ -49,8 +51,8 @@ const getSubscriptions = async (address) => {
   if (!address) {
     const subscriptions = {
       activeSubscriptions: loggedOutSubscriptions,
-      loggedInSubscriptions,
-      loggedOutSubscriptions: [],
+      loggedInSubscriptions: [],
+      loggedOutSubscriptions,
       ethereumSubscriptions: []
     }
     debug('getSubscriptions returns', subscriptions)
@@ -125,7 +127,6 @@ const getFeed = async ({subscriptions, startAt = 0, limit = 20}, cb) => {
   if (useBackgroundFeedCache) {
     posts = getFeedFromBackgroundFeedCache({startAt, limit})
   }
-  //
   else {
     posts = await getFeedFromActiveFeedCache({subscriptions, startAt, limit}, cb)
   }
@@ -182,7 +183,7 @@ const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) =
     posts = activeFeedCache.posts
     posts = filterRequestedPosts({posts, startAt, limit})
   }
-  //
+
   else if (feedCacheBufferExceeded && hasNextCache) {
     const subscriptions = activeFeedCache.nextCache.nextPublishers
     const cache = activeFeedCache.nextCache
@@ -197,7 +198,7 @@ const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) =
     const mergedPosts = [...feedCachePosts, ...posts]
     await indexedDb.setActiveFeedCache({posts: mergedPosts, nextCache, hasMorePosts})
   }
-  //
+
   else {
     if (feedCacheBufferExceeded) {
       console.warn('feedCacheBufferExceeded and no nextCache, this request will be extremely slow and contain unexpected subscriptions.')
@@ -219,5 +220,5 @@ export {
   getProfile,
   getSubscriptions,
   getSettings,
-  getFeed,
+  getFeed
 }

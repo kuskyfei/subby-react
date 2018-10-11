@@ -45,7 +45,7 @@ const getActiveSubscriptions = ({loggedInSubscriptions, loggedOutSubscriptions, 
 }
 
 const publishersMatch = (publishers, prevPublishers) => {
-  if (!publishers && prevPublishers || publishers && !prevPublishers) {
+  if ((!publishers && prevPublishers) || (publishers && !prevPublishers)) {
     return false
   }
 

@@ -37,6 +37,7 @@ export {
   setSettings,
   setSubscriptions,
   subscribe,
+  unsubscribe,
   donate,
   publish
 }

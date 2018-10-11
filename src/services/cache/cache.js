@@ -1,6 +1,6 @@
 const subbyJs = require('subby.js')
 const indexedDb = require('../indexedDb')
-const {cacheIsExpired, publishersMatch} = require('./util')
+const {cacheIsExpired} = require('./util')
 const {getSubscriptions} = require('./read')
 const debug = require('debug')('services:cache:cache')
 
@@ -38,8 +38,8 @@ const updateBackgroundFeedCache = async (subscriptions) => {
   debug('updateBackgroundFeedCache start')
 
   await populateFeedCache({
-    subscriptions, 
-    getFeedCache: indexedDb.getBackgroundFeedCache, 
+    subscriptions,
+    getFeedCache: indexedDb.getBackgroundFeedCache,
     setFeedCache: indexedDb.setBackgroundFeedCache
   })
 
@@ -50,8 +50,8 @@ const updateActiveFeedCache = async (subscriptions, cb) => {
   debug('updateActiveFeedCache start', {subscriptions})
 
   await populateFeedCache({
-    subscriptions, 
-    getFeedCache: indexedDb.getActiveFeedCache, 
+    subscriptions,
+    getFeedCache: indexedDb.getActiveFeedCache,
     setFeedCache: indexedDb.setActiveFeedCache
   })
 
@@ -77,12 +77,12 @@ const populateFeedCache = async ({subscriptions, startAt = 0, cache, getFeedCach
 
   // merge the previous posts with the new ones
   const feedCache = await getFeedCache()
-  const feedCachePosts = feedCache && feedCache.posts || []
+  const feedCachePosts = (feedCache && feedCache.posts) || []
   posts = [...feedCachePosts, ...posts]
 
   // set the new cache
   await setFeedCache({posts, nextCache, hasMorePosts})
-  
+
   const nextStartAt = (startAt) ? (startAt + limit) : limit
   // stop fetching if the buffer is full or if has no more posts on ethereum
   if (nextStartAt >= feedCacheBufferSize) {

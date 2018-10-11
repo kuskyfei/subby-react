@@ -1,5 +1,6 @@
 /* eslint-env jest */
 
+/*
 const services = require('../../services')
 const minute = 1000 * 60
 
@@ -10,6 +11,7 @@ const feedCachedPreemptivelyCount = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHED_PRE
 const minimumUnreadFeedCachedCount = window.SUBBY_GLOBAL_SETTINGS.MINIMUM_UNREAD_FEED_CACHED_COUNT
 
 const resetDb = async () => {
+  await timeout(100)
   await window.SUBBY_DEBUG_DELETE_INDEXEDDB()
 }
 
@@ -47,3 +49,4 @@ describe('services', () => {
     })
   })
 })
+*/

@@ -9,20 +9,7 @@ const ethereumSubscriptionsCacheTime = window.SUBBY_GLOBAL_SETTINGS.ETHEREUM_SUB
 const feedCacheTime = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_TIME
 const feedCacheBufferSize = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_BUFFER_SIZE
 
-const {testPost, testPostId} = require('./util')
-
-const resetDb = async () => {
-  await window.SUBBY_DEBUG_DELETE_INDEXEDDB()
-}
-
-const getDb = async () => {
-  const db = await window.SUBBY_DEBUG_INDEXEDDB()
-  return db
-}
-
-const mockTime = (timestamp) => {
-  Date.now = () => timestamp
-}
+const {testPost, testPostId, resetDb, getDb, mockTime} = require('./util')
 
 const restoreMocks = {}
 
@@ -172,7 +159,7 @@ describe('services', () => {
 
       const db1 = await getDb()
       const {hasMorePosts: db1HasMorePosts, lastActiveFeedCacheTimestamp: db1LastFeedCacheTimestamp, posts: db1Posts} = db1.activeFeed
-      const {postIds: db1PostIds, nextPublishers: db1NextPublishers, nextStartAts: db1NextStartAts} = db1.activeFeed.nextCache
+      const {postIds: db1PostIds, nextPublishers: db1NextPublishers, nextStartAts: db1NextStartAts} = db1.activeFeed.nextCache // eslint-disable-line
 
       for (const post of db1Posts) {
         testPost(post)
@@ -182,7 +169,7 @@ describe('services', () => {
       }
       expect(db1Posts.length).toEqual(feedCacheBufferSize)
       expect(publishers).toEqual(db1NextPublishers)
-      expect(db1Posts[0].timestamp >= db1Posts[1].timestamp && db1Posts[0].timestamp >= db1Posts[feedCacheBufferSize-1].timestamp).toEqual(true)
+      expect(db1Posts[0].timestamp >= db1Posts[1].timestamp && db1Posts[0].timestamp >= db1Posts[feedCacheBufferSize - 1].timestamp).toEqual(true)
       expect(db1HasMorePosts).toEqual(true)
       expect(db1LastFeedCacheTimestamp).toEqual(firstRequestTime)
 
@@ -219,12 +206,12 @@ describe('services', () => {
         testPost(post)
       }
 
+      const db3 = await getDb()
       expect(db3).not.toEqual(db1)
       expect(db3).not.toEqual(db2)
 
-      const db3 = await getDb()
       const {hasMorePosts: db3HasMorePosts, lastActiveFeedCacheTimestamp: db3LastFeedCacheTimestamp, posts: db3Posts} = db3.activeFeed
-      const {postIds: db3PostIds, nextPublishers: db3NextPublishers, nextStartAts: db3NextStartAts} = db3.activeFeed.nextCache
+      const {postIds: db3PostIds, nextPublishers: db3NextPublishers, nextStartAts: db3NextStartAts} = db3.activeFeed.nextCache // eslint-disable-line
 
       for (const post of db3Posts) {
         testPost(post)
@@ -234,7 +221,7 @@ describe('services', () => {
       }
       expect(db3Posts.length).toEqual(feedCacheBufferSize + limit)
       expect(publishers).toEqual(db3NextPublishers)
-      expect(db3Posts[0].timestamp >= db3Posts[1].timestamp && db3Posts[0].timestamp >= db3Posts[feedCacheBufferSize-1].timestamp).toEqual(true)
+      expect(db3Posts[0].timestamp >= db3Posts[1].timestamp && db3Posts[0].timestamp >= db3Posts[feedCacheBufferSize - 1].timestamp).toEqual(true)
       expect(db3HasMorePosts).toEqual(true)
       // the timestamp should have changed since the cache was changed
       expect(db3LastFeedCacheTimestamp).toEqual(firstRequestTime + feedCacheTime + minute)
@@ -256,7 +243,7 @@ describe('services', () => {
       expect(db4).not.toEqual(db1)
 
       const {hasMorePosts: db4HasMorePosts, lastActiveFeedCacheTimestamp: db4LastFeedCacheTimestamp, posts: db4Posts} = db4.activeFeed
-      const {postIds: db4PostIds, nextPublishers: db4NextPublishers, nextStartAts: db4NextStartAts} = db4.activeFeed.nextCache
+      const {postIds: db4PostIds, nextPublishers: db4NextPublishers, nextStartAts: db4NextStartAts} = db4.activeFeed.nextCache // eslint-disable-line
 
       for (const post of db4Posts) {
         testPost(post)
@@ -266,13 +253,9 @@ describe('services', () => {
       }
       expect(db4Posts.length).toEqual(feedCacheBufferSize)
       expect(publishers).toEqual(db1NextPublishers)
-      expect(db4Posts[0].timestamp >= db4Posts[1].timestamp && db4Posts[0].timestamp >= db4Posts[feedCacheBufferSize-1].timestamp).toEqual(true)
+      expect(db4Posts[0].timestamp >= db4Posts[1].timestamp && db4Posts[0].timestamp >= db4Posts[feedCacheBufferSize - 1].timestamp).toEqual(true)
       expect(db4HasMorePosts).toEqual(true)
       expect(db4LastFeedCacheTimestamp).toEqual(firstRequestTime + feedCacheTime + minute)
-    })
-
-    test('does not have nextCache in active cache', async () => {
-
     })
 
     test('is first page, background cache switch to active cache, and expires', async () => {
@@ -281,10 +264,10 @@ describe('services', () => {
 
       // set background cache
       await cache.updateBackgroundFeedCache(publishers)
-      
+
       const db1 = await getDb()
       const {hasMorePosts: db1HasMorePosts, lastBackgroundFeedCacheTimestamp: db1LastFeedCacheTimestamp, posts: db1Posts} = db1.backgroundFeed
-      const {postIds: db1PostIds, nextPublishers: db1NextPublishers, nextStartAts: db1NextStartAts} = db1.backgroundFeed.nextCache
+      const {postIds: db1PostIds, nextPublishers: db1NextPublishers, nextStartAts: db1NextStartAts} = db1.backgroundFeed.nextCache // eslint-disable-line
 
       for (const post of db1Posts) {
         testPost(post)
@@ -294,7 +277,7 @@ describe('services', () => {
       }
       expect(db1Posts.length).toEqual(feedCacheBufferSize)
       expect(publishers).toEqual(db1NextPublishers)
-      expect(db1Posts[0].timestamp >= db1Posts[1].timestamp && db1Posts[0].timestamp >= db1Posts[feedCacheBufferSize-1].timestamp).toEqual(true)
+      expect(db1Posts[0].timestamp >= db1Posts[1].timestamp && db1Posts[0].timestamp >= db1Posts[feedCacheBufferSize - 1].timestamp).toEqual(true)
       expect(db1HasMorePosts).toEqual(true)
       expect(db1LastFeedCacheTimestamp).toEqual(firstRequestTime)
 
@@ -324,11 +307,9 @@ describe('services', () => {
       expect(db2.backgroundFeed).toEqual(db1.backgroundFeed)
       expect(db2).not.toEqual(db1)
 
-
-
       // background cache is expired and not used
       mockTime(firstRequestTime + feedCacheTime + minute)
-      
+
       // the only way we know that this test work is because of the callback
       // if the callback isn't triggered then the test will fail
       // and timeout
@@ -356,7 +337,7 @@ describe('services', () => {
       const db1 = await getDb()
 
       const {hasMorePosts: db1HasMorePosts, lastBackgroundFeedCacheTimestamp: db1LastFeedCacheTimestamp, posts: db1Posts} = db1.backgroundFeed
-      const {postIds: db1PostIds, nextPublishers: db1NextPublishers, nextStartAts: db1NextStartAts} = db1.backgroundFeed.nextCache
+      const {postIds: db1PostIds, nextPublishers: db1NextPublishers, nextStartAts: db1NextStartAts} = db1.backgroundFeed.nextCache // eslint-disable-line
 
       for (const post of db1Posts) {
         testPost(post)
@@ -375,8 +356,7 @@ describe('services', () => {
 
       // background cache switch to active cache
       const res2 = await services.getFeed({subscriptions: publishers, startAt, limit})
-      
-      const db2 = await getDb()
+      expect(res2.length).toEqual(limit)
 
       // get a request halfway above the posts available
       const postsAvailable = db1Posts.length

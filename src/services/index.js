@@ -30,36 +30,8 @@ const {
   setSettings,
   setSubscriptions,
   subscribe,
-  tip,
-  publish,
-
-  getAddress,
-  getProfile,
-  getSubscriptions,
-  getSettings,
-  getFeed,
-  getPosts,
-
-  updateCache
-} = require('./cache')
-
-const {
-  getTorrent,
-  getMagnetFromTorrentFile,
-  prepareMagnetForEthereum
-} = require('./torrent')
-
-export {
-  init,
-  ipfs,
-  mockSmartContracts,
-  mockWebTorrent,
-  mockIpfsApi,
-
-  setSettings,
-  setSubscriptions,
-  subscribe,
-  tip,
+  unsubscribe,
+  donate,
   publish,
 
   getAddress,
@@ -70,7 +42,40 @@ export {
   getPosts,
 
   updateCache,
+  updateBackgroundFeedCache
+} = require('./cache')
 
+const {
+  getTorrent,
+  getMagnetFromTorrentFile,
+  prepareMagnetForEthereum
+} = require('./torrent')
+
+export {
+  // init
+  init,
+  ipfs,
+  mockSmartContracts,
+  mockWebTorrent,
+  mockIpfsApi,
+  // cache
+  setSettings,
+  setSubscriptions,
+  subscribe,
+  unsubscribe,
+  donate,
+  publish,
+
+  getAddress,
+  getProfile,
+  getSubscriptions,
+  getSettings,
+  getFeed,
+  getPosts,
+
+  updateCache,
+  updateBackgroundFeedCache,
+  // torrent
   getTorrent,
   getMagnetFromTorrentFile,
   prepareMagnetForEthereum

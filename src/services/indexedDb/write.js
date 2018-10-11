@@ -1,5 +1,4 @@
 const db = require('./db').default
-const feedCacheBufferSize = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_BUFFER_SIZE
 
 const debug = require('debug')('services:indexedDb:write')
 
