@@ -164,6 +164,9 @@ const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) =
   if (feedCacheContainsRequestedPosts) {
     useCache = true
   }
+  if (!hasMorePosts) {
+    useCache = true
+  }
   if (feedCacheBufferExceeded) {
     useCache = false
   }
@@ -171,17 +174,13 @@ const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) =
     useCache = false
   }
 
-  debug('getFeedFromActiveFeedCache', {useCache, feedCacheBufferExceeded, hasNextCache, isFirstPage, hasMorePosts})
+  debug('getFeedFromActiveFeedCache', {useCache, feedCacheContainsRequestedPosts, feedCacheBufferExceeded, hasNextCache, isFirstPage, hasMorePosts})
 
   let posts
 
   if (useCache) {
     posts = activeFeedCache.posts
     posts = filterRequestedPosts({posts, startAt, limit})
-  }
-  //
-  else if (!hasMorePosts) {
-    posts = []
   }
   //
   else if (feedCacheBufferExceeded && hasNextCache) {

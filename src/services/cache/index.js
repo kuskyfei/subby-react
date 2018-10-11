@@ -2,7 +2,7 @@ const {
   setSettings,
   setSubscriptions,
   subscribe,
-  tip,
+  donate,
   publish
 } = require('./write')
 
@@ -16,14 +16,15 @@ const {
 } = require('./read')
 
 const {
-  updateCache
+  updateCache,
+  updateBackgroundFeedCache
 } = require('./cache')
 
 export {
   setSettings,
   setSubscriptions,
   subscribe,
-  tip,
+  donate,
   publish,
 
   getAddress,
@@ -33,5 +34,6 @@ export {
   getFeed,
   getPosts,
 
-  updateCache
+  updateCache,
+  updateBackgroundFeedCache
 }

@@ -55,8 +55,8 @@ const setBackgroundFeedCache = async ({posts, nextCache, hasMorePosts}) => {
 
   const tx = db
     .db
-    .transaction(['activeFeed'], 'readwrite')
-    .objectStore('activeFeed')
+    .transaction(['backgroundFeed'], 'readwrite')
+    .objectStore('backgroundFeed')
 
   tx.put(posts, 'posts')
   tx.put(hasMorePosts, 'hasMorePosts')

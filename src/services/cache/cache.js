@@ -21,7 +21,8 @@ const updateCache = async (account) => {
     await updateSubscriptionsCache(account)
   }
   if (await backgroundFeedCacheIsExpired()) {
-    await updateBackgroundFeedCache()
+    const subscriptions = await getSubscriptions(account)
+    await updateBackgroundFeedCache(subscriptions)
   }
 }
 
@@ -33,11 +34,8 @@ const updateSubscriptionsCache = () => {
   debug('updateSubscriptionsCache')
 }
 
-const updateBackgroundFeedCache = async () => {
+const updateBackgroundFeedCache = async (subscriptions) => {
   debug('updateBackgroundFeedCache start')
-
-  const address = await subbyJs.getAddress()
-  const subscriptions = await getSubscriptions(address)
 
   await populateFeedCache({
     subscriptions, 
@@ -79,7 +77,7 @@ const populateFeedCache = async ({subscriptions, startAt = 0, cache, getFeedCach
 
   // merge the previous posts with the new ones
   const feedCache = await getFeedCache()
-  const {posts: feedCachePosts} = feedCache || {}
+  const feedCachePosts = feedCache && feedCache.posts || []
   posts = [...feedCachePosts, ...posts]
 
   // set the new cache
