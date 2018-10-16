@@ -38,7 +38,7 @@ describe('services', () => {
         expect(publisher in subscriptions.localSubscriptions).toEqual(true)
         expect(publisher in subscriptions.activeSubscriptions).toEqual(true)
       }
-  
+
       // test unsubscribing locally
       const db1 = await getDb()
 

@@ -29,7 +29,7 @@
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "npm run lint-fix && jest --forceExit --detectOpenHandles",
+    "test": "npm run lint-fix && jest --forceExit --detectOpenHandles --verbose",
     "eject": "react-scripts eject",
     "lint": "./node_modules/.bin/standard",
     "lint-fix": "./node_modules/.bin/standard --fix"

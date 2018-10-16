@@ -128,7 +128,7 @@ describe('services', () => {
 
   describe('get feed', () => {
     beforeAll(() => {
-      jest.setTimeout(5*minute)
+      jest.setTimeout(5 * minute)
     })
     afterAll(() => {
       jest.setTimeout(5000)

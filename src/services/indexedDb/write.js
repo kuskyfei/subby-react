@@ -112,7 +112,7 @@ const addToLocalSubscriptions = async (publisher) => {
 
 const removeFromLocalSubscriptions = async (publisher) => {
   const subscriptions = await getLocalSubscriptions()
-  
+
   if (!subscriptions) {
     return
   }
@@ -126,7 +126,7 @@ const removeFromLocalSubscriptions = async (publisher) => {
 }
 
 const setSettings = async (newSettings) => {
-  debug('setSettings', settings)
+  debug('setSettings', newSettings)
 
   const oldSettings = await getSettings()
 
