@@ -1,4 +1,5 @@
 const db = require('./db').default
+const {getLocalSubscriptions, getSettings} = require('./read')
 
 const debug = require('debug')('services:indexedDb:write')
 
@@ -84,32 +85,52 @@ const setEthereumSubscriptionsCache = async ({address, ethereumSubscriptions}) =
   return tx.complete
 }
 
-const setLoggedOutSubscriptions = async (loggedOutSubscriptions) => {
-  debug('setLoggedOutSubscriptions', loggedOutSubscriptions)
+const setLocalSubscriptions = async (subscriptions) => {
+  debug('setLocalSubscriptions', subscriptions)
 
   const tx = await db
     .db
-    .transaction(['loggedOutSubscriptions'], 'readwrite')
-    .objectStore('loggedOutSubscriptions')
-    .put(loggedOutSubscriptions, 'subscriptions')
+    .transaction(['localSubscriptions'], 'readwrite')
+    .objectStore('localSubscriptions')
+    .put(subscriptions, 'subscriptions')
 
   return tx.complete
 }
 
-const setLoggedInSubscriptions = async ({address, loggedInSubscriptions}) => {
-  debug('setLoggedInSubscriptions', {address, loggedInSubscriptions})
+const addToLocalSubscriptions = async (publisher) => {
+  let subscriptions = await getLocalSubscriptions()
+  if (!subscriptions) subscriptions = {}
 
-  const tx = await db
-    .db
-    .transaction(['loggedInSubscriptions'], 'readwrite')
-    .objectStore('loggedInSubscriptions')
-    .put(loggedInSubscriptions, address)
+  if (subscriptions[publisher]) {
+    return
+  }
 
-  return tx.complete
+  subscriptions[publisher] = {}
+
+  await setLocalSubscriptions(subscriptions)
 }
 
-const setSettings = async (settings) => {
+const removeFromLocalSubscriptions = async (publisher) => {
+  const subscriptions = await getLocalSubscriptions()
+  
+  if (!subscriptions) {
+    return
+  }
+  if (!subscriptions[publisher]) {
+    return
+  }
+
+  delete subscriptions[publisher]
+
+  await setLocalSubscriptions(subscriptions)
+}
+
+const setSettings = async (newSettings) => {
   debug('setSettings', settings)
+
+  const oldSettings = await getSettings()
+
+  const settings = {...oldSettings, ...newSettings}
 
   const tx = await db
     .db
@@ -125,7 +146,8 @@ export {
   setActiveFeedCache,
   setBackgroundFeedCache,
   setEthereumSubscriptionsCache,
-  setLoggedOutSubscriptions,
-  setLoggedInSubscriptions,
-  setSettings
+  setLocalSubscriptions,
+  setSettings,
+  addToLocalSubscriptions,
+  removeFromLocalSubscriptions
 }

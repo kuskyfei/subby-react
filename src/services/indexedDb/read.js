@@ -17,7 +17,7 @@ const getEverything = async () => {
   for (const objectStoreName of objectStoreNames) {
     const keys = await db
       .db
-      .transaction(objectStoreName)
+      .transaction([objectStoreName])
       .objectStore(objectStoreName)
       .getAllKeys()
 
@@ -103,32 +103,16 @@ const getLastEthereumSubscriptionsCacheTimestamp = async (account) => {
   return lastEthereumSubscriptionsCacheTimestamp
 }
 
-const getLoggedOutSubscriptions = async () => {
-  debug('getLoggedOutSubscriptions')
+const getLocalSubscriptions = async () => {
+  debug('getLocalSubscriptions')
 
   const subscriptions = await db
     .db
-    .transaction(['loggedOutSubscriptions'])
-    .objectStore('loggedOutSubscriptions')
+    .transaction(['localSubscriptions'])
+    .objectStore('localSubscriptions')
     .get('subscriptions')
 
-  debug('getLoggedOutSubscriptions returns', subscriptions)
-
-  return subscriptions
-}
-
-const getLoggedInSubscriptions = async (account) => {
-  debug('getLoggedInSubscriptions', {account})
-
-  const res = await db
-    .db
-    .transaction(['loggedInSubscriptions'])
-    .objectStore('loggedInSubscriptions')
-    .get(account)
-
-  const subscriptions = res && res.subscriptions
-
-  debug('getLoggedInSubscriptions returns', subscriptions)
+  debug('getLocalSubscriptions returns', subscriptions)
 
   return subscriptions
 }
@@ -224,8 +208,7 @@ const getSettings = async () => {
 export {
   getProfileCache,
   getEthereumSubscriptionsCache,
-  getLoggedInSubscriptions,
-  getLoggedOutSubscriptions,
+  getLocalSubscriptions,
   getLastEthereumSubscriptionsCacheTimestamp,
   getLastProfileCacheTimestamp,
   getBackgroundFeedCache,

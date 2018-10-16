@@ -7,7 +7,8 @@ const {
   arrayToObjectWithItemsAsProps,
   mergeEthereumSubscriptionsCache,
   getActiveSubscriptions,
-  formatSubscriptions
+  formatSubscriptionsForGetFeed,
+  filterRequestedPosts
 } = require('./util')
 const debug = require('debug')('services:cache:read')
 
@@ -46,20 +47,19 @@ const getProfile = async (account) => {
 const getSubscriptions = async (address) => {
   debug('getSubscriptions', address)
 
-  const loggedOutSubscriptions = await indexedDb.getLoggedOutSubscriptions()
+  let localSubscriptions = await indexedDb.getLocalSubscriptions()
+  if (!localSubscriptions) localSubscriptions = {}
 
   if (!address) {
     const subscriptions = {
-      activeSubscriptions: loggedOutSubscriptions,
-      loggedInSubscriptions: [],
-      loggedOutSubscriptions,
-      ethereumSubscriptions: []
+      activeSubscriptions: localSubscriptions,
+      localSubscriptions,
+      ethereumSubscriptions: {}
     }
     debug('getSubscriptions returns', subscriptions)
     return subscriptions
   }
 
-  const loggedInSubscriptions = await indexedDb.getLoggedInSubscriptions(address)
   const ethereumSubscriptionsCache = await indexedDb.getEthereumSubscriptionsCache(address)
   let ethereumSubscriptions = ethereumSubscriptionsCache
 
@@ -78,12 +78,11 @@ const getSubscriptions = async (address) => {
     await indexedDb.setEthereumSubscriptionsCache({address, ethereumSubscriptions})
   }
 
-  const activeSubscriptions = getActiveSubscriptions({loggedInSubscriptions, loggedOutSubscriptions, ethereumSubscriptions})
+  const activeSubscriptions = getActiveSubscriptions({localSubscriptions, ethereumSubscriptions})
 
   const subscriptions = {
     activeSubscriptions,
-    loggedInSubscriptions,
-    loggedOutSubscriptions,
+    localSubscriptions,
     ethereumSubscriptions
   }
   debug('getSubscriptions returns', subscriptions)
@@ -94,7 +93,15 @@ const getSubscriptions = async (address) => {
 const getSettings = async () => {
   debug('getSettings')
 
-  const settings = await indexedDb.getSettings()
+  let indexedDbSettings = await indexedDb.getSettings()
+
+  if (!indexedDbSettings) indexedDbSettings = {}
+
+  if (indexedDbSettings.USE_DEFAULT_SETTINGS) {
+    return {...window.SUBBY_GLOBAL_SETTINGS, USE_DEFAULT_SETTINGS: true}
+  }
+
+  const settings = {...window.SUBBY_GLOBAL_SETTINGS, ...indexedDbSettings}
 
   debug('getSettings returns', settings)
 
@@ -105,7 +112,7 @@ const getFeed = async ({subscriptions, startAt = 0, limit = 20}, cb) => {
   debug('getFeed', {subscriptions, startAt, limit})
   // subscriptions can either be an array or object with publishers as keys
   // but needs to be converted to array
-  subscriptions = formatSubscriptions(subscriptions)
+  subscriptions = formatSubscriptionsForGetFeed(subscriptions)
 
   const isFirstPage = startAt === 0
   const backgroundFeedCacheIsExpired = await cache.backgroundFeedCacheIsExpired()
@@ -209,10 +216,6 @@ const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) =
 
   debug('getFeedFromActiveFeedCache returns', {posts: posts.length})
   return posts
-}
-
-const filterRequestedPosts = ({posts, startAt, limit}) => {
-  return posts.slice(startAt, startAt + limit)
 }
 
 export {

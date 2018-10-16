@@ -2,7 +2,6 @@ const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const DelWebpackPlugin = require('del-webpack-plugin')
-const AddModuleExportsPlugin = require('add-module-exports-webpack-plugin')
 const {manifest, images, settingsMessage} = require('./src/settings')
 
 // debug
@@ -77,10 +76,6 @@ module.exports = function override (config, env) {
       settingsMessage
     }))
   }
-
-  // add module.exports
-  config.plugins.push(new AddModuleExportsPlugin())
-  config.output.libraryTarget = 'commonjs2'
 
   // replace default create-react-app ESLint with Standard.js
   config.module.rules[0] = {

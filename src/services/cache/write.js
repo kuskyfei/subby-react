@@ -1,7 +1,30 @@
-// const ethereum = require('../ethereum')
 const indexedDb = require('../indexedDb')
+const {arrayToObjectWithItemsAsProps} = require('./util')
 
 const debug = require('debug')('services:cache:write')
+
+const subscribe = async (publisher) => {
+  debug('subscribe', publisher)
+
+  await indexedDb.addToLocalSubscriptions(publisher)
+}
+
+const unsubscribe = async (publisher) => {
+  debug('unsubscribe', publisher)
+
+  await indexedDb.removeFromLocalSubscriptions(publisher)
+}
+
+const setSubscriptions = async (localSubscriptions) => {
+  debug('setSubscriptions', localSubscriptions)
+
+  // localSubscriptions can be an array but if so it has to be converted
+  if (Array.isArray(localSubscriptions)) {
+    localSubscriptions = arrayToObjectWithItemsAsProps(localSubscriptions)
+  }
+
+  await indexedDb.setLocalSubscriptions(localSubscriptions)
+}
 
 const setSettings = async (settings) => {
   debug('setSettings', settings)
@@ -9,24 +32,8 @@ const setSettings = async (settings) => {
   await indexedDb.setSettings(settings)
 }
 
-const subscribe = async ({account, publisher}) => {
-  debug('subscribe', account)
-}
-
-const unsubscribe = async ({account, publisher}) => {
-  debug('subscribe', account)
-}
-
-const setSubscriptions = async ({account, loggedInSubscriptions, loggedOutSubscriptions, ethereumSubscriptions}) => {
-  debug('setSubscriptions', {account, loggedInSubscriptions, loggedOutSubscriptions, ethereumSubscriptions})
-
-  await indexedDb.setEthereumSubscriptionsCache({account, ethereumSubscriptions})
-  await indexedDb.setLoggedInSubscriptions({account, loggedInSubscriptions})
-  await indexedDb.setLoggedOutSubscriptions(loggedOutSubscriptions)
-}
-
 const donate = async ({account, value, message}) => {
-  debug('tip', {account, value, message})
+  debug('donate', {account, value, message})
 }
 
 const publish = async (post) => {

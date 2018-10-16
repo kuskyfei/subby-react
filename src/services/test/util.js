@@ -44,4 +44,6 @@ const mockTime = (timestamp) => {
 
 const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-module.exports = {testProfile, testPost, testPostId, resetDb, getDb, mockTime}
+const deepCopy = (obj) => JSON.parse(JSON.stringify(obj))
+
+module.exports = {testProfile, testPost, testPostId, resetDb, getDb, mockTime, deepCopy}

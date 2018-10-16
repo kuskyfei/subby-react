@@ -1,32 +1,14 @@
 /* eslint-env jest */
 
-/*
 const services = require('../../services')
-const minute = 1000 * 60
 
-const profileCacheTime = window.SUBBY_GLOBAL_SETTINGS.PROFILE_CACHE_TIME
-const ethereumSubscriptionsCacheTime = window.SUBBY_GLOBAL_SETTINGS.ETHEREUM_SUBSCRIPTIONS_CACHE_TIME
-const feedCacheTime = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_TIME
-const feedCachedPreemptivelyCount = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHED_PREEMPTIVELY_COUNT
-const minimumUnreadFeedCachedCount = window.SUBBY_GLOBAL_SETTINGS.MINIMUM_UNREAD_FEED_CACHED_COUNT
-
-const resetDb = async () => {
-  await timeout(100)
-  await window.SUBBY_DEBUG_DELETE_INDEXEDDB()
-}
-
-const getDb = async () => {
-  const db = await window.SUBBY_DEBUG_INDEXEDDB()
-  return db
-}
-
-const mockTime = (timestamp) => {
-  Date.now = () => timestamp
-}
+const {resetDb, getDb, deepCopy} = require('./util')
 
 const restoreMocks = {}
 
-const ADDRESSES = ['0x79d5c59a00d65ea9ac571ad67db5a8f3afabacea']
+const ADDRESSES = ['0x79d5c59a00d65ea9ac571ad67db5a8f3afabacea', '0x1234567890123456789012345678901234567890']
+
+const PUBLISHERS = ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222', 'john', 'john2', 'john3']
 
 describe('services', () => {
   beforeEach(async () => {
@@ -43,10 +25,142 @@ describe('services', () => {
     Date.now = restoreMocks.DateNow
   })
 
-  describe('get profile', () => {
-    test('cache expires', async () => {
+  describe('subscribe/unsubscribe', () => {
+    test('locally', async () => {
+      // test subscribing locally
+      for (const publisher of PUBLISHERS) {
+        await services.subscribe(publisher)
+      }
+      const subscriptions = await services.getSubscriptions(ADDRESSES[0])
 
+      expect(Object.keys(subscriptions.localSubscriptions).length).toEqual(PUBLISHERS.length)
+      for (const publisher of PUBLISHERS) {
+        expect(publisher in subscriptions.localSubscriptions).toEqual(true)
+        expect(publisher in subscriptions.activeSubscriptions).toEqual(true)
+      }
+  
+      // test unsubscribing locally
+      const db1 = await getDb()
+
+      await services.unsubscribe(PUBLISHERS[0])
+      const db2 = await getDb()
+
+      const db1Copy = deepCopy(db1)
+      delete db1Copy.localSubscriptions.subscriptions[PUBLISHERS[0]]
+      expect(db2).toEqual(db1Copy)
+      expect(Object.keys(db2.localSubscriptions.subscriptions).length).toEqual(Object.keys(db1.localSubscriptions.subscriptions).length - 1)
+      expect(PUBLISHERS[0] in db1.localSubscriptions.subscriptions).toEqual(true)
+      expect(PUBLISHERS[0] in db2.localSubscriptions.subscriptions).toEqual(false)
+    })
+  })
+
+  describe('setSubscriptions', () => {
+    test('locally', async () => {
+      { // test with a publishers array
+        await services.setSubscriptions(PUBLISHERS)
+
+        const subscriptions = await services.getSubscriptions()
+        expect(Object.keys(subscriptions.localSubscriptions).length).toEqual(PUBLISHERS.length)
+        for (const publisher of PUBLISHERS) {
+          expect(publisher in subscriptions.localSubscriptions).toEqual(true)
+          expect(publisher in subscriptions.activeSubscriptions).toEqual(true)
+        }
+      }
+
+      { // test with an empty publisher object
+        await services.setSubscriptions({})
+
+        const subscriptions = await services.getSubscriptions()
+        expect(subscriptions.localSubscriptions).toEqual({})
+      }
+    })
+  })
+
+  describe('setSettings', () => {
+    test('locally', async () => {
+      let testSettings = {
+        test1: true,
+        test2: true,
+        test3: true
+      }
+
+      { // make sure the default settings are false
+        const settings = await services.getSettings()
+        expect(settings.test1).toEqual(undefined)
+        expect(settings.test2).toEqual(undefined)
+        expect(settings.test3).toEqual(undefined)
+      }
+
+      { // test adding arbitrary settings
+        await services.setSettings(testSettings)
+        const settings = await services.getSettings()
+        expect(settings.test1).toEqual(true)
+        expect(settings.test2).toEqual(true)
+        expect(settings.test3).toEqual(true)
+      }
+
+      testSettings = {
+        test1: false
+      }
+
+      { // test changing one setting only
+        await services.setSettings(testSettings)
+        const settings = await services.getSettings()
+        expect(settings.test1).toEqual(false)
+        expect(settings.test2).toEqual(true)
+        expect(settings.test3).toEqual(true)
+      }
+
+      testSettings = {
+        test1: true,
+        test2: false,
+        test4: true
+      }
+
+      { // test changing a few settings
+        await services.setSettings(testSettings)
+        const settings = await services.getSettings()
+        expect(settings.test1).toEqual(true)
+        expect(settings.test2).toEqual(false)
+        expect(settings.test3).toEqual(true)
+        expect(settings.test4).toEqual(true)
+      }
+    })
+
+    test('use default', async () => {
+      let testSettings = {
+        test1: true,
+        test2: true,
+        test3: true
+      }
+
+      { // make sure the default settings are false
+        const settings = await services.getSettings()
+        expect(settings.test1).toEqual(undefined)
+        expect(settings.test2).toEqual(undefined)
+        expect(settings.test3).toEqual(undefined)
+      }
+
+      { // test adding arbitrary settings
+        await services.setSettings(testSettings)
+        const settings = await services.getSettings()
+        expect(settings.test1).toEqual(true)
+        expect(settings.test2).toEqual(true)
+        expect(settings.test3).toEqual(true)
+      }
+
+      testSettings = {
+        USE_DEFAULT_SETTINGS: true
+      }
+
+      { // test changing USE_DEFAULT_SETTINGS
+        await services.setSettings(testSettings)
+        const settings = await services.getSettings()
+        expect(settings.test1).toEqual(undefined)
+        expect(settings.test2).toEqual(undefined)
+        expect(settings.test3).toEqual(undefined)
+        expect(settings).toEqual({...window.SUBBY_GLOBAL_SETTINGS, USE_DEFAULT_SETTINGS: true})
+      }
     })
   })
 })
-*/

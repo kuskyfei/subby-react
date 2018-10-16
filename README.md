@@ -21,6 +21,14 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
+services 
+->
+setSettings,
+setSubscriptions,
+subscribe,
+unsubscribe,
+
+metamask is locked icon
 fix bug with twitter and IG cards
 add 'username is taken' error validation
 make subscribe/unsubscribe button work
