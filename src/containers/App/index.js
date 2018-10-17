@@ -41,35 +41,35 @@ const styles = images => theme => {
 }
 
 class App extends Component {
-  state = {route: () => ''}
+  state = {
+    route: () => '',
+    isInitializing: true,
+  }
 
   componentDidMount () {
     ;(async () => {
+      this.handleRouteChange()
+
       await services.init()
       services.mockSmartContracts()
+      this.setState({...this.state, isInitializing: false})
 
-      // const settings = await services.getSettings()
-
-      const address = await services.getAddress()
+      const settings = await services.getSettings()
+      // const address = await services.getAddress()
+      const address = '0x1111111111111111111111111111111111111111'
       const profile = await services.getProfile(address)
       const subscriptions = await services.getSubscriptions(address)
 
       const {setAddress, setProfile, setSubscriptions} = this.props.actions
       setAddress(address)
       setProfile(profile)
-      setSubscriptions(subscriptions)
+      setSubscriptions(subscriptions.activeSubscriptions)
 
-      // setInterval(() =>
-      //   services.updateCache({address})
-      //   , 10000)
+      // // setInterval(() =>
+      // //   services.updateCache({address})
+      // //   , 10000)
 
-      this.handleRouteChange()
-
-      debug('props', this.props)
-      debug('address', address)
-      debug('profile', profile)
-      debug('subscriptions', subscriptions)
-      debug('mounted')
+      debug('mounted', {address, profile, subscriptions})
     })()
   }
 
@@ -96,10 +96,11 @@ class App extends Component {
   }
 
   render () {
-    const Route = this.state.route
+    const {isInitializing, route: Route} = this.state
     const {headerIsLoading, classes} = this.props
 
-    const isLoading = headerIsLoading
+    let isLoading = headerIsLoading
+    if (isInitializing) isLoading = true
 
     return (
       <div>

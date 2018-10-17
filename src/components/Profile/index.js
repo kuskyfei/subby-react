@@ -63,9 +63,6 @@ const Profile = (props) => {
 
   if (!profile.username) profile.username = profile.address
 
-  // not sure why this is needed, the 0 isn't being converted to null for some reason
-  if (profile.minimumTextDonation === 0) profile.minimumTextDonation = null
-
   if (isLoading) return <Loading />
 
   return (
@@ -89,7 +86,7 @@ const Profile = (props) => {
         <Modal maxWidth={400} trigger={
           <Button size='small' variant='contained' color='default' className={classes.button}>
             Donate&nbsp;
-            {profile.minimumTextDonation &&
+            {profile.minimumTextDonation !== 0 &&
               <span className={classes.contents}>
                 <MessageIcon className={classes.iconSmall} />
                 &nbsp;

@@ -1,19 +1,7 @@
 const queryString = require('query-string')
 
-const getProfileQueryFromUrlParams = (urlParams, address) => {
-  const {u, p} = queryString.parse(urlParams)
-
-  let profileQuery
-
-  if (u) {
-    profileQuery = isValidAddress(u) ? {address: u} : {username: u}
-  }
-
-  if (p === 'profile') {
-    profileQuery = {address}
-  }
-
-  return profileQuery
+const getAccountFromUrlParams = (urlParams) => {
+  return queryString.parse(urlParams).u
 }
 
 const getUsernameFromUrlParams = (urlParams) => {
@@ -98,7 +86,7 @@ const isRouteChange = (props, prevProps) => {
 
 module.exports = {
   isRouteChange,
-  getProfileQueryFromUrlParams,
+  getAccountFromUrlParams,
   getUsernameFromUrlParams,
   getPostIdFromUrlParams,
   isValidAddress,

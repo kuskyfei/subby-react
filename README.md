@@ -19,6 +19,18 @@ localStorage.debug = 'containers:App'
 localStorage.debug = 'containers:Feed'
 ```
 
+puppeteer tests
+
+- homepage gets help and sets address, profile and subscriptions
+- publish post of each type
+- header navigation loads proper pages
+- search bar loads proper page
+- feed works
+- publisher feed works
+- permalink feed works
+- my profile feed works
+- scrolling each feed till 1000 posts
+
 ##todo
 
 services 
@@ -28,7 +40,15 @@ setSubscriptions,
 subscribe,
 unsubscribe,
 
-metamask is locked icon
+make subscibe/unsubscribe button work
+add unsubscribe to feed button
+add copy permalink button
+add donate and price earned
+fix subscriptions page
+fix settings page
+
+add pagination after 200 posts
+fix services.getAddress mock
 fix bug with twitter and IG cards
 add 'username is taken' error validation
 make subscribe/unsubscribe button work

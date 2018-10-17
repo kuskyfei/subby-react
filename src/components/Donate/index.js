@@ -194,7 +194,7 @@ class Donate extends React.Component {
             onClick={this.handleDonate.bind(this)}
           >
             <span className={classes.publishButtonText}>Donate</span>
-            <MessageIcon className={classes.rightIcon} />
+            {textDonationEnabled && <MessageIcon className={classes.rightIcon} />}
           </Button>
         </div>
 

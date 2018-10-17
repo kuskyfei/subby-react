@@ -49,7 +49,8 @@ class Feed extends React.Component {
     const percentScrolled = getPercentScrolled()
     const {postCount} = this.props
 
-    if (postCount / 2 > MINIMUM_POSTS_LEFT_TO_ADD_MORE_POST) {
+    if (postCount - (postCount * percentScrolled / 100) > MINIMUM_POSTS_LEFT_TO_ADD_MORE_POST) {
+      debug('percent scrolled', percentScrolled, postCount - (postCount * percentScrolled / 100))
       return
     }
 

@@ -20,6 +20,25 @@ const testPost = (post) => {
   expect(typeof post.id).toEqual('number')
 }
 
+const getDuplicatePosts = (posts) => {
+  const object = {}
+  const duplicates = []
+
+  for (const post of posts) {
+    const key = post.username + '-' + post.address + '-' + post.id
+    
+    if (object[key]) {
+      duplicates.push(key)
+    }
+
+    object[key] = 'taken'
+  }
+
+  duplicates.sort()
+
+  return duplicates
+}
+
 const testPostId = (postId) => {
   expect(typeof postId.timestamp).toEqual('number')
   expect(typeof postId.publisher).toEqual('string')
@@ -46,4 +65,4 @@ const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 const deepCopy = (obj) => JSON.parse(JSON.stringify(obj))
 
-module.exports = {testProfile, testPost, testPostId, resetDb, getDb, mockTime, deepCopy}
+module.exports = {testProfile, testPost, testPostId, resetDb, getDb, mockTime, deepCopy, getDuplicatePosts}

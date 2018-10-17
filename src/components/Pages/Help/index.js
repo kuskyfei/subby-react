@@ -20,7 +20,7 @@ const styles = theme => ({
       paddingTop: theme.spacing.unit * 6
     },
     [theme.breakpoints.up(900 + theme.spacing.unit * 2 * 2)]: {
-      paddingTop: theme.spacing.unit * 6,
+      paddingTop: theme.spacing.unit * 8,
       width: 800,
       marginLeft: 'auto',
       marginRight: 'auto'
@@ -34,7 +34,7 @@ const styles = theme => ({
     [theme.breakpoints.up(800 + theme.spacing.unit * 2 * 2)]: {
       marginBottom: `${theme.spacing.unit * 6}px!important`
     },
-    [theme.breakpoints.down(500 + theme.spacing.unit * 2 * 2)]: {
+    [theme.breakpoints.down(550 + theme.spacing.unit * 2 * 2)]: {
       fontSize: '3rem'
     },
     [theme.breakpoints.down(400 + theme.spacing.unit * 2 * 2)]: {

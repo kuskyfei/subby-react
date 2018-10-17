@@ -138,7 +138,7 @@ const getFeed = async ({subscriptions, startAt = 0, limit = 20}, cb) => {
     posts = await getFeedFromActiveFeedCache({subscriptions, startAt, limit}, cb)
   }
 
-  debug('getFeed returns', {posts: posts.length})
+  debug('getFeed returns', {posts: posts})
   return posts
 }
 
