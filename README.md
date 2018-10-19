@@ -19,7 +19,43 @@ localStorage.debug = 'containers:App'
 localStorage.debug = 'containers:Feed'
 ```
 
-puppeteer tests
+##todo
+
+fix subby.js sync subscriptions
+fix subby.js events
+fix subby.js total donations for profile and posts
+add donations page
+add donation event mesages
+new version available pop up
+fix subscriptions page
+fix settings page
+ - add terminate account button to settings
+ - add use default settings to settings
+"you're not following anyone, find accounts to follow"
+fix services.getAddress mock
+add 'username is taken' error validation
+make publish edited profile send data
+ - add hide donation amounts
+make publish button send data
+make sync subscriptions button send data
+add a "your metamask is locked page"
+make publishing content guide
+make find accounts to follow post
+fix line bug in preview with iframes
+set up optional embeds and other settings
+detect errors with embeds (using height of elements possibly?) / fix bug with twitter and IG cards
+fix profile remounting when going to same profile
+
+##todo after release
+add pagination after 200 posts
+add react-helmet for SEO and social media shares
+set up analytics events
+add IPFS and torrents streaming
+add warning to use chrome
+fix end of feed behavior
+add blacklist
+
+## todo puppeteer tests
 
 - homepage gets help and sets address, profile and subscriptions
 - publish post of each type
@@ -32,73 +68,9 @@ puppeteer tests
 - scrolling each feed till 1000 posts
 - test subscribe / unsubscribe
 
-##todo
+## todo jest tests
 
-services 
-->
-setSettings,
-setSubscriptions,
-subscribe,
-unsubscribe,
 
-add total donations to profile and subby.js
-new version available pop up
-add unsubscribe to feed button
-add copy permalink button
-add donate and price earned
-fix subscriptions page
-fix settings page
-"you're not following anyone, find accounts to follow"
-
-add pagination after 200 posts
-fix services.getAddress mock
-fix bug with twitter and IG cards
-add 'username is taken' error validation
-make subscribe/unsubscribe button work
-make subscription page buttons work
-thoroughly test cache
-modify mock ethereum API to match new api
-add donate button to cards
-add permalink copy button to card
-add unsub/hide to card
-add thumbnail to header
-make publish edited profile button work
-make publish button send data
-make settings page work, all buttons and settings, link with db
-add terminate account button to settings
-add a "your metamask is locked page"
-add subby.js to npm
-make publishing content guide
-make find accounts to follow post
-add use default settings to settings
-add warning to use chrome
-add donation page
-add donation event mesages
-add show donation event messags to settings
-add react-helmet for SEO and social media shares
-set up analytics events
-set up optional embeds
-detect errors with embeds (using height of elements possibly?)
-make setting page save settings to db
-make settings page settings actually do something
-fix profile remounting when going to same profile
-fix end of feed behavior
-fix possible bug with posts displaying addresses instead of usernames
-add blacklist
-add video, audio, torrent and ipfs urls to mock
-fix line bug in preview with iframes
-remove delay timeout from profile load in component
-
-##fixed
-fix page change not triggering on url change
-
-##todo unit tests
-
-idb in browser
-idb in jest
-cache test
-make puppeteer tests
-mock api for IPFS
 
 ##todo long term
 

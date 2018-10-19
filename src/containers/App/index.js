@@ -47,6 +47,8 @@ class App extends Component {
   }
 
   componentDidMount () {
+    const {actions} = this.props
+
     ;(async () => {
       this.handleRouteChange()
 
@@ -54,6 +56,11 @@ class App extends Component {
       // services.mockSmartContracts({explicit: true})
       services.mockSmartContracts()
       this.setState({...this.state, isInitializing: false})
+
+      const address = await services.getAddress()
+      const profile = await services.getProfile(address)
+      actions.setAddress(address)
+      actions.setProfile(profile)
 
       // setInterval(() =>
       //   services.updateCache({address})

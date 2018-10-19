@@ -143,7 +143,9 @@ class Card extends React.Component {
 
   handlePermalinkCopy() {
     const {post} = this.props
-    const permalink = `https://subby.io/?u=${post.username}&id=${post.id}`
+    const username = post.username || post.address
+
+    const permalink = `https://subby.io/?u=${username}&id=${post.id}`
 
     copyToClipboard(permalink)
 
@@ -173,7 +175,7 @@ class Card extends React.Component {
 
     if (isLoading) return <LoadingCard classes={classes} />
 
-    if (!post.username) post.username = post.address
+    const username = post.username || post.address
 
     const date = (preview) ? 'Previewing...' : timeago.format(this.state.timestamp)
 
@@ -183,9 +185,9 @@ class Card extends React.Component {
         <CardHeader
           className={classes.cardHeaderEllipsis}
           avatar={
-            <Link to={'?u=' + post.username}>
+            <Link to={'?u=' + username}>
               <Avatar src={post.thumbnail} className={classes.avatar}>
-                {post.username.substring(0, 2)}
+                {username.substring(0, 2)}
               </Avatar>
             </Link>
           }
@@ -195,7 +197,7 @@ class Card extends React.Component {
                 <CloseIcon className={classes.closeButton} />
               </StyledIconButton>
               : <Tooltip
-                  title={`Unsubscribed from ${post.username || post.address}!`}
+                  title={`Unsubscribed from ${username}!`}
                   classes={{tooltip: classes.lightTooltip}}
                   open={unsubscribeTooltipOpen}
                 >
@@ -209,8 +211,8 @@ class Card extends React.Component {
                   </IconButton>
                 </Tooltip>
           }
-          title={<Link to={'?u=' + post.username}>{post.username}</Link>}
-          subheader={<Link to={`?u=${post.username}&id=${post.id}`}>{date}</Link>}
+          title={<Link to={'?u=' + username}>{username}</Link>}
+          subheader={<Link to={`?u=${username}&id=${post.id}`}>{date}</Link>}
         />
 
         <Menu

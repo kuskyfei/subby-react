@@ -87,7 +87,7 @@ class Profile extends React.Component {
     const {classes, profile, editable, isLoading} = this.props
     const {isSubscribed} = this.state
 
-    if (!profile.username) profile.username = profile.address
+    const username = profile.username || profile.address
     if (isSubscribed === true) profile.isSubscribed = true
     if (isSubscribed === false) profile.isSubscribed = false
 
@@ -96,15 +96,15 @@ class Profile extends React.Component {
     return (
       <div className={classes.profile}>
         <Avatar
-          alt={profile.username}
+          alt={username}
           src={profile.thumbnail}
           className={classNames(classes.avatar, classes.bigAvatar)}
         >
-          {profile.username && profile.username.substring(0, 2)}
+          {username && username.substring(0, 2)}
         </Avatar>
 
         <Typography className={classes.username} variant='title' noWrap gutterBottom>
-          {profile.username}
+          {username}
         </Typography>
 
         {!profile.isSubscribed && 
