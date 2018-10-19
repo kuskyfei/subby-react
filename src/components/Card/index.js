@@ -18,10 +18,16 @@ import CloseIcon from '@material-ui/icons/Close'
 import ShareIcon from '@material-ui/icons/Share'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
+import Tooltip from '@material-ui/core/Tooltip'
+import Menu from '@material-ui/core/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
+import Popover from '@material-ui/core/Popover'
 
 // components
+import {Modal, Donate} from '../../components'
 import EmbedWidget from './EmbedWidget'
 import Loading from './Loading'
+const {copyToClipboard} = require('./util')
 
 // util
 const timeago = require('timeago.js')()
@@ -80,6 +86,18 @@ const styles = theme => ({
   closeButton: {
     color: theme.palette.grey['300'],
     fontSize: 48
+  },
+
+  donationAmounts: {
+    display: 'initial',
+    verticalAlign: 'middle'
+  },
+
+  lightTooltip: {
+    background: theme.palette.common.white,
+    color: theme.palette.text.primary,
+    boxShadow: theme.shadows[1],
+    fontSize: 12,
   }
 })
 
@@ -95,21 +113,59 @@ const StyledIconButton = withStyles({
 class Card extends React.Component {
   state = {
     expanded: false,
-    timestamp: null
+    timestamp: null,
+    permalinkTooltipOpen: false,
+    unsubscribeTooltipOpen: false,
+    cardMenuAnchorEl: null
   }
 
-  commentDidMount () {
-    const {post} = this.props
+  handleCardMenuClick = event => {
+    this.setState({...this.state, cardMenuAnchorEl: event.currentTarget })
+  }
 
+  handleCardMenuClose = () => {
+    this.setState({...this.state, cardMenuAnchorEl: null })
+  }
+
+  async handleUnsubscribe() {
+    this.setState({...this.state, cardMenuAnchorEl: null, unsubscribeTooltipOpen: true})
+    setTimeout(() => {
+      this.setState({...this.state, unsubscribeTooltipOpen: false})
+    }, 1500)
+
+    const {services, post} = this.props
+    if (!services) {
+      return
+    }
+    const address = await services.getAddress()
+    await services.unsubscribe({address, publishers: [post.username, post.address]})
+  }
+
+  handlePermalinkCopy() {
+    const {post} = this.props
+    const permalink = `https://subby.io/?u=${post.username}&id=${post.id}`
+
+    copyToClipboard(permalink)
+
+    this.setState({...this.state, permalinkTooltipOpen: true})
+
+    setTimeout(() => {
+      this.setState({...this.state, permalinkTooltipOpen: false})
+    }, 1500)
+  }
+
+  componentDidMount () {
+    const {post} = this.props
     this.setState({...this.state, timestamp: post.timestamp})
   }
 
   handleExpandClick = () => {
-    this.setState(state => ({ expanded: !state.expanded }))
+    this.setState(state => ({...state, expanded: !state.expanded}))
   }
 
   render () {
     let {classes, isLoading, post, preview, onPreviewClose} = this.props
+    const {permalinkTooltipOpen, cardMenuAnchorEl, unsubscribeTooltipOpen} = this.state
 
     if (!preview) {
       onPreviewClose = () => {}
@@ -138,13 +194,41 @@ class Card extends React.Component {
               ? <StyledIconButton onClick={onPreviewClose}>
                 <CloseIcon className={classes.closeButton} />
               </StyledIconButton>
-              : <IconButton>
-                <MoreVertIcon />
-              </IconButton>
+              : <Tooltip
+                  title={`Unsubscribed from ${post.username || post.address}!`}
+                  classes={{tooltip: classes.lightTooltip}}
+                  open={unsubscribeTooltipOpen}
+                >
+                  <IconButton
+                    ref={this.menuButtonRef}
+                    aria-owns={cardMenuAnchorEl ? 'card-menu' : null}
+                    aria-haspopup="true"
+                    onClick={this.handleCardMenuClick}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                </Tooltip>
           }
           title={<Link to={'?u=' + post.username}>{post.username}</Link>}
           subheader={<Link to={`?u=${post.username}&id=${post.id}`}>{date}</Link>}
         />
+
+        <Menu
+          id="card-menu"
+          anchorEl={cardMenuAnchorEl}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+          open={Boolean(cardMenuAnchorEl)}
+          onClose={this.handleCardMenuClose}
+        >
+          <MenuItem onClick={this.handleUnsubscribe.bind(this)}>Unsubscribe</MenuItem>
+        </Menu>
 
         <EmbedWidget url={post.link} />
 
@@ -162,12 +246,29 @@ class Card extends React.Component {
 
         {!preview &&
           <CardActions className={classes.actions} disableActionSpacing>
-            <IconButton aria-label='Add to favorites'>
-              <FavoriteIcon />
-            </IconButton>
-            <IconButton aria-label='Share'>
-              <ShareIcon />
-            </IconButton>
+
+            <Modal maxWidth={400} trigger={
+              <span>
+                <IconButton aria-label='Donate'>
+                  <FavoriteIcon />
+                </IconButton>
+                <Typography className={classes.donationAmounts} variant='body1' noWrap gutterBottom>
+                  0.85
+                </Typography>
+              </span>}>
+
+              <Donate profile={post} />
+            </Modal>
+
+            <Tooltip
+              title="Permalink copied to clipboard!"
+              classes={{tooltip: classes.lightTooltip}}
+              open={permalinkTooltipOpen}
+            >
+              <IconButton onClick={this.handlePermalinkCopy.bind(this)} aria-label='Share'>
+                <ShareIcon />
+              </IconButton>
+            </Tooltip>
 
             {isLongComment(post.comment) &&
               <IconButton

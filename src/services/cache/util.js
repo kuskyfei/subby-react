@@ -41,16 +41,23 @@ const mergeEthereumSubscriptionsCache = (ethereumSubscriptions, ethereumSubscrip
   return ethereumSubscriptions
 }
 
-const getActiveSubscriptions = ({localSubscriptions, ethereumSubscriptions}) => {
+const getActiveSubscriptionsFromSubscriptions = ({localSubscriptions, ethereumSubscriptions}) => {
   // it's important that ethereumSubscriptions is at the end, because it contains pending deletion statuses
   // whereas the others can overwrite each other as much as they want
   const activeSubscriptions = {...localSubscriptions, ...ethereumSubscriptions}
+
+  for (const key in activeSubscriptions) {
+    if (activeSubscriptions[key].pendingDeletion) {
+      delete activeSubscriptions[key]
+    }
+  }
+
   return activeSubscriptions
 }
 
 export {
   arrayToObjectWithItemsAsProps,
-  getActiveSubscriptions,
+  getActiveSubscriptionsFromSubscriptions,
   mergeEthereumSubscriptionsCache,
   formatSubscriptionsForGetFeed,
   cacheIsExpired,

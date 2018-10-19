@@ -3,7 +3,7 @@ const minute = 1000 * 60
 // these are the default recommended settings that get
 // transpiled into the subby.html file.
 const settings = {
-  WEB3_PROVIDER: 'https://mainnet.infura.io/uaNKEkpjsyvArG0sHifx',
+  WEB3_PROVIDER: '',
   IPFS_PROVIDER: 'https://ipfs.infura.io:5001',
 
   REDDIT_EMBEDS: true,

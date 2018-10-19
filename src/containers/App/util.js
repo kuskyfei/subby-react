@@ -37,6 +37,13 @@ const isUrlParamsChange = (urlParams, prevUrlParams) => {
   }
 }
 
+const isUrlParamsChangeFromProps = (props, prevProps) => {
+  const urlParams = getUrlParamsFromProps(props)
+  const prevUrlParams = getUrlParamsFromProps(prevProps)
+
+  return isUrlParamsChange(urlParams, prevUrlParams)
+}
+
 const getRouteFromUrlParams = (urlParams) => {
   const page = urlParams.p
   const isProfile = urlParams.u
@@ -63,4 +70,4 @@ const getRouteFromUrlParams = (urlParams) => {
   }
 }
 
-export {isRouteChange, getRouteFromUrlParams}
+export {isRouteChange, getRouteFromUrlParams, isUrlParamsChangeFromProps}

@@ -77,10 +77,6 @@ class Feed extends React.Component {
     publisherStartAt: 0
   }
 
-  componentWillMount () {
-    debug('componentWillMount')
-  }
-
   componentDidMount () {
     this.addPostsToFeed({reset: true})
     this.handleProfile({reset: true})
@@ -90,10 +86,6 @@ class Feed extends React.Component {
 
   componentDidUpdate (prevProps) {
     this.handleRouteChange(prevProps)
-
-    if (this.subscriptionsHaveInitialized(prevProps)) {
-      this.addPostsToFeed()
-    }
 
     debug('updated')
   }
@@ -106,26 +98,27 @@ class Feed extends React.Component {
     const {location, actions} = this.props
     debug('handleProfile start', location)
 
-    if (reset) actions.setPublisherProfile(null)
-
-    if (!isPublisher(location.search)) return
-
-    if (reset) this.setState((state, props) => ({...state, profileIsLoading: true}))
+    if (reset) {
+      actions.setPublisherProfile(null)
+    }
+    if (!isPublisher(location.search)) {
+      return
+    }
+    if (reset) {
+      this.setState((state, props) => ({...state, profileIsLoading: true}))
+    }
 
     const account = getAccountFromUrlParams(location.search)
-    const profile = await services.getProfile(account)
+    const profile = await getProfile(account)
     actions.setPublisherProfile(profile)
-
-    setTimeout(() => {
-      this.setState((state, props) => ({...state, profileIsLoading: false}))
-    }, 5000)
+    this.setState((state, props) => ({...state, profileIsLoading: false}))
 
     debug('handleProfile end', {account})
   }
 
   async addPostsToFeed ({reset} = {}) {
     debug('addPostsToFeed start', this.props, this.state)
-    let {location, actions, feed, subscriptions, address} = this.props
+    let {location, actions, feed} = this.props
     let {hasMorePosts, publisherStartAt} = this.state
     const username = getUsernameFromUrlParams(location.search)
 
@@ -161,20 +154,19 @@ class Feed extends React.Component {
     }
 
     else if (isProfile(location.search)) {
-      if (address) {
-        const res = await services.getPostsFromPublisher(address, {limit: 10, startAt: publisherStartAt})
-        const {posts, nextStartAt, hasMorePosts} = res
-        actions.setFeed([...feed, ...posts])
-        this.setState((state, props) => ({...state, publisherStartAt: nextStartAt, hasMorePosts}))
-      }
+      const address = await services.getAddress()
+      const res = await services.getPostsFromPublisher(address, {limit: 10, startAt: publisherStartAt})
+      const {posts, nextStartAt, hasMorePosts} = res
+      actions.setFeed([...feed, ...posts])
+      this.setState((state, props) => ({...state, publisherStartAt: nextStartAt, hasMorePosts}))
     }
 
     else if (isFeed(location.search)) {
-      if (subscriptions) {
-        const startAt = feed.length
-        const newPosts = await services.getFeed({subscriptions, startAt, limit: 10})
-        actions.setFeed([...feed, ...newPosts])
-      }
+      const startAt = feed.length
+      const address = await services.getAddress()
+      const subscriptions = await services.getActiveSubscriptions(address)
+      const newPosts = await services.getFeed({subscriptions, startAt, limit: 10})
+      actions.setFeed([...feed, ...newPosts])
     }
 
     this.setState((state, props) => ({...state, addingMorePosts: false}))
@@ -204,7 +196,7 @@ class Feed extends React.Component {
     return (
       <div className={classes.layout}>
 
-        {profile && <Profile isLoading={profileIsLoading} profile={profile} editable={editable} />}
+        {profile && <Profile isLoading={profileIsLoading} profile={profile} editable={editable} services={services} />}
 
         <FeedComponent postCount={posts.length} addPostsToFeed={this.addPostsToFeed.bind(this)} >
           {posts}
@@ -225,24 +217,20 @@ class Feed extends React.Component {
 
     debug('feed changed')
   }
+}
 
-  subscriptionsHaveInitialized (prevProps) {
-    const prevSubscriptions = prevProps.subscriptions
-    const subscriptions = this.props.subscriptions
-
-    if (!prevSubscriptions && subscriptions) {
-      debug('subscriptionsHaveInitialized')
-      return true
-    }
-  }
+const getProfile = async (account) => {
+  const profile = await services.getProfile(account)
+  const address = await services.getAddress()
+  const isSubscribed = await services.isSubscribed({publisher: profile, address})
+  profile.isSubscribed = isSubscribed
+  return profile
 }
 
 const mapStateToProps = state => ({
   feed: state.feed.feed,
   publisherProfile: state.feed.publisherProfile,
-  address: state.app.address,
   profile: state.app.profile,
-  subscriptions: state.app.subscriptions
 })
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch)

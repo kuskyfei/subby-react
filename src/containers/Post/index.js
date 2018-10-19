@@ -214,7 +214,7 @@ class Post extends React.Component {
     if (isIpfsContent(newPost.comment)) newPost.comment = 'loading'
 
     return (
-      <Card isLoading={isLoading} post={newPost} preview={preview} onPreviewClose={onPreviewClose} />
+      <Card services={services} isLoading={isLoading} post={newPost} preview={preview} onPreviewClose={onPreviewClose} />
     )
   }
 }

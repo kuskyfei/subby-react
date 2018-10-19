@@ -11,9 +11,10 @@ const {
   getAddress,
   getProfile,
   getSubscriptions,
+  getActiveSubscriptions,
   getSettings,
   getFeed,
-  getPosts
+  isSubscribed
 } = require('./read')
 
 const {
@@ -32,9 +33,10 @@ export {
   getAddress,
   getProfile,
   getSubscriptions,
+  getActiveSubscriptions,
+  isSubscribed,
   getSettings,
   getFeed,
-  getPosts,
 
   updateCache,
   updateBackgroundFeedCache

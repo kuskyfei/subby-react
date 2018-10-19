@@ -58,65 +58,104 @@ const styles = theme => ({
   }
 })
 
-const Profile = (props) => {
-  const {classes, profile, editable, isLoading} = props
+class Profile extends React.Component {
+  state = {isSubscribed: null}
 
-  if (!profile.username) profile.username = profile.address
+  async handleSubscribe() {
+    const {services, profile} = this.props
+    if (!services) {
+      return
+    }
+    const account = profile.username || profile.address
 
-  if (isLoading) return <Loading />
+    this.setState({...this.state, isSubscribed: true})
+    const address = await services.getAddress()
+    await services.subscribe({address, publisher: account})
+  }
 
-  return (
-    <div className={classes.profile}>
-      <Avatar
-        alt={profile.username}
-        src={profile.thumbnail}
-        className={classNames(classes.avatar, classes.bigAvatar)}
-      >
-        {profile.username && profile.username.substring(0, 2)}
-      </Avatar>
-      <Typography className={classes.username} variant='title' noWrap gutterBottom>
-        {profile.username}
-      </Typography>
-      <Button size='small' variant='contained' color='default' className={classes.button}>
-        Subscribe&nbsp;
-        <span className={classes.count}>{profile.subscriberCount || ''}</span>
-      </Button>
+  async handleUnsubscribe() {
+    const {services, profile} = this.props
+    if (!services) {
+      return
+    }
+    this.setState({...this.state, isSubscribed: false})
+    const address = await services.getAddress()
+    await services.unsubscribe({address, publishers: [profile.username, profile.address]})
+  }
 
-      {!editable &&
-        <Modal maxWidth={400} trigger={
-          <Button size='small' variant='contained' color='default' className={classes.button}>
-            Donate&nbsp;
-            {profile.minimumTextDonation !== 0 &&
-              <span className={classes.contents}>
-                <MessageIcon className={classes.iconSmall} />
-                &nbsp;
-                <span className={classNames(classes.count, classes.leftNudge)}>{profile.minimumTextDonation}</span>
-              </span>
-            }
-          </Button>}>
+  render() {
+    const {classes, profile, editable, isLoading} = this.props
+    const {isSubscribed} = this.state
 
-          <Donate profile={profile} />
+    if (!profile.username) profile.username = profile.address
+    if (isSubscribed === true) profile.isSubscribed = true
+    if (isSubscribed === false) profile.isSubscribed = false
 
-        </Modal>
-      }
+    if (isLoading) return <Loading />
 
-      {editable &&
-        <Modal trigger={
-          <Button size='small' variant='contained' color='default' className={classes.button}>
-              Edit&nbsp;
-            <EditIcon className={classes.iconSmall} />
-          </Button>}>
+    return (
+      <div className={classes.profile}>
+        <Avatar
+          alt={profile.username}
+          src={profile.thumbnail}
+          className={classNames(classes.avatar, classes.bigAvatar)}
+        >
+          {profile.username && profile.username.substring(0, 2)}
+        </Avatar>
 
-          <EditForm profile={profile} />
+        <Typography className={classes.username} variant='title' noWrap gutterBottom>
+          {profile.username}
+        </Typography>
 
-        </Modal>
-      }
+        {!profile.isSubscribed && 
+          <Button onClick={this.handleSubscribe.bind(this)} size='small' variant='contained' color='default' className={classes.button}>
+            Subscribe&nbsp;
+            <span className={classes.count}>{profile.subscriberCount || ''}</span>
+          </Button>
+        }
+        {profile.isSubscribed && 
+          <Button onClick={this.handleUnsubscribe.bind(this)} size='small' variant='contained' color='default' className={classes.button}>
+            Unsubscribe&nbsp;
+            <span className={classes.count}>{profile.subscriberCount || ''}</span>
+          </Button>
+        }
 
-      <Typography className={classes.bio} variant='body1' gutterBottom>
-        {profile.bio}
-      </Typography>
-    </div>
-  )
+        {!editable &&
+          <Modal maxWidth={400} trigger={
+            <Button size='small' variant='contained' color='default' className={classes.button}>
+              Donate&nbsp;
+              {profile.minimumTextDonation !== 0 &&
+                <span className={classes.contents}>
+                  <MessageIcon className={classes.iconSmall} />
+                  &nbsp;
+                  <span className={classNames(classes.count, classes.leftNudge)}>{profile.minimumTextDonation}</span>
+                </span>
+              }
+            </Button>}>
+
+            <Donate profile={profile} />
+
+          </Modal>
+        }
+
+        {editable &&
+          <Modal trigger={
+            <Button size='small' variant='contained' color='default' className={classes.button}>
+                Edit&nbsp;
+              <EditIcon className={classes.iconSmall} />
+            </Button>}>
+
+            <EditForm profile={profile} />
+
+          </Modal>
+        }
+
+        <Typography className={classes.bio} variant='body1' gutterBottom>
+          {profile.bio}
+        </Typography>
+      </div>
+    )
+  }
 }
 
 export default withStyles(styles)(Profile)

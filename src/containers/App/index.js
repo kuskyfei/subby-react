@@ -27,10 +27,10 @@ window.SUBBY_DEBUG_SERVICES = services
 
 // util
 const queryString = require('query-string')
-const {isRouteChange, getRouteFromUrlParams} = require('./util')
+const {isRouteChange, getRouteFromUrlParams, isUrlParamsChangeFromProps} = require('./util')
 const debug = require('debug')('containers:App')
 
-const styles = images => theme => {
+const styles = theme => {
   debug(theme)
 
   return {
@@ -51,30 +51,21 @@ class App extends Component {
       this.handleRouteChange()
 
       await services.init()
+      // services.mockSmartContracts({explicit: true})
       services.mockSmartContracts()
       this.setState({...this.state, isInitializing: false})
 
-      const settings = await services.getSettings()
-      // const address = await services.getAddress()
-      const address = '0x1111111111111111111111111111111111111111'
-      const profile = await services.getProfile(address)
-      const subscriptions = await services.getSubscriptions(address)
+      // setInterval(() =>
+      //   services.updateCache({address})
+      //   , 10000)
 
-      const {setAddress, setProfile, setSubscriptions} = this.props.actions
-      setAddress(address)
-      setProfile(profile)
-      setSubscriptions(subscriptions.activeSubscriptions)
-
-      // // setInterval(() =>
-      // //   services.updateCache({address})
-      // //   , 10000)
-
-      debug('mounted', {address, profile, subscriptions})
+      debug('mounted')
     })()
   }
 
   componentDidUpdate (prevProps) {
     this.handleRouteChange(prevProps)
+    this.scrollToTopOnUrlParamsChange(prevProps)
 
     debug('updated')
   }
@@ -93,6 +84,12 @@ class App extends Component {
 
     debug('urlParams', urlParams)
     debug('route changed')
+  }
+
+  scrollToTopOnUrlParamsChange = (prevProps) => {
+    if (isUrlParamsChangeFromProps(this.props, prevProps)) {
+      window.scrollTo(0,0)
+    }
   }
 
   render () {
@@ -144,9 +141,6 @@ const getRouteComponentFromUrlParams = (urlParams) => {
 }
 
 const mapStateToProps = state => ({
-  profile: state.profile,
-  address: state.address,
-  subscriptions: state.subscriptions,
   headerIsLoading: state.header.isLoading
 })
 const mapDispatchToProps = dispatch => ({

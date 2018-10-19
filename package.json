@@ -21,7 +21,7 @@
     "readable-stream": "^3.0.2",
     "redux": "^4.0.0",
     "redux-actions": "^2.6.1",
-    "subby.js": "^0.1.6",
+    "subby.js": "^0.1.7",
     "timeago.js": "^3.0.2",
     "truffle-hdwallet-provider": "0.0.6",
     "webtorrent": "^0.102.2"

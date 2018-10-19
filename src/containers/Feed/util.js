@@ -1,11 +1,16 @@
 const queryString = require('query-string')
 
-const getAccountFromUrlParams = (urlParams) => {
-  return queryString.parse(urlParams).u
+const getUsernameFromUrlParams = (urlParams) => {
+  let account = queryString.parse(urlParams).u
+
+  if (isValidAddress(account)) {
+    account = cleanAddress(account)
+  }
+  return account
 }
 
-const getUsernameFromUrlParams = (urlParams) => {
-  return queryString.parse(urlParams).u
+const getAccountFromUrlParams = (urlParams) => {
+  return getUsernameFromUrlParams(urlParams)
 }
 
 const getPostIdFromUrlParams = (urlParams) => {

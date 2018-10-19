@@ -29,7 +29,11 @@ describe('services', () => {
     test('locally', async () => {
       // test subscribing locally
       for (const publisher of PUBLISHERS) {
-        await services.subscribe(publisher)
+        let isSubscribed = await services.isSubscribed({publisher, address: ADDRESSES[0]})
+        expect(isSubscribed).toEqual(false)
+        await services.subscribe({publisher, address: ADDRESSES[0]})
+        isSubscribed = await services.isSubscribed({publisher, address: ADDRESSES[0]})
+        expect(isSubscribed).toEqual(true)
       }
       const subscriptions = await services.getSubscriptions(ADDRESSES[0])
 
@@ -41,8 +45,7 @@ describe('services', () => {
 
       // test unsubscribing locally
       const db1 = await getDb()
-
-      await services.unsubscribe(PUBLISHERS[0])
+      await services.unsubscribe({publishers: [PUBLISHERS[0]], address: ADDRESSES[0]})
       const db2 = await getDb()
 
       const db1Copy = deepCopy(db1)
@@ -51,6 +54,25 @@ describe('services', () => {
       expect(Object.keys(db2.localSubscriptions.subscriptions).length).toEqual(Object.keys(db1.localSubscriptions.subscriptions).length - 1)
       expect(PUBLISHERS[0] in db1.localSubscriptions.subscriptions).toEqual(true)
       expect(PUBLISHERS[0] in db2.localSubscriptions.subscriptions).toEqual(false)
+
+      for (const i in PUBLISHERS) {
+        const isSubscribed = await services.isSubscribed({publisher: PUBLISHERS[i], address: ADDRESSES[0]})
+        if (i === '0') {
+          expect(isSubscribed).toEqual(false)
+        } else {
+          expect(isSubscribed).toEqual(true)
+        }
+      }
+    })
+
+    test('isSubscribed', async () => {
+      let isSubscribed = await services.isSubscribed({publisher: PUBLISHERS[0], address: ADDRESSES[0]})
+      expect(isSubscribed).toEqual(false)
+
+      await services.subscribe({publisher: PUBLISHERS[0], address: ADDRESSES[0]})
+
+      isSubscribed = await services.isSubscribed({publisher: PUBLISHERS[0], address: ADDRESSES[0]})
+      expect(isSubscribed).toEqual(true)
     })
   })
 

@@ -6,7 +6,7 @@ const cache = require('./cache')
 const {
   arrayToObjectWithItemsAsProps,
   mergeEthereumSubscriptionsCache,
-  getActiveSubscriptions,
+  getActiveSubscriptionsFromSubscriptions,
   formatSubscriptionsForGetFeed,
   filterRequestedPosts
 } = require('./util')
@@ -17,7 +17,8 @@ const feedCacheBufferSize = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_BUFFER_SIZE
 const getAddress = async () => {
   debug('getAddress')
 
-  const ethereumAddress = await subbyJs.getAddress()
+  // const ethereumAddress = await subbyJs.getAddress()
+  const ethereumAddress = '0x1111111111111111111111111111111111111111'
 
   debug('getAddress returns', ethereumAddress)
 
@@ -78,7 +79,7 @@ const getSubscriptions = async (address) => {
     await indexedDb.setEthereumSubscriptionsCache({address, ethereumSubscriptions})
   }
 
-  const activeSubscriptions = getActiveSubscriptions({localSubscriptions, ethereumSubscriptions})
+  const activeSubscriptions = getActiveSubscriptionsFromSubscriptions({localSubscriptions, ethereumSubscriptions})
 
   const subscriptions = {
     activeSubscriptions,
@@ -88,6 +89,43 @@ const getSubscriptions = async (address) => {
   debug('getSubscriptions returns', subscriptions)
 
   return subscriptions
+}
+
+const getActiveSubscriptions = async (address) => {
+  debug('getActiveSubscriptions', address)
+  const subscriptions = await getSubscriptions(address)
+  const {activeSubscriptions} = subscriptions
+
+  debug('getActiveSubscriptions returns', {activeSubscriptions})
+  return activeSubscriptions
+}
+
+const isSubscribed = async ({publisher, address}) => {
+  debug('isSubscribed', {publisher, address})
+
+  const subscriptions = await getActiveSubscriptions(address)
+
+  let isSubscribed = false
+
+  // if publisher is a profile object
+  if (typeof publisher === 'object') {
+    if (subscriptions[publisher.username]) {
+      isSubscribed =  true
+    }
+    if (subscriptions[publisher.address]) {
+      isSubscribed =  true
+    }    
+  }
+
+  // if publisher is a string
+  if (typeof publisher === 'string') {
+    if (subscriptions[publisher]) {
+      isSubscribed =  true
+    }  
+  }
+
+  debug('isSubscribed returns', isSubscribed)
+  return isSubscribed
 }
 
 const getSettings = async () => {
@@ -222,6 +260,8 @@ export {
   getAddress,
   getProfile,
   getSubscriptions,
+  getActiveSubscriptions,
+  isSubscribed,
   getSettings,
   getFeed
 }

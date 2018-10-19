@@ -30,6 +30,7 @@ puppeteer tests
 - permalink feed works
 - my profile feed works
 - scrolling each feed till 1000 posts
+- test subscribe / unsubscribe
 
 ##todo
 
@@ -40,12 +41,14 @@ setSubscriptions,
 subscribe,
 unsubscribe,
 
-make subscibe/unsubscribe button work
+add total donations to profile and subby.js
+new version available pop up
 add unsubscribe to feed button
 add copy permalink button
 add donate and price earned
 fix subscriptions page
 fix settings page
+"you're not following anyone, find accounts to follow"
 
 add pagination after 200 posts
 fix services.getAddress mock

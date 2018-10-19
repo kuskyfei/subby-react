@@ -1,18 +1,66 @@
 const indexedDb = require('../indexedDb')
 const {arrayToObjectWithItemsAsProps} = require('./util')
+const {getSubscriptions} = require('./read')
 
 const debug = require('debug')('services:cache:write')
 
-const subscribe = async (publisher) => {
-  debug('subscribe', publisher)
+const subscribe = async ({publisher, address}) => {
+  debug('subscribe', {publisher, address})
 
   await indexedDb.addToLocalSubscriptions(publisher)
+
+  if (!address) {
+    return
+  }
+
+  const subscriptions = await getSubscriptions(address)
+  const {ethereumSubscriptions} = subscriptions
+  
+  let changed = false
+  if (!ethereumSubscriptions[publisher]) {
+    return
+  }
+  if (!ethereumSubscriptions[publisher].pendingDeletion) {
+    return
+  }
+
+  delete ethereumSubscriptions[publisher].pendingDeletion
+  changed = true
+
+  if (changed) {
+    await indexedDb.setEthereumSubscriptionsCache({address, ethereumSubscriptions})
+  }
 }
 
-const unsubscribe = async (publisher) => {
-  debug('unsubscribe', publisher)
+const unsubscribe = async ({publishers, address}) => {
+  debug('unsubscribe', publishers, address)
 
-  await indexedDb.removeFromLocalSubscriptions(publisher)
+  for (const publisher of publishers) {
+    await indexedDb.removeFromLocalSubscriptions(publisher)
+  }
+
+  if (!address) {
+    return
+  }
+
+  const subscriptions = await getSubscriptions(address)
+  const {ethereumSubscriptions} = subscriptions
+  
+  let changed = false
+  for (const publisher of publishers) {
+    if (!ethereumSubscriptions[publisher]) {
+      continue
+    }
+    if (ethereumSubscriptions[publisher].pendingDeletion) {
+      continue
+    }
+    ethereumSubscriptions[publisher].pendingDeletion =  true
+    changed = true
+  }
+
+  if (changed) {
+    await indexedDb.setEthereumSubscriptionsCache({address, ethereumSubscriptions})
+  }
 }
 
 const setSubscriptions = async (localSubscriptions) => {

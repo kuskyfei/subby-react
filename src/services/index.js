@@ -10,16 +10,18 @@ const init = async () => {
   debug('init start')
 
   await indexedDb.init({version: settings.INDEXEDDB_VERSION})
-  await subbyJs.init({provider: window.SUBBY_GLOBAL_SETTINGS.WEB3_PROVIDER, mnemonic: 'no mnemonic'})
-  await subbyJs.init({provider: window.SUBBY_GLOBAL_SETTINGS.WEB3_PROVIDER, mnemonic: 'no mnemonic'})
+  await subbyJs.init({provider: window.SUBBY_GLOBAL_SETTINGS.WEB3_PROVIDER})
   torrent.init()
   ipfs.setProvider(window.SUBBY_GLOBAL_SETTINGS.IPFS_PROVIDER)
 
   debug('init end')
 }
 
-const mockSmartContracts = () => {
-  const smartContractsMock = require('subby.js/test/mock')
+const mockSmartContracts = ({explicit} = {}) => {
+  let smartContractsMock = require('subby.js/test/mock')
+  if (explicit) {
+    smartContractsMock = require('subby.js/test/mockExplicit')
+  }
   subbyJs.mockSmartContracts(smartContractsMock)
 }
 
@@ -44,8 +46,10 @@ const {
   getAddress,
   getProfile,
   getSubscriptions,
+  getActiveSubscriptions,
   getSettings,
   getFeed,
+  isSubscribed,
 
   updateCache,
   updateBackgroundFeedCache
@@ -64,24 +68,27 @@ export {
   mockSmartContracts,
   mockWebTorrent,
   mockIpfsApi,
-  // cache
+  // cache write
   setSettings,
   setSubscriptions,
   subscribe,
   unsubscribe,
   donate,
   publish,
-
+  // cache read
   getAddress,
   getProfile,
   getSubscriptions,
+  getActiveSubscriptions,
+  isSubscribed,
   getSettings,
   getFeed,
-  getPostsFromPublisher,
-  getPostFromId,
-
+  // cache
   updateCache,
   updateBackgroundFeedCache,
+  // subby.js
+  getPostsFromPublisher,
+  getPostFromId,
   // torrent
   getTorrent,
   getMagnetFromTorrentFile,
