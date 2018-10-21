@@ -30,7 +30,8 @@ const {
   isPublisher,
   isProfile,
   isFeed,
-  isRouteChange
+  isRouteChange,
+  isProfileChange
 } = require('./util')
 const debug = require('debug')('containers:Feed')
 
@@ -56,7 +57,7 @@ const permalinkTestPost = {
   // link: 'ipfs:QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV', // video
   // link: 'ipfs:QmZbp9u6yMDW94mfxTYe8hMaomBLr2NfckUhYf3J7ax7zM/dog-loves-baby.mp4',
   // link: 'ipfs:QmQ747r7eLfsVtBFBSRwfXsPK6tADJpQzJxz4uFdoZb9XJ', // big video
-  link: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
+  link: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
   // link: 'https://interactive-examples.mdn.mozilla.net/media/examples/stream_of_water.webm',
   // link: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Example.ogg',
   // link: 'http://www.hochmuth.com/mp3/Haydn_Cello_Concerto_D-1.mp3',
@@ -74,13 +75,21 @@ class Feed extends React.Component {
   state = {
     hasMorePosts: true,
     addingMorePosts: false,
-    publisherStartAt: 0
+    publisherStartAt: 0,
+    isInitializing: false,
+    settings: {}
   }
 
   componentDidMount () {
+    ;(async () => {
+      this.setState(state => ({isInitializing: true}))
+      const settings = await services.getSettings()
+      this.setState(state => ({settings, isInitializing: false}))
+    })()
+
     this.addPostsToFeed({reset: true})
     this.handleProfile({reset: true})
-    debug('props', this.props)
+
     debug('mounted')
   }
 
@@ -105,13 +114,13 @@ class Feed extends React.Component {
       return
     }
     if (reset) {
-      this.setState((state, props) => ({...state, profileIsLoading: true}))
+      this.setState(state => ({profileIsLoading: true}))
     }
 
     const account = getAccountFromUrlParams(location.search)
     const profile = await getProfile(account)
     actions.setPublisherProfile(profile)
-    this.setState((state, props) => ({...state, profileIsLoading: false}))
+    this.setState(state => ({profileIsLoading: false}))
 
     debug('handleProfile end', {account})
   }
@@ -128,7 +137,7 @@ class Feed extends React.Component {
       // they need to be overwritten
       actions.setFeed([])
       feed = []
-      this.setState((state, props) => ({...state, hasMorePosts: true, publisherStartAt: 0}))
+      this.setState(state => ({hasMorePosts: true, publisherStartAt: 0}))
       hasMorePosts = true
       publisherStartAt = 0
     }
@@ -137,10 +146,10 @@ class Feed extends React.Component {
       return
     }
 
-    this.setState((state, props) => ({...state, addingMorePosts: true}))
+    this.setState(state => ({addingMorePosts: true}))
 
     if (isPermalink(location.search)) {
-      this.setState((state, props) => ({...state, hasMorePosts: false}))
+      this.setState(state => ({hasMorePosts: false}))
       const id = getPostIdFromUrlParams(location.search)
       let post = await services.getPostFromId({publisher: username, id})
       actions.setFeed([post])
@@ -150,7 +159,7 @@ class Feed extends React.Component {
       const res = await services.getPostsFromPublisher(username, {limit: 10, startAt: publisherStartAt})
       const {posts, nextStartAt, hasMorePosts} = res
       actions.setFeed([...feed, ...posts])
-      this.setState((state, props) => ({...state, publisherStartAt: nextStartAt, hasMorePosts}))
+      this.setState(state => ({publisherStartAt: nextStartAt, hasMorePosts}))
     }
 
     else if (isProfile(location.search)) {
@@ -158,7 +167,7 @@ class Feed extends React.Component {
       const res = await services.getPostsFromPublisher(address, {limit: 10, startAt: publisherStartAt})
       const {posts, nextStartAt, hasMorePosts} = res
       actions.setFeed([...feed, ...posts])
-      this.setState((state, props) => ({...state, publisherStartAt: nextStartAt, hasMorePosts}))
+      this.setState(state => ({publisherStartAt: nextStartAt, hasMorePosts}))
     }
 
     else if (isFeed(location.search)) {
@@ -169,18 +178,22 @@ class Feed extends React.Component {
       actions.setFeed([...feed, ...newPosts])
     }
 
-    this.setState((state, props) => ({...state, addingMorePosts: false}))
+    this.setState(state => ({addingMorePosts: false}))
     debug('addPostsToFeed end', this.props, this.state)
   }
 
   render () {
     const {classes, feed, location} = this.props
-    const {addingMorePosts, profileIsLoading} = this.state
+    const {addingMorePosts, profileIsLoading, settings, isInitializing} = this.state
+
+    if (isInitializing) {
+      return <div />
+    }
 
     const posts = []
     for (const post of feed) {
       if (post) {
-        posts.push(<Post key={post.username + post.address + post.id} post={post} />)
+        posts.push(<Post key={post.username + post.address + post.id} post={post} settings={settings}/>)
       }
     }
 
@@ -213,6 +226,11 @@ class Feed extends React.Component {
     }
 
     this.addPostsToFeed({reset: true})
+
+    if (!isProfileChange(this.props, prevProps)) {
+      return
+    }
+
     this.handleProfile({reset: true})
 
     debug('feed changed')

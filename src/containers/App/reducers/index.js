@@ -3,7 +3,6 @@ import A from './type'
 const initialState = {
   address: null,
   profile: null,
-  subscriptions: null
 }
 
 const reducer = (state = initialState, action) => {
@@ -18,12 +17,6 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         profile: action.payload
-      }
-
-    case A.SET_SUBSCRIPTIONS:
-      return {
-        ...state,
-        subscriptions: action.payload
       }
 
     default:

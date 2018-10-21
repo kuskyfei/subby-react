@@ -14,12 +14,13 @@ import {
 const {extractRootDomain, stripUrlQuery} = require('./util')
 
 const EmbedWidget = (props) => {
-  const Widget = getWidgetFromUrl(props.url)
+  const settings = props.settings || {}
+  const Widget = getWidgetFromUrl(props.url, settings)
 
   return <Widget url={props.url} />
 }
 
-const getWidgetFromUrl = (url) => {
+const getWidgetFromUrl = (url, settings) => {
   if (!url) {
     return () => <div />
   }
@@ -29,6 +30,9 @@ const getWidgetFromUrl = (url) => {
   }
 
   if (isTorrent(url)) {
+    if (!settings.WEB_TORRENT_EMBEDS) {
+      return Magnet
+    }
     return Torrent
   }
 
@@ -41,6 +45,9 @@ const getWidgetFromUrl = (url) => {
   }
 
   if (isIpfs(url)) {
+    if (!settings.IPFS_EMBEDS) {
+      return Download
+    }
     return Ipfs
   }
 
@@ -64,21 +71,39 @@ const getWidgetFromUrl = (url) => {
 
   switch (type) {
     case 'facebook':
+      if (!settings.FACEBOOK_EMBEDS) {
+        return Link
+      }
       return Facebook
 
     case 'instagram':
+      if (!settings.INSTAGRAM_EMBEDS) {
+        return Link
+      }
       return Instagram
 
     case 'reddit':
+      if (!settings.REDDIT_EMBEDS) {
+        return Link
+      }
       return Reddit
 
     case 'twitter':
+      if (!settings.TWITTER_EMBEDS) {
+        return Link
+      }
       return Twitter
 
     case 'vimeo':
+      if (!settings.VIMEO_EMBEDS) {
+        return Link
+      }
       return Vimeo
 
     case 'youtube':
+      if (!settings.YOUTUBE_EMBEDS) {
+        return Link
+      }
       return Youtube
 
     default:

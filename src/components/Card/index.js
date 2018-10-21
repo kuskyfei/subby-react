@@ -120,17 +120,17 @@ class Card extends React.Component {
   }
 
   handleCardMenuClick = event => {
-    this.setState({...this.state, cardMenuAnchorEl: event.currentTarget })
+    this.setState({cardMenuAnchorEl: event.currentTarget })
   }
 
   handleCardMenuClose = () => {
-    this.setState({...this.state, cardMenuAnchorEl: null })
+    this.setState({cardMenuAnchorEl: null })
   }
 
   async handleUnsubscribe() {
-    this.setState({...this.state, cardMenuAnchorEl: null, unsubscribeTooltipOpen: true})
+    this.setState({cardMenuAnchorEl: null, unsubscribeTooltipOpen: true})
     setTimeout(() => {
-      this.setState({...this.state, unsubscribeTooltipOpen: false})
+      this.setState({unsubscribeTooltipOpen: false})
     }, 1500)
 
     const {services, post} = this.props
@@ -149,24 +149,24 @@ class Card extends React.Component {
 
     copyToClipboard(permalink)
 
-    this.setState({...this.state, permalinkTooltipOpen: true})
+    this.setState({permalinkTooltipOpen: true})
 
     setTimeout(() => {
-      this.setState({...this.state, permalinkTooltipOpen: false})
+      this.setState({permalinkTooltipOpen: false})
     }, 1500)
   }
 
   componentDidMount () {
     const {post} = this.props
-    this.setState({...this.state, timestamp: post.timestamp})
+    this.setState({timestamp: post.timestamp})
   }
 
   handleExpandClick = () => {
-    this.setState(state => ({...state, expanded: !state.expanded}))
+    this.setState(state => ({expanded: !state.expanded}))
   }
 
   render () {
-    let {classes, isLoading, post, preview, onPreviewClose} = this.props
+    let {classes, isLoading, post, preview, onPreviewClose, settings} = this.props
     const {permalinkTooltipOpen, cardMenuAnchorEl, unsubscribeTooltipOpen} = this.state
 
     if (!preview) {
@@ -232,7 +232,7 @@ class Card extends React.Component {
           <MenuItem onClick={this.handleUnsubscribe.bind(this)}>Unsubscribe</MenuItem>
         </Menu>
 
-        <EmbedWidget url={post.link} />
+        <EmbedWidget settings={settings} url={post.link} />
 
         {post.comment !== 'loading' &&
           <CardContent>

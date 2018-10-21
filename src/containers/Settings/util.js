@@ -1,19 +1,15 @@
-const getPercentScrolled = () => {
-  const winheight = window.innerHeight || (document.documentElement || document.body).clientHeight
-  const docheight = getDocHeight()
-  const scrollTop = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop
-  const trackLength = docheight - winheight
-  const pctScrolled = Math.floor(scrollTop / trackLength * 100) // gets percentage scrolled (ie: 80 or NaN if tracklength == 0)
-  return pctScrolled
+const onFinishedTyping = (cb) => {
+  this.onFinishedTypingCounter = 0
+
+  clearInterval(this.onFinishedTypingInterval)
+
+  this.onFinishedTypingInterval = setInterval(() => {
+    if (this.onFinishedTypingCounter > 1) {
+      cb()
+      clearInterval(this.onFinishedTypingInterval)
+    }
+    this.onFinishedTypingCounter++
+  }, 700)
 }
 
-const getDocHeight = () => {
-  const D = document
-  return Math.max(
-    D.body.scrollHeight, D.documentElement.scrollHeight,
-    D.body.offsetHeight, D.documentElement.offsetHeight,
-    D.body.clientHeight, D.documentElement.clientHeight
-  )
-}
-
-module.exports = {getPercentScrolled}
+module.exports = {onFinishedTyping}

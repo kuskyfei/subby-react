@@ -1,4 +1,4 @@
-const db = require('./db').default
+const db = require('./db')
 const {isObjectStoreName} = require('./util')
 const debug = require('debug')('services:indexedDb:read')
 

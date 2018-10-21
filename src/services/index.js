@@ -8,11 +8,18 @@ const {settings} = require('../settings')
 
 const init = async () => {
   debug('init start')
-
   await indexedDb.init({version: settings.INDEXEDDB_VERSION})
-  await subbyJs.init({provider: window.SUBBY_GLOBAL_SETTINGS.WEB3_PROVIDER})
+
+  const localUserSettings = await getSettings()
+
+  await subbyJs.init({provider: localUserSettings.WEB3_PROVIDER})
   torrent.init()
-  ipfs.setProvider(window.SUBBY_GLOBAL_SETTINGS.IPFS_PROVIDER)
+
+  let ipfsProvider = localUserSettings.IPFS_PROVIDER
+  if (ipfsProvider === '') {
+    ipfsProvider = 'https://ipfs.infura.io:5001'
+  }
+  ipfs.setProvider(ipfsProvider)
 
   debug('init end')
 }
@@ -44,6 +51,7 @@ const {
   publish,
 
   getAddress,
+  isTerminated,
   getProfile,
   getSubscriptions,
   getActiveSubscriptions,
@@ -76,7 +84,6 @@ export {
   donate,
   publish,
   // cache read
-  getAddress,
   getProfile,
   getSubscriptions,
   getActiveSubscriptions,
@@ -87,6 +94,8 @@ export {
   updateCache,
   updateBackgroundFeedCache,
   // subby.js
+  getAddress,
+  isTerminated,
   getPostsFromPublisher,
   getPostFromId,
   // torrent

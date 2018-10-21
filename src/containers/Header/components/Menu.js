@@ -16,6 +16,7 @@ import ContactSupportIcon from '@material-ui/icons/ContactSupport'
 import SettingsIcon from '@material-ui/icons/Settings'
 import ListIcon from '@material-ui/icons/List'
 import HomeIcon from '@material-ui/icons/Home'
+import ModeComment from '@material-ui/icons/ModeComment'
 
 const styles = theme => ({
   menuLink: {
@@ -97,6 +98,15 @@ class Menu extends React.Component {
                 <ListIcon />
               </ListItemIcon>
               <ListItemText classes={{ primary: classes.primary }} inset primary='Subscriptions' />
+            </MenuItem>
+          </Link>
+
+          <Link to='?p=donations'>
+            <MenuItem onClick={this.handleClose}>
+              <ListItemIcon className={classes.icon}>
+                <ModeComment />
+              </ListItemIcon>
+              <ListItemText classes={{ primary: classes.primary }} inset primary='Donations' />
             </MenuItem>
           </Link>
 

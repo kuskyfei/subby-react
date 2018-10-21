@@ -13,7 +13,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import {Pages} from '../../components'
 
 // containers
-import {Header, Feed, Subscriptions, Settings} from '../../containers'
+import {Header, Feed, Subscriptions, Settings, Donations} from '../../containers'
 
 // actions
 import actions from './reducers/actions'
@@ -135,6 +135,9 @@ const getRouteComponentFromUrlParams = (urlParams) => {
 
     case 'subscriptions':
       return Subscriptions
+
+    case 'donations':
+      return Donations
 
     case 'settings':
       return Settings

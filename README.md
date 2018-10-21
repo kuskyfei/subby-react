@@ -21,30 +21,25 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
+add torrents to subby.js mocks
 fix subby.js sync subscriptions
 fix subby.js events
 fix subby.js total donations for profile and posts
+fix services.getAddress mock
+fix services.isTerminated mock
 add donations page
 add donation event mesages
 new version available pop up
-fix subscriptions page
-fix settings page
- - add terminate account button to settings
- - add use default settings to settings
 "you're not following anyone, find accounts to follow"
-fix services.getAddress mock
 add 'username is taken' error validation
 make publish edited profile send data
- - add hide donation amounts
 make publish button send data
 make sync subscriptions button send data
 add a "your metamask is locked page"
 make publishing content guide
 make find accounts to follow post
 fix line bug in preview with iframes
-set up optional embeds and other settings
 detect errors with embeds (using height of elements possibly?) / fix bug with twitter and IG cards
-fix profile remounting when going to same profile
 
 ##todo after release
 add pagination after 200 posts

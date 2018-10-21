@@ -15,6 +15,7 @@ const debug = require('debug')('services:cache:read')
 const feedCacheBufferSize = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_BUFFER_SIZE
 
 const getAddress = async () => {
+  // NEED TO CHANGE THIS TO USE SUBBY.JS INSTEAD
   debug('getAddress')
 
   // const ethereumAddress = await subbyJs.getAddress()
@@ -23,6 +24,11 @@ const getAddress = async () => {
   debug('getAddress returns', ethereumAddress)
 
   return ethereumAddress
+}
+
+const isTerminated = async () => {
+  // NEED TO CHANGE THIS TO USE SUBBY.JS INSTEAD
+  return false
 }
 
 const getProfile = async (account) => {
@@ -258,6 +264,7 @@ const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) =
 
 export {
   getAddress,
+  isTerminated,
   getProfile,
   getSubscriptions,
   getActiveSubscriptions,

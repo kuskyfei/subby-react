@@ -201,7 +201,7 @@ class Post extends React.Component {
   }
 
   render () {
-    const {isLoading, post, preview, onPreviewClose} = this.props
+    const {isLoading, post, preview, onPreviewClose, settings} = this.props
     const {link, comment} = this.state
 
     const newPost = {...post}
@@ -214,7 +214,7 @@ class Post extends React.Component {
     if (isIpfsContent(newPost.comment)) newPost.comment = 'loading'
 
     return (
-      <Card services={services} isLoading={isLoading} post={newPost} preview={preview} onPreviewClose={onPreviewClose} />
+      <Card settings={settings} services={services} isLoading={isLoading} post={newPost} preview={preview} onPreviewClose={onPreviewClose} />
     )
   }
 }

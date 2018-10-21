@@ -1,8 +1,6 @@
 // react
 import React from 'react'
-import {connect} from 'react-redux'
-import {bindActionCreators, compose} from 'redux'
-import {withRouter} from 'react-router-dom'
+import {compose} from 'redux'
 import PropTypes from 'prop-types'
 import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
@@ -13,14 +11,12 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 // material
 import withStyles from '@material-ui/core/styles/withStyles'
 
-// actions
-import actions from './reducers/actions'
-
 // api
-// const services = require('../../services')
+const services = require('../../services')
 
 // util
 const debug = require('debug')('containers:Settings')
+const {onFinishedTyping} = require('./util')
 
 const styles = theme => ({
   layout: {
@@ -50,10 +46,13 @@ class Settings extends React.Component {
 
   componentDidMount () {
     ;(async () => {
+      const settings = await services.getSettings()
+      this.setState(settings)
 
+      const isTerminated = await services.isTerminated()
+      this.setState({isTerminated})
     })()
 
-    debug('props', this.props)
     debug('mounted')
   }
 
@@ -61,32 +60,65 @@ class Settings extends React.Component {
     debug('updated')
   }
 
-  handleChange = name => event => {
+  handleValueChange = name => event => {
+    const value = event.target.value
     this.setState({
-      [name]: event.target.value
+      [name]: value,
+    })
+    onFinishedTyping(async () => {
+      await services.setSettings({...this.state, [name]: value})
+      await services.init()
     })
   }
 
+  handleCheckedChange = name => async event => {
+    this.setState({
+      [name]: event.target.checked,
+    })
+    await services.setSettings({...this.state, [name]: event.target.checked})
+  }
+
+  handleTerminate = () => {
+
+  }
+
   render () {
-    const { classes } = this.props
+    const {classes} = this.props
 
     return (
       <div className={classes.layout}>
         <Paper className={classes.paper}>
           <form className={classes.container} noValidate autoComplete='off'>
 
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={Boolean(this.state.USE_DEFAULT_SETTINGS)}
+                  onChange={this.handleCheckedChange('USE_DEFAULT_SETTINGS')}
+                  value='USE_DEFAULT_SETTINGS'
+                  color='primary'
+                />
+              }
+              label='Use Default Settings'
+            />
+
+            <Typography className={classes.message} variant='caption' gutterBottom>
+              Default settings are defined at the top of subby.html.
+            </Typography>
+
             <TextField
               fullWidth
               placeholder='https://example.com'
               label='Web3 Provider'
               className={classes.textField}
-              value={this.state.web3Provider}
-              onChange={this.handleChange('web3Provider')}
+              value={this.state.WEB3_PROVIDER || ''}
+              onChange={this.handleValueChange('WEB3_PROVIDER')}
               margin='normal'
+              disabled={this.state.USE_DEFAULT_SETTINGS}
             />
 
             <Typography className={classes.message} variant='caption' gutterBottom>
-              To use web3, you must connect to an Ethereum node. Subby uses Infura by default. You can add your own here. Note that if you have Metamask enabled, the MetaMask default provider will be used.
+              To use web3, you must connect to an Ethereum node. Leave blank to use ethers.js default provider. If you have MetaMask enabled, the MetaMask provider will be used.
             </Typography>
 
             <TextField
@@ -94,22 +126,24 @@ class Settings extends React.Component {
               placeholder='https://example.com:8080'
               label='IPFS Provider'
               className={classes.textField}
-              value={this.state.ipfsProvider}
-              onChange={this.handleChange('ipfsProvider')}
+              value={this.state.IPFS_PROVIDER || ''}
+              onChange={this.handleValueChange('IPFS_PROVIDER')}
               margin='normal'
+              disabled={this.state.USE_DEFAULT_SETTINGS}
             />
 
             <Typography className={classes.message} variant='caption' gutterBottom>
-              To use IPFS, you must connect to an IPFS node. Subby uses infura by default. You can add your own here.
+              To use IPFS, you must connect to an IPFS node. Leave blank to use Infura default.
             </Typography>
 
             <FormControlLabel
               control={
                 <Switch
-                  checked={this.state.redditEmbeds}
-                  onChange={this.handleChange('redditEmbeds')}
-                  value='redditEmbeds'
+                  checked={Boolean(this.state.REDDIT_EMBEDS)}
+                  onChange={this.handleCheckedChange('REDDIT_EMBEDS')}
+                  value='REDDIT_EMBEDS'
                   color='primary'
+                  disabled={this.state.USE_DEFAULT_SETTINGS}
                 />
               }
               label='Reddit Embeds'
@@ -118,10 +152,11 @@ class Settings extends React.Component {
             <FormControlLabel
               control={
                 <Switch
-                  checked={this.state.facebookEmbeds}
-                  onChange={this.handleChange('facebookEmbeds')}
-                  value='facebookEmbeds'
+                  checked={Boolean(this.state.FACEBOOK_EMBEDS)}
+                  onChange={this.handleCheckedChange('FACEBOOK_EMBEDS')}
+                  value='FACEBOOK_EMBEDS'
                   color='primary'
+                  disabled={this.state.USE_DEFAULT_SETTINGS}
                 />
               }
               label='Facebook Embeds'
@@ -130,10 +165,11 @@ class Settings extends React.Component {
             <FormControlLabel
               control={
                 <Switch
-                  checked={this.state.youtubeEmbeds}
-                  onChange={this.handleChange('youtubeEmbeds')}
-                  value='youtubeEmbeds'
+                  checked={Boolean(this.state.YOUTUBE_EMBEDS)}
+                  onChange={this.handleCheckedChange('YOUTUBE_EMBEDS')}
+                  value='YOUTUBE_EMBEDS'
                   color='primary'
+                  disabled={this.state.USE_DEFAULT_SETTINGS}
                 />
               }
               label='Youtube Embeds'
@@ -142,10 +178,11 @@ class Settings extends React.Component {
             <FormControlLabel
               control={
                 <Switch
-                  checked={this.state.vimeoEmbeds}
-                  onChange={this.handleChange('vimeoEmbeds')}
-                  value='vimeoEmbeds'
+                  checked={Boolean(this.state.VIMEO_EMBEDS)}
+                  onChange={this.handleCheckedChange('VIMEO_EMBEDS')}
+                  value='VIMEO_EMBEDS'
                   color='primary'
+                  disabled={this.state.USE_DEFAULT_SETTINGS}
                 />
               }
               label='Vimeo Embeds'
@@ -154,10 +191,11 @@ class Settings extends React.Component {
             <FormControlLabel
               control={
                 <Switch
-                  checked={this.state.twitterEmbeds}
-                  onChange={this.handleChange('twitterEmbeds')}
-                  value='twitterEmbeds'
+                  checked={Boolean(this.state.TWITTER_EMBEDS)}
+                  onChange={this.handleCheckedChange('TWITTER_EMBEDS')}
+                  value='TWITTER_EMBEDS'
                   color='primary'
+                  disabled={this.state.USE_DEFAULT_SETTINGS}
                 />
               }
               label='Twitter Embeds'
@@ -166,74 +204,79 @@ class Settings extends React.Component {
             <FormControlLabel
               control={
                 <Switch
-                  checked={this.state.instagramEmbeds}
-                  onChange={this.handleChange('instagramEmbeds')}
-                  value='instagramEmbeds'
+                  checked={Boolean(this.state.INSTAGRAM_EMBEDS)}
+                  onChange={this.handleCheckedChange('INSTAGRAM_EMBEDS')}
+                  value='INSTAGRAM_EMBEDS'
                   color='primary'
+                  disabled={this.state.USE_DEFAULT_SETTINGS}
                 />
               }
               label='Instagram Embeds'
             />
 
             <Typography className={classes.message} variant='caption' gutterBottom>
-              Embed content makes Subby fun to use, but it also allows companies to track you. Turn them off here.
+              Links are embeded from sites using iframes or Javascript.
             </Typography>
 
             <FormControlLabel
               control={
                 <Switch
-                  checked={this.state.ipfsEmbeds}
-                  onChange={this.handleChange('ipfsEmbeds')}
-                  value='ipfsEmbeds'
+                  checked={Boolean(this.state.IPFS_EMBEDS)}
+                  onChange={this.handleCheckedChange('IPFS_EMBEDS')}
+                  value='IPFS_EMBEDS'
                   color='primary'
+                  disabled={this.state.USE_DEFAULT_SETTINGS}
                 />
               }
               label='IPFS Embeds'
             />
 
             <Typography className={classes.message} variant='caption' gutterBottom>
-              IPFS is great, but nodes/providers might be able to track you. Turn it off here.
+              Supported IPFS media are embeded into posts.
             </Typography>
 
             <FormControlLabel
               control={
                 <Switch
-                  checked={this.state.webTorrentEmbeds}
-                  onChange={this.handleChange('webTorrentEmbeds')}
-                  value='webTorrentEmbeds'
+                  checked={Boolean(this.state.WEB_TORRENT_EMBEDS)}
+                  onChange={this.handleCheckedChange('WEB_TORRENT_EMBEDS')}
+                  value='WEB_TORRENT_EMBEDS'
                   color='primary'
+                  disabled={this.state.USE_DEFAULT_SETTINGS}
                 />
               }
               label='Web Torrent Embeds'
             />
 
             <Typography className={classes.message} variant='caption' gutterBottom>
-              Web torrent allows you to connect to other web torrent enabled clients, Those might be able to track you. Turn it off here.
+              Web torrent connects to other web torrent enabled clients and embeds metadata.
             </Typography>
 
             <FormControlLabel
               control={
                 <Switch
-                  checked={this.state.googleAnalyics}
-                  onChange={this.handleChange('googleAnalyics')}
-                  value='googleAnalyics'
+                  checked={Boolean(this.state.GOOGLE_ANALYTICS)}
+                  onChange={this.handleCheckedChange('GOOGLE_ANALYTICS')}
+                  value='GOOGLE_ANALYTICS'
                   color='primary'
+                  disabled={this.state.USE_DEFAULT_SETTINGS}
                 />
               }
               label='Google Analytics'
             />
 
             <Typography className={classes.message} variant='caption' gutterBottom>
-              Google analytics is 100% anonymous, the data is used to improve Subby user experience.
+              Google Analytics is 100% anonymous, no personally identifiable information. Data is used to improve Subby user experience.
             </Typography>
 
             <FormControlLabel
               control={
                 <Switch
-                  checked={this.state.updateNotifications}
-                  onChange={this.handleChange('updateNotifications')}
-                  value='updateNotifications'
+                  checked={Boolean(this.state.UPDATE_NOTIFICATIONS)}
+                  onChange={this.handleCheckedChange('UPDATE_NOTIFICATIONS')}
+                  value='UPDATE_NOTIFICATIONS'
                   color='primary'
+                  disabled={this.state.USE_DEFAULT_SETTINGS}
                 />
               }
               label='Update Notifications'
@@ -241,6 +284,21 @@ class Settings extends React.Component {
 
             <Typography className={classes.message} variant='caption' gutterBottom>
               Get notified when updates and security fixes are released. This is done through Subby and does not require a connection to a centralized server.
+            </Typography>
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={Boolean(this.state.isTerminated)}
+                  onChange={this.handleTerminate}
+                  color='primary'
+                />
+              }
+              label='Terminate Account'
+            />
+
+            <Typography className={classes.message} variant='caption' gutterBottom>
+              A terminated account will hide all its posts and profile information, as well as disable donations and publishing. It is permanent and requires an Ethereum transaction. Hidden posts are not deleted, nothing can be deleted from Ethereum.
             </Typography>
 
           </form>
@@ -254,16 +312,7 @@ Settings.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-const mapStateToProps = state => ({
-  settings: state.app.settings
-})
-const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(actions, dispatch)
-})
-
 const enhance = compose(
-  withRouter,
-  connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles)
 )
 

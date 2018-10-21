@@ -15,7 +15,7 @@ const subscribe = async ({publisher, address}) => {
 
   const subscriptions = await getSubscriptions(address)
   const {ethereumSubscriptions} = subscriptions
-  
+
   let changed = false
   if (!ethereumSubscriptions[publisher]) {
     return
@@ -63,15 +63,30 @@ const unsubscribe = async ({publishers, address}) => {
   }
 }
 
-const setSubscriptions = async (localSubscriptions) => {
-  debug('setSubscriptions', localSubscriptions)
+const setSubscriptions = async ({localSubscriptions, ethereumSubscriptions, address}) => {
+  debug('setSubscriptions', {localSubscriptions, ethereumSubscriptions, address})
 
-  // localSubscriptions can be an array but if so it has to be converted
-  if (Array.isArray(localSubscriptions)) {
-    localSubscriptions = arrayToObjectWithItemsAsProps(localSubscriptions)
+  if (localSubscriptions) {
+    // localSubscriptions can be an array but if so it has to be converted
+    if (Array.isArray(localSubscriptions)) {
+      localSubscriptions = arrayToObjectWithItemsAsProps(localSubscriptions)
+    }
+
+    await indexedDb.setLocalSubscriptions(localSubscriptions)
   }
 
-  await indexedDb.setLocalSubscriptions(localSubscriptions)
+  if (!address) {
+    return
+  }
+  if (!ethereumSubscriptions) {
+    return
+  }
+  // ethereumSubscriptions can be an array but if so it has to be converted
+  if (Array.isArray(ethereumSubscriptions)) {
+    ethereumSubscriptions = arrayToObjectWithItemsAsProps(ethereumSubscriptions)
+  }
+
+  await indexedDb.setEthereumSubscriptionsCache({address, ethereumSubscriptions})
 }
 
 const setSettings = async (settings) => {

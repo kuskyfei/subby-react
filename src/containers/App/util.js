@@ -59,6 +59,9 @@ const getRouteFromUrlParams = (urlParams) => {
     case 'subscriptions':
       return 'subscriptions'
 
+    case 'donations':
+      return 'donations'
+
     case 'settings':
       return 'settings'
 

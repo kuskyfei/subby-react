@@ -1,4 +1,4 @@
-const db = require('./db').default
+const db = require('./db')
 const {getLocalSubscriptions, getSettings} = require('./read')
 
 const debug = require('debug')('services:indexedDb:write')
@@ -11,7 +11,7 @@ const setProfileCache = async (profile) => {
 
   if (profile.username) {
     const key = profile.username
-    const tx = await db // eslint-disable-line
+    const tx = await db
       .db
       .transaction(['profiles'], 'readwrite')
       .objectStore('profiles')
@@ -20,7 +20,7 @@ const setProfileCache = async (profile) => {
 
   if (profile.address) {
     const key = profile.address
-    const tx = await db // eslint-disable-line
+    const tx = await db
       .db
       .transaction(['profiles'], 'readwrite')
       .objectStore('profiles')

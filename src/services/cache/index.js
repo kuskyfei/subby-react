@@ -9,6 +9,7 @@ const {
 
 const {
   getAddress,
+  isTerminated,
   getProfile,
   getSubscriptions,
   getActiveSubscriptions,
@@ -31,6 +32,7 @@ export {
   publish,
 
   getAddress,
+  isTerminated,
   getProfile,
   getSubscriptions,
   getActiveSubscriptions,

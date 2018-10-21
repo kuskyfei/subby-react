@@ -86,6 +86,7 @@ class EditForm extends React.Component {
     bio: '',
     thumbnail: '',
     textDonationEnabled: '',
+    hideDonationAmounts: '',
     minimumTextDonation: '',
     address: '',
     usernameIsEditable: true
@@ -95,7 +96,6 @@ class EditForm extends React.Component {
     const {profile} = this.props
 
     this.setState({
-      ...this.state,
       ...profile,
       usernameIsEditable: !profile.username,
       textDonationEnabled: !!profile.minimumTextDonation
@@ -122,11 +122,11 @@ class EditForm extends React.Component {
       usernameError: null
     })
 
-    if (username.length > 32) {
+    if (username.length > 39) {
       this.setState({
         ...this.state,
         username,
-        usernameError: 'Over 32 characters'
+        usernameError: 'Over 39 characters'
       })
     }
   }
@@ -137,7 +137,7 @@ class EditForm extends React.Component {
 
   render () {
     const {classes} = this.props
-    const {username, usernameError, bio, thumbnail, textDonationEnabled, minimumTextDonation, address, usernameIsEditable} = this.state
+    const {username, usernameError, bio, thumbnail, textDonationEnabled, minimumTextDonation, address, usernameIsEditable, hideDonationAmounts} = this.state
 
     return (
       <form className={classes.container} noValidate autoComplete='off'>
@@ -156,7 +156,7 @@ class EditForm extends React.Component {
         />
 
         <Typography className={classes.message} variant='caption' gutterBottom>
-          Choose a unique username between 1-32 characters. It can never be changed. Spaces at beginning and end are trimmed.
+          Choose a unique username between 1-39 characters. It can never be changed. Spaces at beginning and end are trimmed.
         </Typography>
 
         <div className={classes.profile}>
@@ -218,6 +218,18 @@ class EditForm extends React.Component {
             />
           }
           label='Enable Text Donations'
+        />
+
+        <FormControlLabel
+          control={
+            <Switch
+              checked={hideDonationAmounts}
+              onChange={this.handleSwitch('hideDonationAmounts')}
+              value={hideDonationAmounts}
+              color='primary'
+            />
+          }
+          label='Hide Donations'
         />
 
         <FormControl fullWidth className={classes.margin}>

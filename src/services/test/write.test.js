@@ -79,7 +79,7 @@ describe('services', () => {
   describe('setSubscriptions', () => {
     test('locally', async () => {
       { // test with a publishers array
-        await services.setSubscriptions(PUBLISHERS)
+        await services.setSubscriptions({localSubscriptions: PUBLISHERS})
 
         const subscriptions = await services.getSubscriptions()
         expect(Object.keys(subscriptions.localSubscriptions).length).toEqual(PUBLISHERS.length)
@@ -90,7 +90,7 @@ describe('services', () => {
       }
 
       { // test with an empty publisher object
-        await services.setSubscriptions({})
+        await services.setSubscriptions({localSubscriptions: {}})
 
         const subscriptions = await services.getSubscriptions()
         expect(subscriptions.localSubscriptions).toEqual({})

@@ -1,4 +1,4 @@
-const {init} = require('./db').default
+const {init} = require('./init')
 
 export {init}
 export * from './write'
