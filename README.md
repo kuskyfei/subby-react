@@ -21,6 +21,7 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
+fix subby.js onNetworkChange and onAddressChange 
 add torrents to subby.js mocks
 fix subby.js sync subscriptions
 fix subby.js events
