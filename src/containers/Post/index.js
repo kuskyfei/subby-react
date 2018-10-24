@@ -125,7 +125,34 @@ class Post extends React.Component {
     debug('handleIpfsLink end')
   }
 
-  getBlobFromStream = ({ipfsHash, fileExtension}) => new Promise(resolve => {
+  getBlobFromStream = async ({ipfsHash, fileExtension}) => {
+    this.setState({
+      ...this.state,
+      link: {
+        download: this.download.bind(this, {ipfsHash, fileExtension}),
+        message: 'Connecting.',
+        downloadMessage: 'Cancel'
+      },
+      isDownloading: true
+    })
+
+    const blob = await services.ipfs.getBlobFromStream(ipfsHash, (progress) => {
+      this.killStream = progress.killStream
+      this.setState({
+        ...this.state,
+        link: {
+          download: this.download.bind(this, {ipfsHash, fileExtension}),
+          message: `${progress.progressInMbs} MB downloaded.`,
+          downloadMessage: 'Cancel'
+        },
+        isDownloading: true
+      })
+    })
+
+    return blob
+  }
+
+  getBlobFromWebWorker = ({ipfsHash, fileExtension}) => new Promise(resolve => {
     this.setState({
       ...this.state,
       link: {

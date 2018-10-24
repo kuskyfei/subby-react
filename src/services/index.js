@@ -27,7 +27,7 @@ const init = async () => {
 const mockSmartContracts = ({explicit} = {}) => {
   let smartContractsMock = require('subby.js/test/mock')
   if (explicit) {
-    smartContractsMock = require('subby.js/test/mockExplicit')
+    smartContractsMock = require('subby.js/test/mock/explicit')
   }
   subbyJs.mockSmartContracts(smartContractsMock)
 }
@@ -40,7 +40,7 @@ const mockIpfsApi = () => {
   ipfs.mockIpfsApi()
 }
 
-const {getPostsFromPublisher, getPostFromId} = subbyJs
+const {getPostsFromPublisher, getPostFromId, onDonation, getAddress, isTerminated} = subbyJs
 
 const {
   setSettings,
@@ -50,8 +50,6 @@ const {
   donate,
   publish,
 
-  getAddress,
-  isTerminated,
   getProfile,
   getSubscriptions,
   getActiveSubscriptions,
@@ -98,6 +96,7 @@ export {
   isTerminated,
   getPostsFromPublisher,
   getPostFromId,
+  onDonation,
   // torrent
   getTorrent,
   getMagnetFromTorrentFile,

@@ -26,7 +26,7 @@ const getDuplicatePosts = (posts) => {
 
   for (const post of posts) {
     const key = post.username + '-' + post.address + '-' + post.id
-    
+
     if (object[key]) {
       duplicates.push(key)
     }

@@ -14,23 +14,6 @@ const debug = require('debug')('services:cache:read')
 
 const feedCacheBufferSize = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_BUFFER_SIZE
 
-const getAddress = async () => {
-  // NEED TO CHANGE THIS TO USE SUBBY.JS INSTEAD
-  debug('getAddress')
-
-  // const ethereumAddress = await subbyJs.getAddress()
-  const ethereumAddress = '0x1111111111111111111111111111111111111111'
-
-  debug('getAddress returns', ethereumAddress)
-
-  return ethereumAddress
-}
-
-const isTerminated = async () => {
-  // NEED TO CHANGE THIS TO USE SUBBY.JS INSTEAD
-  return false
-}
-
 const getProfile = async (account) => {
   debug('getProfile', account)
 
@@ -116,18 +99,18 @@ const isSubscribed = async ({publisher, address}) => {
   // if publisher is a profile object
   if (typeof publisher === 'object') {
     if (subscriptions[publisher.username]) {
-      isSubscribed =  true
+      isSubscribed = true
     }
     if (subscriptions[publisher.address]) {
-      isSubscribed =  true
-    }    
+      isSubscribed = true
+    }
   }
 
   // if publisher is a string
   if (typeof publisher === 'string') {
     if (subscriptions[publisher]) {
-      isSubscribed =  true
-    }  
+      isSubscribed = true
+    }
   }
 
   debug('isSubscribed returns', isSubscribed)
@@ -263,8 +246,6 @@ const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) =
 }
 
 export {
-  getAddress,
-  isTerminated,
   getProfile,
   getSubscriptions,
   getActiveSubscriptions,

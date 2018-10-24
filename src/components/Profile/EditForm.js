@@ -86,7 +86,7 @@ class EditForm extends React.Component {
     bio: '',
     thumbnail: '',
     textDonationEnabled: '',
-    hideDonationAmounts: '',
+    hideDonations: '',
     minimumTextDonation: '',
     address: '',
     usernameIsEditable: true
@@ -137,7 +137,7 @@ class EditForm extends React.Component {
 
   render () {
     const {classes} = this.props
-    const {username, usernameError, bio, thumbnail, textDonationEnabled, minimumTextDonation, address, usernameIsEditable, hideDonationAmounts} = this.state
+    const {username, usernameError, bio, thumbnail, textDonationEnabled, minimumTextDonation, address, usernameIsEditable, hideDonations} = this.state
 
     return (
       <form className={classes.container} noValidate autoComplete='off'>
@@ -223,9 +223,9 @@ class EditForm extends React.Component {
         <FormControlLabel
           control={
             <Switch
-              checked={hideDonationAmounts}
-              onChange={this.handleSwitch('hideDonationAmounts')}
-              value={hideDonationAmounts}
+              checked={hideDonations}
+              onChange={this.handleSwitch('hideDonations')}
+              value={hideDonations}
               color='primary'
             />
           }

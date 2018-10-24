@@ -43,7 +43,7 @@ const styles = theme => {
 class App extends Component {
   state = {
     route: () => '',
-    isInitializing: true,
+    isInitializing: true
   }
 
   componentDidMount () {
@@ -95,7 +95,7 @@ class App extends Component {
 
   scrollToTopOnUrlParamsChange = (prevProps) => {
     if (isUrlParamsChangeFromProps(this.props, prevProps)) {
-      window.scrollTo(0,0)
+      window.scrollTo(0, 0)
     }
   }
 

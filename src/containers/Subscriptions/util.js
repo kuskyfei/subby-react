@@ -148,7 +148,7 @@ const importTextFile = () => {
     // reading the file
     input.onchange = ({target} = {}) => {
       const reader = new FileReader()
-      reader.onload = function() {
+      reader.onload = function () {
         const text = reader.result
         resolve(text)
       }
@@ -161,9 +161,9 @@ const importTextFile = () => {
 }
 
 export {
-  subscriptionsStringToObject, 
-  subscriptionsObjectToString, 
-  downloadTextFile, 
-  getActiveSubscriptionsFromSubscriptions, 
+  subscriptionsStringToObject,
+  subscriptionsObjectToString,
+  downloadTextFile,
+  getActiveSubscriptionsFromSubscriptions,
   importTextFile
 }

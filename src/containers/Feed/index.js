@@ -10,7 +10,7 @@ import {withRouter} from 'react-router-dom'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
-import {Profile, Feed as FeedComponent} from '../../components'
+import {Profile, Feed as FeedComponent, Pages} from '../../components'
 
 // containers
 import {Post} from '../../containers'
@@ -77,7 +77,8 @@ class Feed extends React.Component {
     addingMorePosts: false,
     publisherStartAt: 0,
     isInitializing: false,
-    settings: {}
+    settings: {},
+    noSubscriptions: false
   }
 
   componentDidMount () {
@@ -174,6 +175,9 @@ class Feed extends React.Component {
       const startAt = feed.length
       const address = await services.getAddress()
       const subscriptions = await services.getActiveSubscriptions(address)
+      if (Object.keys(subscriptions).length === 0 || true) {
+        this.setState(state => ({noSubscriptions: true}))
+      }
       const newPosts = await services.getFeed({subscriptions, startAt, limit: 10})
       actions.setFeed([...feed, ...newPosts])
     }
@@ -184,16 +188,20 @@ class Feed extends React.Component {
 
   render () {
     const {classes, feed, location} = this.props
-    const {addingMorePosts, profileIsLoading, settings, isInitializing} = this.state
+    const {addingMorePosts, profileIsLoading, settings, isInitializing, noSubscriptions} = this.state
 
     if (isInitializing) {
       return <div />
     }
 
+    if (noSubscriptions) {
+      return <Pages.FindSubscriptions />
+    }
+
     const posts = []
     for (const post of feed) {
       if (post) {
-        posts.push(<Post key={post.username + post.address + post.id} post={post} settings={settings}/>)
+        posts.push(<Post key={post.username + post.address + post.id} post={post} settings={settings} />)
       }
     }
 
@@ -248,7 +256,7 @@ const getProfile = async (account) => {
 const mapStateToProps = state => ({
   feed: state.feed.feed,
   publisherProfile: state.feed.publisherProfile,
-  profile: state.app.profile,
+  profile: state.app.profile
 })
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch)

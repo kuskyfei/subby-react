@@ -89,13 +89,13 @@ module.exports = function override (config, env) {
   }
 
   // enable inline web workers as .worker.js files
-  // config.module.rules.push({
-  //   test: /\.worker\.js$/,
-  //   use: {
-  //     loader: 'worker-loader',
-  //     options: {inline: true}
-  //   }
-  // })
+  config.module.rules.push({
+    test: /\.worker\.js$/,
+    use: {
+      loader: 'worker-loader',
+      options: {inline: true}
+    }
+  })
 
   return config
 }

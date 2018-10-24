@@ -63,7 +63,7 @@ class Settings extends React.Component {
   handleValueChange = name => event => {
     const value = event.target.value
     this.setState({
-      [name]: value,
+      [name]: value
     })
     onFinishedTyping(async () => {
       await services.setSettings({...this.state, [name]: value})
@@ -73,7 +73,7 @@ class Settings extends React.Component {
 
   handleCheckedChange = name => async event => {
     this.setState({
-      [name]: event.target.checked,
+      [name]: event.target.checked
     })
     await services.setSettings({...this.state, [name]: event.target.checked})
   }
@@ -187,7 +187,7 @@ class Settings extends React.Component {
               }
               label='Vimeo Embeds'
             />
-
+{/* there's a bug with twitter and instagram
             <FormControlLabel
               control={
                 <Switch
@@ -213,7 +213,7 @@ class Settings extends React.Component {
               }
               label='Instagram Embeds'
             />
-
+*/}
             <Typography className={classes.message} variant='caption' gutterBottom>
               Links are embeded from sites using iframes or Javascript.
             </Typography>

@@ -10,27 +10,15 @@ import {withRouter} from 'react-router-dom'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
-import {Feed as FeedComponent} from '../../components'
-
-// containers
-import {Post} from '../../containers'
+import {Feed as FeedComponent, Donation} from '../../components'
 
 // api
 const services = require('../../services')
 
 // util
-const {
-  getAccountFromUrlParams,
-  getUsernameFromUrlParams,
-  getPostIdFromUrlParams,
-  isPermalink,
-  isPublisher,
-  isProfile,
-  isFeed,
-  isRouteChange,
-  isProfileChange
-} = require('./util')
 const debug = require('debug')('containers:Donations')
+
+const DONATIONS_PER_PAGE = 50
 
 const styles = theme => ({
   layout: {
@@ -47,17 +35,18 @@ const styles = theme => ({
 
 class Donations extends React.Component {
   state = {
-    hasMorePosts: true,
-    addingMorePosts: false,
-    publisherStartAt: 0
+    donations: []
   }
+
+  donations = []
 
   componentDidMount () {
     ;(async () => {
-
+      this.onDonation = services.onDonation({}, (donation) => {
+        this.donations.push(donation)
+        this.setState({donations: this.donations})
+      })
     })()
-
-    this.addPostsToFeed({reset: true})
 
     debug('mounted')
   }
@@ -70,57 +59,22 @@ class Donations extends React.Component {
     debug('unmounted')
   }
 
-  async addPostsToFeed ({reset} = {}) {
-    debug('addPostsToFeed start', this.props, this.state)
-    let {location, actions, feed} = this.props
-    let {hasMorePosts, publisherStartAt} = this.state
-    const username = getUsernameFromUrlParams(location.search)
-
-    if (!hasMorePosts) {
-      return
-    }
-
-    this.setState(state => ({addingMorePosts: true}))
-
-    const startAt = feed.length
-    const address = await services.getAddress()
-    const subscriptions = await services.getActiveSubscriptions(address)
-    const newPosts = await services.getFeed({subscriptions, startAt, limit: 10})
-    actions.setFeed([...feed, ...newPosts])
-
-    this.setState(state => ({addingMorePosts: false}))
-    debug('addPostsToFeed end', this.props, this.state)
-  }
-
   render () {
-    const {classes, feed, location} = this.props
-    const {addingMorePosts, profileIsLoading, settings, isInitializing} = this.state
+    const {classes} = this.props
+    let {donations} = this.state
 
-    if (isInitializing) {
-      return <div />
-    }
+    donations = donations.slice(donations.length - DONATIONS_PER_PAGE, donations.length)
 
-    const posts = []
-    for (const post of feed) {
-      if (post) {
-        posts.push(<Post key={post.username + post.address + post.id} post={post} settings={settings}/>)
-      }
-    }
+    const donationCards = []
 
-    let profile, editable
-    if (isProfile(location.search)) {
-      profile = this.props.profile
-      editable = true
-    }
-    if (isPublisher(location.search)) {
-      profile = this.props.publisherProfile
+    for (const donation of donations) {
+      donationCards.push(<Donation donation={donation}/>)
     }
 
     return (
       <div className={classes.layout}>
-        <FeedComponent postCount={posts.length} addPostsToFeed={this.addPostsToFeed.bind(this)} >
-          {posts}
-          {addingMorePosts && <Post isLoading />}
+        <FeedComponent postCount={donations.length}>
+          {donationCards}
         </FeedComponent>
 
       </div>

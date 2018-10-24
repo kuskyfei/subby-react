@@ -27,10 +27,10 @@ import actions from './reducers/actions'
 // api
 const services = require('../../services')
 const {
-  subscriptionsStringToObject, 
-  subscriptionsObjectToString, 
-  downloadTextFile, 
-  getActiveSubscriptionsFromSubscriptions, 
+  subscriptionsStringToObject,
+  subscriptionsObjectToString,
+  downloadTextFile,
+  getActiveSubscriptionsFromSubscriptions,
   importTextFile
 } = require('./util')
 
@@ -103,7 +103,7 @@ const styles = theme => ({
       marginLeft: 16,
       marginRight: 16,
       transform: 'scale(1.2)'
-    },
+    }
   },
   buttons: {
     whiteSpace: 'nowrap',
@@ -112,7 +112,7 @@ const styles = theme => ({
     display: 'inline-flex',
     marginTop: 32,
     [theme.breakpoints.down(700)]: {
-      marginTop: 24,
+      marginTop: 24
     },
     [theme.breakpoints.down(500)]: {
       display: 'grid',
@@ -142,7 +142,7 @@ const styles = theme => ({
     background: theme.palette.common.white,
     color: theme.palette.text.primary,
     boxShadow: theme.shadows[1],
-    fontSize: 12,
+    fontSize: 12
   }
 })
 
@@ -271,7 +271,7 @@ class Subscriptions extends React.Component {
               {isLoading &&
                 <Paper className={classNames(classes.paper, classes.loadingPaper)}>
                   <LinearProgress className={classes.loading} />
-                  <TextField className={classes.textField} multiline disableUnderline disabled/>
+                  <TextField className={classes.textField} multiline disableUnderline disabled />
                 </Paper>
               }
 
@@ -295,7 +295,7 @@ class Subscriptions extends React.Component {
               {isLoading &&
                 <Paper className={classNames(classes.paper, classes.loadingPaper)}>
                   <LinearProgress className={classes.loading} />
-                  <TextField className={classes.textField} multiline disableUnderline disabled/>
+                  <TextField className={classes.textField} multiline disableUnderline disabled />
                 </Paper>
               }
 
@@ -319,26 +319,26 @@ class Subscriptions extends React.Component {
 
           <div className={classes.buttons} >
             <Tooltip
-              title="Saved!"
+              title='Saved!'
               classes={{tooltip: classes.lightTooltip}}
               open={saveTooltipOpen}
             >
               <Button onClick={this.handleSave} size='small' variant='contained' color='default' className={classes.button}>
                 Save
-                <SaveIcon className={classes.rightIcon}/>
+                <SaveIcon className={classes.rightIcon} />
               </Button>
             </Tooltip>
             <Button size='small' variant='contained' color='default' className={classes.button}>
               Sync
-              <CloudUploadIcon className={classes.rightIcon}/>
+              <CloudUploadIcon className={classes.rightIcon} />
             </Button>
             <Button onClick={this.handleImport} size='small' variant='contained' color='default' className={classes.button}>
               Import
-              <PublishIcon className={classes.rightIcon}/>
+              <PublishIcon className={classes.rightIcon} />
             </Button>
             <Button onClick={this.handleExport} size='small' variant='contained' color='default' className={classes.button}>
               Export
-              <GetAppIcon className={classes.rightIcon}/>
+              <GetAppIcon className={classes.rightIcon} />
             </Button>
             <Tooltip title={<HelpText />} placement='top-end'>
               <HelpIcon className={classNames(classes.greyIcon, classes.button)} />

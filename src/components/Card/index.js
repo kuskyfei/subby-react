@@ -97,7 +97,7 @@ const styles = theme => ({
     background: theme.palette.common.white,
     color: theme.palette.text.primary,
     boxShadow: theme.shadows[1],
-    fontSize: 12,
+    fontSize: 12
   }
 })
 
@@ -127,7 +127,7 @@ class Card extends React.Component {
     this.setState({cardMenuAnchorEl: null })
   }
 
-  async handleUnsubscribe() {
+  async handleUnsubscribe () {
     this.setState({cardMenuAnchorEl: null, unsubscribeTooltipOpen: true})
     setTimeout(() => {
       this.setState({unsubscribeTooltipOpen: false})
@@ -141,7 +141,7 @@ class Card extends React.Component {
     await services.unsubscribe({address, publishers: [post.username, post.address]})
   }
 
-  handlePermalinkCopy() {
+  handlePermalinkCopy () {
     const {post} = this.props
     const username = post.username || post.address
 
@@ -176,8 +176,8 @@ class Card extends React.Component {
     if (isLoading) return <LoadingCard classes={classes} />
 
     const username = post.username || post.address
-
     const date = (preview) ? 'Previewing...' : timeago.format(this.state.timestamp)
+    let postDonationsAmount = (post.postDonationsAmount === 0) ? null : post.postDonationsAmount 
 
     return (
       <MaterialCard className={classes.card}>
@@ -197,26 +197,25 @@ class Card extends React.Component {
                 <CloseIcon className={classes.closeButton} />
               </StyledIconButton>
               : <Tooltip
-                  title={`Unsubscribed from ${username}!`}
-                  classes={{tooltip: classes.lightTooltip}}
-                  open={unsubscribeTooltipOpen}
+                title={`Unsubscribed from ${username}!`}
+                classes={{tooltip: classes.lightTooltip}}
+                open={unsubscribeTooltipOpen}
+              >
+                <IconButton
+                  aria-owns={cardMenuAnchorEl ? 'card-menu' : null}
+                  aria-haspopup='true'
+                  onClick={this.handleCardMenuClick}
                 >
-                  <IconButton
-                    ref={this.menuButtonRef}
-                    aria-owns={cardMenuAnchorEl ? 'card-menu' : null}
-                    aria-haspopup="true"
-                    onClick={this.handleCardMenuClick}
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                </Tooltip>
+                  <MoreVertIcon />
+                </IconButton>
+              </Tooltip>
           }
           title={<Link to={'?u=' + username}>{username}</Link>}
           subheader={<Link to={`?u=${username}&id=${post.id}`}>{date}</Link>}
         />
 
         <Menu
-          id="card-menu"
+          id='card-menu'
           anchorEl={cardMenuAnchorEl}
           anchorOrigin={{
             vertical: 'top',
@@ -254,16 +253,19 @@ class Card extends React.Component {
                 <IconButton aria-label='Donate'>
                   <FavoriteIcon />
                 </IconButton>
-                <Typography className={classes.donationAmounts} variant='body1' noWrap gutterBottom>
-                  0.85
-                </Typography>
+
+                {postDonationsAmount &&
+                  <Typography className={classes.donationAmounts} variant='body1' noWrap gutterBottom>
+                    {post.postDonationsAmount}
+                  </Typography>
+                }
               </span>}>
 
               <Donate profile={post} />
             </Modal>
 
             <Tooltip
-              title="Permalink copied to clipboard!"
+              title='Permalink copied to clipboard!'
               classes={{tooltip: classes.lightTooltip}}
               open={permalinkTooltipOpen}
             >

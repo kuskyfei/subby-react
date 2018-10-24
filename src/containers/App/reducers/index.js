@@ -2,7 +2,7 @@ import A from './type'
 
 const initialState = {
   address: null,
-  profile: null,
+  profile: null
 }
 
 const reducer = (state = initialState, action) => {

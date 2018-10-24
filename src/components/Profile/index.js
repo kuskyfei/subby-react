@@ -5,6 +5,7 @@ import Button from '@material-ui/core/Button'
 import classNames from 'classnames'
 import Typography from '@material-ui/core/Typography'
 import MessageIcon from '@material-ui/icons/Message'
+import PersonAddIcon from '@material-ui/icons/PersonAdd'
 import EditIcon from '@material-ui/icons/Edit'
 
 import {Modal, Donate} from '../../components'
@@ -61,7 +62,7 @@ const styles = theme => ({
 class Profile extends React.Component {
   state = {isSubscribed: null}
 
-  async handleSubscribe() {
+  async handleSubscribe () {
     const {services, profile} = this.props
     if (!services) {
       return
@@ -73,7 +74,7 @@ class Profile extends React.Component {
     await services.subscribe({address, publisher: account})
   }
 
-  async handleUnsubscribe() {
+  async handleUnsubscribe () {
     const {services, profile} = this.props
     if (!services) {
       return
@@ -83,7 +84,7 @@ class Profile extends React.Component {
     await services.unsubscribe({address, publishers: [profile.username, profile.address]})
   }
 
-  render() {
+  render () {
     const {classes, profile, editable, isLoading} = this.props
     const {isSubscribed} = this.state
 
@@ -107,16 +108,15 @@ class Profile extends React.Component {
           {username}
         </Typography>
 
-        {!profile.isSubscribed && 
+        {!profile.isSubscribed &&
           <Button onClick={this.handleSubscribe.bind(this)} size='small' variant='contained' color='default' className={classes.button}>
             Subscribe&nbsp;
-            <span className={classes.count}>{profile.subscriberCount || ''}</span>
+            <PersonAddIcon className={classes.iconSmall} />
           </Button>
         }
-        {profile.isSubscribed && 
+        {profile.isSubscribed &&
           <Button onClick={this.handleUnsubscribe.bind(this)} size='small' variant='contained' color='default' className={classes.button}>
             Unsubscribe&nbsp;
-            <span className={classes.count}>{profile.subscriberCount || ''}</span>
           </Button>
         }
 
@@ -124,13 +124,14 @@ class Profile extends React.Component {
           <Modal maxWidth={400} trigger={
             <Button size='small' variant='contained' color='default' className={classes.button}>
               Donate&nbsp;
-              {profile.minimumTextDonation !== 0 &&
-                <span className={classes.contents}>
+              <span className={classes.contents}>
+                {profile.minimumTextDonation !== 0 &&
                   <MessageIcon className={classes.iconSmall} />
-                  &nbsp;
-                  <span className={classNames(classes.count, classes.leftNudge)}>{profile.minimumTextDonation}</span>
-                </span>
-              }
+                }
+                {profile.totalDonationsAmount !== 0 && 
+                  <span className={classNames(classes.count, classes.leftNudge)}>&nbsp;{profile.totalDonationsAmount}</span>
+                }
+              </span>
             </Button>}>
 
             <Donate profile={profile} />
