@@ -104,11 +104,18 @@ const getWidgetFromUrl = (url, settings) => {
       if (!settings.YOUTUBE_EMBEDS) {
         return Link
       }
+      if (!isYoutubeVideo(url)) {
+        return Link
+      }
       return Youtube
 
     default:
       return Link
   }
+}
+
+const isYoutubeVideo = (url) => {
+  return url.match(/watch\?v=([^&]+)/)
 }
 
 const getWidgetTypeFromUrl = (url) => {

@@ -129,7 +129,7 @@ class Card extends React.Component {
     if (isLoading) return <LoadingCard classes={classes} />
 
     const username = donation.senderUsername || donation.senderAddress
-    const date = timeago.format(this.state.timestamp)
+    const date = timeago.format(this.state.timestamp * 1000)
 
     return (
       <MaterialCard className={classes.card}>

@@ -176,8 +176,9 @@ class Card extends React.Component {
     if (isLoading) return <LoadingCard classes={classes} />
 
     const username = post.username || post.address
-    const date = (preview) ? 'Previewing...' : timeago.format(this.state.timestamp)
-    let postDonationsAmount = (post.postDonationsAmount === 0) ? null : post.postDonationsAmount 
+    const date = (preview) ? 'Previewing...' : timeago.format(this.state.timestamp * 1000)
+    let postDonationsAmount = (post.postDonationsAmount === 0) ? null : post.postDonationsAmount.toFixed(3)
+    if (postDonationsAmount < 0.001) postDonationsAmount = null
 
     return (
       <MaterialCard className={classes.card}>
@@ -256,7 +257,7 @@ class Card extends React.Component {
 
                 {postDonationsAmount &&
                   <Typography className={classes.donationAmounts} variant='body1' noWrap gutterBottom>
-                    {post.postDonationsAmount}
+                    {postDonationsAmount}
                   </Typography>
                 }
               </span>}>

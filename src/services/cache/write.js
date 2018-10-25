@@ -36,21 +36,9 @@ const setSettings = async (settings) => {
   await indexedDb.setSettings(settings)
 }
 
-const donate = async ({account, value, text, postId}) => {
-  debug('donate', {account, value, text, postId})
-  await subbyJs.donate({account, value, text, postId})
-}
-
-const publish = async ({link, comment}) => {
-  debug('publish', {link, comment})
-  await subbyJs.publishPost({link, comment})
-}
-
 export {
   setSettings,
   setSubscriptions,
   subscribe,
-  unsubscribe,
-  donate,
-  publish
+  unsubscribe
 }

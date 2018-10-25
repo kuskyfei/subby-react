@@ -58,6 +58,9 @@ class App extends Component {
       this.setState({...this.state, isInitializing: false})
 
       const address = await services.getAddress()
+      if (!address) {
+        return
+      }
       const profile = await services.getProfile(address)
       actions.setAddress(address)
       actions.setProfile(profile)

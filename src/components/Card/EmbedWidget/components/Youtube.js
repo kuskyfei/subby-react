@@ -35,8 +35,10 @@ const Youtube = (props) => {
 }
 
 const getYoutubeVideoId = (url) => {
-  const id = /watch\?v=([^&]+)/.exec(url)[1]
-  return id
+  try {
+    const id = /watch\?v=([^&]+)/.exec(url)[1]
+    return id
+  } catch (e) {}
 }
 
 export default withStyles(styles)(Youtube)

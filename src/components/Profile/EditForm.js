@@ -132,12 +132,25 @@ class EditForm extends React.Component {
   }
 
   handlePublish = () => {
+    const {profile} = this.props
+    let {username, bio, thumbnail, hideDonations, minimumDonation} = this.state
 
+    if (username === profile.username) username = null
+    if (bio === profile.bio) bio = null
+    if (thumbnail === profile.thumbnail) thumbnail = null
+    if (hideDonations === profile.hideDonations) hideDonations = null
+    if (minimumDonation === profile.minimumDonation) minimumDonation = null
+
+    console.log({username, bio, thumbnail, hideDonations, minimumDonation})
+
+    //await services.editProfile({username, bio, thumbnail, hideDonations, minimumDonation})
   }
 
   render () {
     const {classes} = this.props
-    const {username, usernameError, bio, thumbnail, textDonationEnabled, minimumTextDonation, address, usernameIsEditable, hideDonations} = this.state
+    let {username, usernameError, bio, thumbnail, textDonationEnabled, minimumTextDonation, address, usernameIsEditable, hideDonations} = this.state
+
+    if (minimumTextDonation && (minimumTextDonation !== 0) && (minimumTextDonation.toFixed(4) < 0.0001)) minimumTextDonation = 0.0001
 
     return (
       <form className={classes.container} noValidate autoComplete='off'>
@@ -259,7 +272,7 @@ class EditForm extends React.Component {
             variant='contained'
             color='default'
             className={classes.publishButton}
-            onClick={this.handlePublish.bind(this)}
+            onClick={this.handlePublish}
           >
             <span className={classes.publishButtonText}>Publish</span>
             <CloudUploadIcon className={classes.rightIcon} />

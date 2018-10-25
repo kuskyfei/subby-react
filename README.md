@@ -21,6 +21,8 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
+fix the subtypes regex
+fix metamask on compiled version
 fix ga
 fix default address
 update cache functions
