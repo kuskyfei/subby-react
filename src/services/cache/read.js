@@ -34,65 +34,19 @@ const getProfile = async (account) => {
   return profile
 }
 
-const getSubscriptions = async (address) => {
-  debug('getSubscriptions', address)
+const getSubscriptions = async () => {
+  debug('getSubscriptions')
 
   let localSubscriptions = await indexedDb.getLocalSubscriptions()
   if (!localSubscriptions) localSubscriptions = {}
 
-  if (!address) {
-    const subscriptions = {
-      activeSubscriptions: localSubscriptions,
-      localSubscriptions,
-      ethereumSubscriptions: {}
-    }
-    debug('getSubscriptions returns', subscriptions)
-    return subscriptions
-  }
-
-  const ethereumSubscriptionsCache = await indexedDb.getEthereumSubscriptionsCache(address)
-  let ethereumSubscriptions = ethereumSubscriptionsCache
-
-  if (await cache.ethereumSubscriptionsCacheIsExpired(address)) {
-    ethereumSubscriptions = await subbyJs.getSubscriptions(address)
-    ethereumSubscriptions = arrayToObjectWithItemsAsProps(ethereumSubscriptions)
-
-    // ethereumSubscriptionsCache have a "pending deletion" status that
-    // prevents them from appearing in the active subscriptions
-    // these pending deletion should not be deleted when the cache
-    // gets updated with fresh data from Ethereum
-    if (ethereumSubscriptionsCache) {
-      ethereumSubscriptions = mergeEthereumSubscriptionsCache(ethereumSubscriptions, ethereumSubscriptionsCache)
-    }
-
-    await indexedDb.setEthereumSubscriptionsCache({address, ethereumSubscriptions})
-  }
-
-  const activeSubscriptions = getActiveSubscriptionsFromSubscriptions({localSubscriptions, ethereumSubscriptions})
-
-  const subscriptions = {
-    activeSubscriptions,
-    localSubscriptions,
-    ethereumSubscriptions
-  }
-  debug('getSubscriptions returns', subscriptions)
-
-  return subscriptions
+  return localSubscriptions
 }
 
-const getActiveSubscriptions = async (address) => {
-  debug('getActiveSubscriptions', address)
-  const subscriptions = await getSubscriptions(address)
-  const {activeSubscriptions} = subscriptions
+const isSubscribed = async (publisher) => {
+  debug('isSubscribed', {publisher})
 
-  debug('getActiveSubscriptions returns', {activeSubscriptions})
-  return activeSubscriptions
-}
-
-const isSubscribed = async ({publisher, address}) => {
-  debug('isSubscribed', {publisher, address})
-
-  const subscriptions = await getActiveSubscriptions(address)
+  const subscriptions = await getSubscriptions()
 
   let isSubscribed = false
 
@@ -248,7 +202,6 @@ const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) =
 export {
   getProfile,
   getSubscriptions,
-  getActiveSubscriptions,
   isSubscribed,
   getSettings,
   getFeed

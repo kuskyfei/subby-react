@@ -7,6 +7,7 @@ import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 const styles = theme => ({
   layout: {
@@ -16,9 +17,9 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit * 3,
     marginRight: theme.spacing.unit * 3,
     paddingTop: theme.spacing.unit * 4,
-    [theme.breakpoints.up(600 + theme.spacing.unit * 2 * 2)]: {
-      marginLeft: theme.spacing.unit * 6,
-      marginRight: theme.spacing.unit * 6,
+    [theme.breakpoints.up(500 + theme.spacing.unit * 2 * 2)]: {
+      marginLeft: 'auto',
+      marginRight: 'auto',
       paddingTop: theme.spacing.unit * 6
     },
     [theme.breakpoints.up(900 + theme.spacing.unit * 2 * 2)]: {
@@ -67,34 +68,80 @@ const styles = theme => ({
       marginBottom: theme.spacing.unit * 6
     },
     '& a:hover': {
-      textDecoration: 'underline'
+      textDecoration: 'underline',
+    },
+    '& a': {
+      fontWeight: 500,
     },
     [theme.breakpoints.down(500 + theme.spacing.unit * 2 * 2)]: {
-      '& h1': {
-        fontSize: '2rem'
-      }
+      fontSize: '2rem'
     },
     [theme.breakpoints.down(400 + theme.spacing.unit * 2 * 2)]: {
-      '& h1': {
-        fontSize: '1.7rem'
-      }
+      fontSize: '1.7rem'
     }
+  },
+
+  loading: {
+    margin: 'auto',
   }
 })
 
-class FindSubscriptions extends React.Component {
+class ErrorMessage extends React.Component {
   componentDidMount () {
 
   }
 
+  state = {
+    isLoading: false
+  }
+
+  async handleRefresh() {
+    const {onRefresh} = this.props
+    this.setState(state => ({isLoading: true}))
+    await onRefresh()
+    setTimeout(() => this.setState(state => ({isLoading:false})), 2000)
+  }
+
   render () {
-    const {classes} = this.props
+    let {classes, subscriptions, onRefresh} = this.props
+    const {isLoading} = this.state
+
+    let message = ''
+    let linkMessage = ''
+    if (subscriptions.length === 0) {
+      message = `You're not subscribed to anyone.`
+      linkMessage = 'Find accounts to follow'
+    } else if (subscriptions.length === 1) {
+      message = `Your 1 subscription hasn't posted anything.`
+      linkMessage = 'Find more accounts to follow'
+    } else {
+      message = `Your ${subscriptions.length} subscriptions haven't posted anything.`
+      linkMessage = 'Find more accounts to follow'
+    }
+
+    if (isLoading) {
+      return (
+        <div className={classes.layout}>
+          <CircularProgress className={classes.loading} size={50} />
+        </div>
+      )
+    }
 
     return (
       <div className={classes.layout}>
 
-        <Typography className={classes.links} variant='display1' gutterBottom>
-          You're not subscribed to anyone. <a href='https://subby.io/follow' target='_blank'>Find accounts to follow</a>
+        <Typography className={classes.links} variant='display1'>
+          {message}
+        </Typography>
+
+        <Typography className={classes.links} variant='display1'>
+          <a href='https://subby.io/follow' target='_blank'>{linkMessage}</a>
+          <br/>
+          {onRefresh && 
+            <span>
+              or <a onClick={this.handleRefresh.bind(this)}>Refresh</a>
+            </span>
+          }
         </Typography>
 
       </div>
@@ -102,8 +149,8 @@ class FindSubscriptions extends React.Component {
   }
 }
 
-FindSubscriptions.propTypes = {
+ErrorMessage.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(FindSubscriptions) // eslint-disable-line
+export default withStyles(styles)(ErrorMessage) // eslint-disable-line

@@ -126,7 +126,7 @@ class Help extends React.Component {
                 Step 3
               </Typography>
               <Typography variant='body1' gutterBottom>
-                Their thousands of subscribers get it on their newsfeed directly from the Ethereum network, at no cost.
+                Their Subby subscribers get it on their newsfeed directly from the Ethereum network, at no cost.
               </Typography>
             </Paper>
           </Grid>

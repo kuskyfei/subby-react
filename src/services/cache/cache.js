@@ -30,10 +30,6 @@ const updateProfileCache = () => {
   debug('updateProfileCache')
 }
 
-const updateSubscriptionsCache = () => {
-  debug('updateSubscriptionsCache')
-}
-
 const updateBackgroundFeedCache = async (subscriptions) => {
   debug('updateBackgroundFeedCache start')
 
@@ -109,18 +105,6 @@ const profileCacheIsExpired = async (account) => {
   return profileCacheIsExpired
 }
 
-const ethereumSubscriptionsCacheIsExpired = async (account) => {
-  debug('ethereumSubscriptionsCacheIsExpired', {account})
-
-  const lastEthereumSubscriptionsCacheTimestamp = await indexedDb.getLastEthereumSubscriptionsCacheTimestamp(account)
-
-  const ethereumSubscriptionsCacheIsExpired = cacheIsExpired(lastEthereumSubscriptionsCacheTimestamp, ethereumSubscriptionsCacheTime)
-
-  debug('ethereumSubscriptionsCacheIsExpired returns', ethereumSubscriptionsCacheIsExpired)
-
-  return ethereumSubscriptionsCacheIsExpired
-}
-
 const backgroundFeedCacheIsExpired = async () => {
   debug('backgroundFeedCacheIsExpired')
 
@@ -136,9 +120,7 @@ const backgroundFeedCacheIsExpired = async () => {
 export {
   updateCache,
   updateProfileCache,
-  updateSubscriptionsCache,
   profileCacheIsExpired,
-  ethereumSubscriptionsCacheIsExpired,
   backgroundFeedCacheIsExpired,
   updateBackgroundFeedCache,
   updateActiveFeedCache

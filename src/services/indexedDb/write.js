@@ -68,23 +68,6 @@ const setBackgroundFeedCache = async ({posts, nextCache, hasMorePosts}) => {
   return tx.complete
 }
 
-const setEthereumSubscriptionsCache = async ({address, ethereumSubscriptions}) => {
-  debug('setEthereumSubscriptionsCache', {address, ethereumSubscriptions})
-
-  const req = {
-    subscriptions: ethereumSubscriptions,
-    lastEthereumSubscriptionsCacheTimestamp: Date.now()
-  }
-
-  const tx = await db
-    .db
-    .transaction(['ethereumSubscriptions'], 'readwrite')
-    .objectStore('ethereumSubscriptions')
-    .put(req, address)
-
-  return tx.complete
-}
-
 const setLocalSubscriptions = async (subscriptions) => {
   debug('setLocalSubscriptions', subscriptions)
 
@@ -145,7 +128,6 @@ export {
   setProfileCache,
   setActiveFeedCache,
   setBackgroundFeedCache,
-  setEthereumSubscriptionsCache,
   setLocalSubscriptions,
   setSettings,
   addToLocalSubscriptions,

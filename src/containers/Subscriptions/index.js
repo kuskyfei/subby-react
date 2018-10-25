@@ -61,6 +61,8 @@ const styles = theme => ({
     }
   },
   paper: {
+    margin: 'auto',
+    maxWidth: 500,
     padding: theme.spacing.unit * 2,
     textAlign: 'center',
     color: theme.palette.text.secondary,
@@ -132,10 +134,13 @@ const styles = theme => ({
 
   greyIcon: {
     color: theme.palette.grey['300'],
-    fontSize: 36
+    fontSize: 36,
+    [theme.breakpoints.down(500)]: {
+      margin: 'auto'
+    }
   },
-  rightIcon: {
-    marginLeft: theme.spacing.unit
+  saveIcon: {
+    marginLeft: theme.spacing.unit / 2
   },
 
   lightTooltip: {
@@ -149,22 +154,18 @@ const styles = theme => ({
 const HelpText = () =>
   <div>
     <p>
-      SAVE your changes to Chrome's local database. Ethereum subscriptions cannot be fully changed by saving, only by syncing. You can mute Ethereum subscriptions and schedule them for deletion on next sync by adding <i>(pending deletion)</i> on the same line.
+      SAVE your changes to Chrome's local database.
     </p>
     <p>
-      SYNC your local and ethereum subscriptions to Ethereum. Optional and very gas intensive. Ethereum subscriptions that are <i>(pending deletion)</i> are muted from your feed and will be deleted on next sync.
+      IMPORT subscriptions from a text file.
     </p>
     <p>
-      IMPORT subscriptions from a text file and add them to your local subscriptions.
-    </p>
-    <p>
-      EXPORT subscriptions to a text file. Local and Ethereum subscriptions are merged.
+      EXPORT subscriptions to a text file.
     </p>
   </div>
 
 class Subscriptions extends React.Component {
   state = {
-    ethereumSubscriptions: {},
     localSubscriptions: {},
     isLoading: false,
     saveTooltipOpen: false
@@ -175,9 +176,8 @@ class Subscriptions extends React.Component {
     ;(async () => {
       this.setState({isLoading: true})
       const address = await services.getAddress()
-      const subscriptions = await services.getSubscriptions(address)
-      const {localSubscriptions, ethereumSubscriptions} = subscriptions
-      this.setState({isLoading: false, localSubscriptions, ethereumSubscriptions})
+      const localSubscriptions = await services.getSubscriptions(address)
+      this.setState({isLoading: false, localSubscriptions})
     })()
 
     debug('props', this.props)
@@ -187,12 +187,10 @@ class Subscriptions extends React.Component {
   handleSave = async () => {
     this.setState({saveTooltipOpen: true})
 
-    let {ethereumSubscriptions, localSubscriptions} = this.state
-    ethereumSubscriptions = subscriptionsStringToObject(ethereumSubscriptions)
+    let {localSubscriptions} = this.state
     localSubscriptions = subscriptionsStringToObject(localSubscriptions)
 
-    const address = await services.getAddress()
-    await services.setSubscriptions({address, localSubscriptions, ethereumSubscriptions})
+    await services.setSubscriptions(localSubscriptions)
 
     setTimeout(() => {
       this.setState({saveTooltipOpen: false})
@@ -200,12 +198,9 @@ class Subscriptions extends React.Component {
   }
 
   handleExport = async () => {
-    let {ethereumSubscriptions, localSubscriptions} = this.state
-    ethereumSubscriptions = subscriptionsStringToObject(ethereumSubscriptions)
-    localSubscriptions = subscriptionsStringToObject(localSubscriptions)
+    let {localSubscriptions} = this.state
 
-    const activeSubscriptions = getActiveSubscriptionsFromSubscriptions({ethereumSubscriptions, localSubscriptions})
-    const subscriptionsString = subscriptionsObjectToString(activeSubscriptions)
+    const subscriptionsString = subscriptionsObjectToString(localSubscriptions)
     const date = new Date().toISOString()
     const fileName = `subby-subscriptions-${date}.txt`
 
@@ -229,7 +224,7 @@ class Subscriptions extends React.Component {
 
   render () {
     const {classes, profile} = this.props
-    const {localSubscriptions, ethereumSubscriptions, isLoading, saveTooltipOpen} = this.state
+    const {localSubscriptions, isLoading, saveTooltipOpen} = this.state
 
     // we need to format the subscriptions object to a string
     // on first render otherwise it is simply a string
@@ -241,81 +236,36 @@ class Subscriptions extends React.Component {
       localSubscriptionsString = localSubscriptions
     }
 
-    let ethereumSubscriptionsString = ''
-    if (typeof ethereumSubscriptions === 'object') {
-      ethereumSubscriptionsString = subscriptionsObjectToString(ethereumSubscriptions)
-    }
-    if (typeof ethereumSubscriptions === 'string') {
-      ethereumSubscriptionsString = ethereumSubscriptions
-    }
-
-    let username = ''
-    if (profile && profile.username) {
-      username = `of ${profile.username}`
-    } else if (profile && profile.address) {
-      username = `of ${profile.address}`
-    }
-
     return (
       <div className={classes.layout}>
 
         <div className={classes.root}>
 
           <Typography className={classes.message} variant='body1' align='center'>
-            Your subscriptions are saved inside Chrome permanently, as long as you don't clear your cache. Export them to file or Sync them with Ethereum to migrate.
+            Your subscriptions are saved inside Chrome permanently, as long as you don't clear your cache.
           </Typography>
 
-          <Grid container spacing={24} className={classes.grid}>
+          {isLoading &&
+            <Paper className={classNames(classes.paper, classes.loadingPaper)}>
+              <LinearProgress className={classes.loading} />
+              <TextField className={classes.textField} multiline disableUnderline disabled />
+            </Paper>
+          }
 
-            <Grid item xs={6}>
-              {isLoading &&
-                <Paper className={classNames(classes.paper, classes.loadingPaper)}>
-                  <LinearProgress className={classes.loading} />
-                  <TextField className={classes.textField} multiline disableUnderline disabled />
-                </Paper>
-              }
-
-              {!isLoading &&
-                <Paper className={classes.paper}>
-                  <TextField
-                    className={classes.textField}
-                    label='Local Subscriptions'
-                    fullWidth
-                    multiline
-                    disableUnderline
-                    value={localSubscriptionsString}
-                    rows={5}
-                    onChange={this.handleChange('localSubscriptions')}
-                  />
-                </Paper>
-              }
-            </Grid>
-
-            <Grid item xs={6}>
-              {isLoading &&
-                <Paper className={classNames(classes.paper, classes.loadingPaper)}>
-                  <LinearProgress className={classes.loading} />
-                  <TextField className={classes.textField} multiline disableUnderline disabled />
-                </Paper>
-              }
-
-              {!isLoading &&
-                <Paper className={classes.paper}>
-                  <TextField
-                    className={classes.textField}
-                    label={`Ethereum Subscriptions ${username}`}
-                    fullWidth
-                    multiline
-                    disableUnderline
-                    value={ethereumSubscriptionsString}
-                    rows={5}
-                    onChange={this.handleChange('ethereumSubscriptions')}
-                  />
-                </Paper>
-              }
-            </Grid>
-
-          </Grid>
+          {!isLoading &&
+            <Paper className={classes.paper}>
+              <TextField
+                className={classes.textField}
+                label='Local Subscriptions'
+                fullWidth
+                multiline
+                disableUnderline
+                value={localSubscriptionsString}
+                rows={5}
+                onChange={this.handleChange('localSubscriptions')}
+              />
+            </Paper>
+          }
 
           <div className={classes.buttons} >
             <Tooltip
@@ -325,13 +275,9 @@ class Subscriptions extends React.Component {
             >
               <Button onClick={this.handleSave} size='small' variant='contained' color='default' className={classes.button}>
                 Save
-                <SaveIcon className={classes.rightIcon} />
+                <SaveIcon className={classes.saveIcon} />
               </Button>
             </Tooltip>
-            <Button size='small' variant='contained' color='default' className={classes.button}>
-              Sync
-              <CloudUploadIcon className={classes.rightIcon} />
-            </Button>
             <Button onClick={this.handleImport} size='small' variant='contained' color='default' className={classes.button}>
               Import
               <PublishIcon className={classes.rightIcon} />

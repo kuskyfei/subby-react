@@ -29,23 +29,22 @@ describe('services', () => {
     test('locally', async () => {
       // test subscribing locally
       for (const publisher of PUBLISHERS) {
-        let isSubscribed = await services.isSubscribed({publisher, address: ADDRESSES[0]})
+        let isSubscribed = await services.isSubscribed(publisher)
         expect(isSubscribed).toEqual(false)
-        await services.subscribe({publisher, address: ADDRESSES[0]})
-        isSubscribed = await services.isSubscribed({publisher, address: ADDRESSES[0]})
+        await services.subscribe(publisher)
+        isSubscribed = await services.isSubscribed(publisher)
         expect(isSubscribed).toEqual(true)
       }
-      const subscriptions = await services.getSubscriptions(ADDRESSES[0])
+      const subscriptions = await services.getSubscriptions()
 
-      expect(Object.keys(subscriptions.localSubscriptions).length).toEqual(PUBLISHERS.length)
+      expect(Object.keys(subscriptions).length).toEqual(PUBLISHERS.length)
       for (const publisher of PUBLISHERS) {
-        expect(publisher in subscriptions.localSubscriptions).toEqual(true)
-        expect(publisher in subscriptions.activeSubscriptions).toEqual(true)
+        expect(publisher in subscriptions).toEqual(true)
       }
 
       // test unsubscribing locally
       const db1 = await getDb()
-      await services.unsubscribe({publishers: [PUBLISHERS[0]], address: ADDRESSES[0]})
+      await services.unsubscribe(PUBLISHERS[0])
       const db2 = await getDb()
 
       const db1Copy = deepCopy(db1)
@@ -56,7 +55,7 @@ describe('services', () => {
       expect(PUBLISHERS[0] in db2.localSubscriptions.subscriptions).toEqual(false)
 
       for (const i in PUBLISHERS) {
-        const isSubscribed = await services.isSubscribed({publisher: PUBLISHERS[i], address: ADDRESSES[0]})
+        const isSubscribed = await services.isSubscribed(PUBLISHERS[i])
         if (i === '0') {
           expect(isSubscribed).toEqual(false)
         } else {
@@ -66,12 +65,12 @@ describe('services', () => {
     })
 
     test('isSubscribed', async () => {
-      let isSubscribed = await services.isSubscribed({publisher: PUBLISHERS[0], address: ADDRESSES[0]})
+      let isSubscribed = await services.isSubscribed(PUBLISHERS[0])
       expect(isSubscribed).toEqual(false)
 
-      await services.subscribe({publisher: PUBLISHERS[0], address: ADDRESSES[0]})
+      await services.subscribe(PUBLISHERS[0])
 
-      isSubscribed = await services.isSubscribed({publisher: PUBLISHERS[0], address: ADDRESSES[0]})
+      isSubscribed = await services.isSubscribed(PUBLISHERS[0])
       expect(isSubscribed).toEqual(true)
     })
   })
@@ -79,21 +78,20 @@ describe('services', () => {
   describe('setSubscriptions', () => {
     test('locally', async () => {
       { // test with a publishers array
-        await services.setSubscriptions({localSubscriptions: PUBLISHERS})
+        await services.setSubscriptions(PUBLISHERS)
 
         const subscriptions = await services.getSubscriptions()
-        expect(Object.keys(subscriptions.localSubscriptions).length).toEqual(PUBLISHERS.length)
+        expect(Object.keys(subscriptions).length).toEqual(PUBLISHERS.length)
         for (const publisher of PUBLISHERS) {
-          expect(publisher in subscriptions.localSubscriptions).toEqual(true)
-          expect(publisher in subscriptions.activeSubscriptions).toEqual(true)
+          expect(publisher in subscriptions).toEqual(true)
         }
       }
 
       { // test with an empty publisher object
-        await services.setSubscriptions({localSubscriptions: {}})
+        await services.setSubscriptions({})
 
         const subscriptions = await services.getSubscriptions()
-        expect(subscriptions.localSubscriptions).toEqual({})
+        expect(subscriptions).toEqual({})
       }
     })
   })

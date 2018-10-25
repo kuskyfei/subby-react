@@ -55,9 +55,6 @@ let init = async ({version}) => {
     if (!upgradeDb.objectStoreNames.contains('localSubscriptions')) {
       upgradeDb.createObjectStore('localSubscriptions')
     }
-    if (!upgradeDb.objectStoreNames.contains('ethereumSubscriptions')) {
-      upgradeDb.createObjectStore('ethereumSubscriptions')
-    }
     if (!upgradeDb.objectStoreNames.contains('settings')) {
       upgradeDb.createObjectStore('settings')
     }

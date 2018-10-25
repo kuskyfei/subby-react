@@ -10,7 +10,8 @@ import {withRouter} from 'react-router-dom'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
-import {Profile, Feed as FeedComponent, Pages} from '../../components'
+import {Profile, Feed as FeedComponent} from '../../components'
+import {ErrorMessage} from './components'
 
 // containers
 import {Post} from '../../containers'
@@ -48,29 +49,6 @@ const styles = theme => ({
   }
 })
 
-const permalinkTestPost = {
-  username: 'test',
-  address: '0x0000000000000000000000000000000000000000',
-  // comment: 'This is dope stuff',
-  comment: 'ipfs:QmX48d6q3YgSxZjUhoSziw47AcEuUAWN3BPfZtaNkUn6uj', // long string
-  // link: 'ipfs:QmeeogFMkaWi3n1hurdMXLuAHjG2tSaYfFXvXqP6SPd1zo', // image
-  // link: 'ipfs:QmPrg9qm6RPpRTPF9cxHcYBtQKHjjytYEriU37PQpKeJTV', // video
-  // link: 'ipfs:QmZbp9u6yMDW94mfxTYe8hMaomBLr2NfckUhYf3J7ax7zM/dog-loves-baby.mp4',
-  // link: 'ipfs:QmQ747r7eLfsVtBFBSRwfXsPK6tADJpQzJxz4uFdoZb9XJ', // big video
-  link: 'magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F',
-  // link: 'https://interactive-examples.mdn.mozilla.net/media/examples/stream_of_water.webm',
-  // link: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Example.ogg',
-  // link: 'http://www.hochmuth.com/mp3/Haydn_Cello_Concerto_D-1.mp3',
-  // link: 'https://twitter.com/APompliano/status/1034115384360792064',
-  // link: 'https://www.reddit.com/r/pics/comments/9b1epu/my_husband_started_17th_grade_his_masters_program/',
-  // link: 'https://www.instagram.com/p/Bm1WJFoHqif/',
-  // link: 'https://vimeo.com/154583964',
-  // link: 'https://www.youtube.com/watch?v=pIbAXzEHjBI',
-  // link: 'https://www.facebook.com/refinery29/posts/10156965764817922',
-  timestamp: Date.now(),
-  id: 4
-}
-
 class Feed extends React.Component {
   state = {
     hasMorePosts: true,
@@ -78,7 +56,7 @@ class Feed extends React.Component {
     publisherStartAt: 0,
     isInitializing: false,
     settings: {},
-    noSubscriptions: false
+    subscriptions: null
   }
 
   componentDidMount () {
@@ -150,7 +128,7 @@ class Feed extends React.Component {
     this.setState(state => ({addingMorePosts: true}))
 
     if (isPermalink(location.search)) {
-      this.setState(state => ({hasMorePosts: false}))
+      this.setState(state => ({hasMorePosts: false, addingMorePosts: true}))
       const id = getPostIdFromUrlParams(location.search)
       let post = await services.getPostFromId({publisher: username, id})
       actions.setFeed([post])
@@ -160,7 +138,7 @@ class Feed extends React.Component {
       const res = await services.getPostsFromPublisher(username, {limit: 10, startAt: publisherStartAt})
       const {posts, nextStartAt, hasMorePosts} = res
       actions.setFeed([...feed, ...posts])
-      this.setState(state => ({publisherStartAt: nextStartAt, hasMorePosts}))
+      this.setState(state => ({publisherStartAt: nextStartAt, hasMorePosts, addingMorePosts: true}))
     }
 
     else if (isProfile(location.search)) {
@@ -168,16 +146,15 @@ class Feed extends React.Component {
       const res = await services.getPostsFromPublisher(address, {limit: 10, startAt: publisherStartAt})
       const {posts, nextStartAt, hasMorePosts} = res
       actions.setFeed([...feed, ...posts])
-      this.setState(state => ({publisherStartAt: nextStartAt, hasMorePosts}))
+      this.setState(state => ({publisherStartAt: nextStartAt, hasMorePosts, addingMorePosts: true}))
     }
 
     else if (isFeed(location.search)) {
       const startAt = feed.length
       const address = await services.getAddress()
-      const subscriptions = await services.getActiveSubscriptions(address)
-      if (Object.keys(subscriptions).length === 0 || true) {
-        this.setState(state => ({noSubscriptions: true}))
-      }
+      const subscriptions = await services.getSubscriptions(address)
+      const subscriptionsArray = Object.keys(subscriptions) 
+      this.setState(state => ({subscriptions: subscriptionsArray, addingMorePosts: true}))
       const newPosts = await services.getFeed({subscriptions, startAt, limit: 10})
       actions.setFeed([...feed, ...newPosts])
     }
@@ -188,14 +165,10 @@ class Feed extends React.Component {
 
   render () {
     const {classes, feed, location} = this.props
-    const {addingMorePosts, profileIsLoading, settings, isInitializing, noSubscriptions} = this.state
+    const {addingMorePosts, profileIsLoading, settings, isInitializing, subscriptions} = this.state
 
     if (isInitializing) {
       return <div />
-    }
-
-    if (noSubscriptions) {
-      return <Pages.FindSubscriptions />
     }
 
     const posts = []
@@ -212,6 +185,13 @@ class Feed extends React.Component {
     }
     if (isPublisher(location.search)) {
       profile = this.props.publisherProfile
+    }
+
+    if (subscriptions && !profile && posts.length === 0) {
+      return <ErrorMessage subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true})} />
+    }
+    if (subscriptions && subscriptions.length === 0) {
+      return <ErrorMessage subscriptions={subscriptions} />
     }
 
     return (

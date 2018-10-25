@@ -12,7 +12,7 @@ const init = async () => {
 
   const localUserSettings = await getSettings()
 
-  await subbyJs.init({provider: localUserSettings.WEB3_PROVIDER})
+  await subbyJs.init({provider: localUserSettings.WEB3_PROVIDER, mnemonic: 'radar blur cabbage chef fix engine embark joy scheme fiction master release'})
   torrent.init()
 
   let ipfsProvider = localUserSettings.IPFS_PROVIDER
@@ -67,6 +67,8 @@ const {
   prepareMagnetForEthereum
 } = require('./torrent')
 
+const ga = require('./ga')
+
 export {
   // init
   init,
@@ -100,5 +102,7 @@ export {
   // torrent
   getTorrent,
   getMagnetFromTorrentFile,
-  prepareMagnetForEthereum
+  prepareMagnetForEthereum,
+  // ga
+  ga
 }

@@ -89,13 +89,15 @@ module.exports = function override (config, env) {
   }
 
   // enable inline web workers as .worker.js files
-  config.module.rules.push({
-    test: /\.worker\.js$/,
-    use: {
-      loader: 'worker-loader',
-      options: {inline: true}
-    }
-  })
+  // this added 1.5mb to the bundle so we decided
+  // not to use web workers
+  // config.module.rules.push({
+  //   test: /\.worker\.js$/,
+  //   use: {
+  //     loader: 'worker-loader',
+  //     options: {inline: true}
+  //   }
+  // })
 
   return config
 }

@@ -135,9 +135,9 @@ class Publish extends React.Component {
     this.setState({...this.state, comment: target.value})
   }
 
-  handlePublish = () => {
-    // publish using web3
-    debug('handlePublish')
+  handlePublish = async () => {
+    const {comment, link} = this.state
+    await services.publish({comment, link})
   }
 
   render () {

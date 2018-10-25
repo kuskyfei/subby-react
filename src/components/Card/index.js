@@ -138,7 +138,7 @@ class Card extends React.Component {
       return
     }
     const address = await services.getAddress()
-    await services.unsubscribe({address, publishers: [post.username, post.address]})
+    await services.unsubscribe([post.username, post.address])
   }
 
   handlePermalinkCopy () {

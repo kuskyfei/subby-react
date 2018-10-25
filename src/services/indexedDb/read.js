@@ -71,38 +71,6 @@ const getLastProfileCacheTimestamp = async (account) => {
   return lastProfileCacheTimestamp
 }
 
-const getEthereumSubscriptionsCache = async (account) => {
-  debug('getEthereumSubscriptionsCache', {account})
-
-  const res = await db
-    .db
-    .transaction(['ethereumSubscriptions'])
-    .objectStore('ethereumSubscriptions')
-    .get(account)
-
-  const subscriptions = res && res.subscriptions
-
-  debug('getEthereumSubscriptionsCache returns', subscriptions)
-
-  return subscriptions
-}
-
-const getLastEthereumSubscriptionsCacheTimestamp = async (account) => {
-  debug('getLastEthereumSubscriptionsCacheTimestamp', {account})
-
-  const res = await db
-    .db
-    .transaction(['ethereumSubscriptions'])
-    .objectStore('ethereumSubscriptions')
-    .get(account)
-
-  const lastEthereumSubscriptionsCacheTimestamp = res && res.lastEthereumSubscriptionsCacheTimestamp
-
-  debug('getLastEthereumSubscriptionsCacheTimestamp returns', lastEthereumSubscriptionsCacheTimestamp)
-
-  return lastEthereumSubscriptionsCacheTimestamp
-}
-
 const getLocalSubscriptions = async () => {
   debug('getLocalSubscriptions')
 
@@ -207,9 +175,7 @@ const getSettings = async () => {
 
 export {
   getProfileCache,
-  getEthereumSubscriptionsCache,
   getLocalSubscriptions,
-  getLastEthereumSubscriptionsCacheTimestamp,
   getLastProfileCacheTimestamp,
   getBackgroundFeedCache,
   getLastBackgroundFeedCacheTimestamp,

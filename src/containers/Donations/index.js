@@ -5,6 +5,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators, compose} from 'redux'
 import {withRouter} from 'react-router-dom'
+import Typography from '@material-ui/core/Typography'
 
 // material
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -30,6 +31,9 @@ const styles = theme => ({
       marginLeft: 'auto',
       marginRight: 'auto'
     }
+  },
+  message: {
+    paddingTop: theme.spacing.unit * 4,
   }
 })
 
@@ -56,6 +60,7 @@ class Donations extends React.Component {
   }
 
   componentWillUnmount () {
+    this.onDonation.off()
     debug('unmounted')
   }
 
@@ -73,6 +78,11 @@ class Donations extends React.Component {
 
     return (
       <div className={classes.layout}>
+        {donationCards.length === 0 &&
+          <Typography className={classes.message} variant='body1' align='center'>
+            When you receive a donation, it will appear below.
+          </Typography>
+        }
         <FeedComponent postCount={donations.length}>
           {donationCards}
         </FeedComponent>

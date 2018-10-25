@@ -54,7 +54,7 @@ class App extends Component {
 
       await services.init()
       // services.mockSmartContracts({explicit: true})
-      services.mockSmartContracts()
+      // services.mockSmartContracts()
       this.setState({...this.state, isInitializing: false})
 
       const address = await services.getAddress()
@@ -73,6 +73,7 @@ class App extends Component {
   componentDidUpdate (prevProps) {
     this.handleRouteChange(prevProps)
     this.scrollToTopOnUrlParamsChange(prevProps)
+    this.handleUrlParamsChange(prevProps)
 
     debug('updated')
   }
@@ -97,6 +98,16 @@ class App extends Component {
     if (isUrlParamsChangeFromProps(this.props, prevProps)) {
       window.scrollTo(0, 0)
     }
+  }
+
+  handleUrlParamsChange = (prevProps) => {
+    const urlParams = this.props.location.search
+    const prevUrlParams = prevProps.location.search
+    if (urlParams === prevUrlParams) {
+      return
+    }
+
+    services.ga.pageView()
   }
 
   render () {

@@ -71,7 +71,7 @@ class Profile extends React.Component {
 
     this.setState({...this.state, isSubscribed: true})
     const address = await services.getAddress()
-    await services.subscribe({address, publisher: account})
+    await services.subscribe(account)
   }
 
   async handleUnsubscribe () {
@@ -81,7 +81,7 @@ class Profile extends React.Component {
     }
     this.setState({...this.state, isSubscribed: false})
     const address = await services.getAddress()
-    await services.unsubscribe({address, publishers: [profile.username, profile.address]})
+    await services.unsubscribe([profile.username, profile.address])
   }
 
   render () {

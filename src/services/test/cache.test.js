@@ -77,49 +77,6 @@ describe('services', () => {
     })
   })
 
-  describe('get subscriptions', () => {
-    test('cache expires', async () => {
-      const firstRequestTime = 1000000000
-
-      // first request with empty cache
-      mockTime(firstRequestTime)
-
-      const res1 = await services.getSubscriptions(ADDRESSES[0])
-      const db1 = await getDb()
-
-      // there's only ethereumSubscriptions so far so activeSubscriptions should be the same
-      expect(res1.ethereumSubscriptions).toEqual(res1.activeSubscriptions)
-
-      const db1EthereumSubscriptions = Object.keys(db1.ethereumSubscriptions[ADDRESSES[0]].subscriptions)
-      const db1LastEthereumSubscriptionsCacheTimestamp = db1.ethereumSubscriptions[ADDRESSES[0]].lastEthereumSubscriptionsCacheTimestamp
-      expect(db1EthereumSubscriptions.length).toEqual(325)
-      expect(db1LastEthereumSubscriptionsCacheTimestamp).toEqual(firstRequestTime)
-
-      // second request with non-expired cache 1 minute later
-      mockTime(firstRequestTime + minute)
-
-      const res2 = await services.getSubscriptions(ADDRESSES[0])
-      const db2 = await getDb()
-
-      // everything should be exactly the same since it used the previous cache
-      expect(res2).toEqual(res1)
-      expect(db2).toEqual(db1)
-
-      // third request with expired cache
-      const newTime = firstRequestTime + ethereumSubscriptionsCacheTime + 1
-      mockTime(newTime)
-
-      const res3 = await services.getSubscriptions(ADDRESSES[0])
-      const db3 = await getDb()
-
-      const db3LastEthereumSubscriptionsCacheTimestamp = db3.ethereumSubscriptions[ADDRESSES[0]].lastEthereumSubscriptionsCacheTimestamp
-
-      // everything should be the same execpt the cache timestamp
-      expect(res3).toEqual(res1)
-      expect(db3LastEthereumSubscriptionsCacheTimestamp).toEqual(newTime)
-    })
-  })
-
   describe('get feed', () => {
     beforeAll(() => {
       jest.setTimeout(5 * minute)

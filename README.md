@@ -21,6 +21,9 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
+fix ga
+fix default address
+update cache functions
 "you're not following anyone, find accounts to follow"
 add GA
 fix subby.js onNetworkChange and onAddressChange 
@@ -46,6 +49,9 @@ new version available pop up
 detect errors with embeds (using height of elements possibly?) / fix bug with twitter and IG cards
 fix line bug in preview with iframes
 "you don't have any donation message"
+make the index.html scripts optional
+add pop up on new posts found during update cache
+fix timestamps in subby.js and revert in front end
 
 ## todo puppeteer tests
 
