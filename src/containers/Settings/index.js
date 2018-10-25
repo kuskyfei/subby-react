@@ -49,7 +49,11 @@ class Settings extends React.Component {
       const settings = await services.getSettings()
       this.setState(settings)
 
-      const isTerminated = await services.isTerminated()
+      const address = await services.getAddress()
+      if (!address) {
+        return
+      }
+      const isTerminated = await services.isTerminated(address)
       this.setState({isTerminated})
     })()
 
@@ -78,8 +82,9 @@ class Settings extends React.Component {
     await services.setSettings({...this.state, [name]: event.target.checked})
   }
 
-  handleTerminate = () => {
-
+  handleTerminate = async () => {
+    console.log('Terminate')
+    await services.terminateAccount()
   }
 
   render () {

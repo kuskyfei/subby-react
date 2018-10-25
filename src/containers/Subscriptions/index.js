@@ -167,6 +167,7 @@ const HelpText = () =>
 class Subscriptions extends React.Component {
   state = {
     localSubscriptions: {},
+    originalSubscriptionsString: {},
     isLoading: false,
     saveTooltipOpen: false
   }
@@ -175,25 +176,25 @@ class Subscriptions extends React.Component {
     const {actions} = this.props
     ;(async () => {
       this.setState({isLoading: true})
-      const address = await services.getAddress()
-      const localSubscriptions = await services.getSubscriptions(address)
-      this.setState({isLoading: false, localSubscriptions})
+      const localSubscriptions = await services.getSubscriptions()
+      const originalSubscriptionsString = subscriptionsObjectToString(localSubscriptions)
+      this.setState({isLoading: false, localSubscriptions, originalSubscriptionsString})
     })()
 
-    debug('props', this.props)
     debug('mounted')
   }
 
   handleSave = async () => {
-    this.setState({saveTooltipOpen: true})
-
     let {localSubscriptions} = this.state
+    const originalSubscriptionsString = localSubscriptions
     localSubscriptions = subscriptionsStringToObject(localSubscriptions)
+
+    this.setState({saveTooltipOpen: true, originalSubscriptionsString})
 
     await services.setSubscriptions(localSubscriptions)
 
     setTimeout(() => {
-      this.setState({saveTooltipOpen: false})
+      this.setState({saveTooltipOpen: false, originalSubscriptionsString})
     }, 500)
   }
 
@@ -224,7 +225,7 @@ class Subscriptions extends React.Component {
 
   render () {
     const {classes, profile} = this.props
-    const {localSubscriptions, isLoading, saveTooltipOpen} = this.state
+    const {localSubscriptions, isLoading, saveTooltipOpen, originalSubscriptionsString} = this.state
 
     // we need to format the subscriptions object to a string
     // on first render otherwise it is simply a string
@@ -235,6 +236,8 @@ class Subscriptions extends React.Component {
     if (typeof localSubscriptions === 'string') {
       localSubscriptionsString = localSubscriptions
     }
+
+    const hasChanges = originalSubscriptionsString !== localSubscriptionsString
 
     return (
       <div className={classes.layout}>
@@ -263,6 +266,7 @@ class Subscriptions extends React.Component {
                 value={localSubscriptionsString}
                 rows={5}
                 onChange={this.handleChange('localSubscriptions')}
+                autoFocus
               />
             </Paper>
           }
@@ -273,7 +277,7 @@ class Subscriptions extends React.Component {
               classes={{tooltip: classes.lightTooltip}}
               open={saveTooltipOpen}
             >
-              <Button onClick={this.handleSave} size='small' variant='contained' color='default' className={classes.button}>
+              <Button disabled={!hasChanges} onClick={this.handleSave} size='small' variant='contained' color='default' className={classes.button}>
                 Save
                 <SaveIcon className={classes.saveIcon} />
               </Button>

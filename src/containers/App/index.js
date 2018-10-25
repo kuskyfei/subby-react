@@ -31,7 +31,7 @@ const {isRouteChange, getRouteFromUrlParams, isUrlParamsChangeFromProps} = requi
 const debug = require('debug')('containers:App')
 
 const styles = theme => {
-  debug(theme)
+  window.SUBBY_DEBUG_THEME = theme
 
   return {
     main: {

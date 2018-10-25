@@ -21,18 +21,14 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
-fix the subtypes regex
+changing metamask accounts breaks publish button
+make the post dialog go away after we click publish in metamask?
+profile not connected message
 fix metamask on compiled version
 fix ga
-fix default address
 update cache functions
-"you're not following anyone, find accounts to follow"
-add GA
 fix subby.js onNetworkChange and onAddressChange 
 add 'username is taken' error validation
-make publish edited profile send data
-make publish button send data
-make sync subscriptions button send data
 add a "your metamask is locked page"
 make find accounts to follow post
 make publishing content guide
@@ -54,6 +50,8 @@ fix line bug in preview with iframes
 make the index.html scripts optional
 add pop up on new posts found during update cache
 fix timestamps in subby.js and revert in front end
+rename minimumDonation to minimumTextDonation in subby.js
+remove toWei function from lib and make it for read only functions
 
 ## todo puppeteer tests
 

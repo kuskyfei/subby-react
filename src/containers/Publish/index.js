@@ -26,7 +26,8 @@ class Publish extends React.Component {
     isDragging: false,
     isPreviewing: false,
     comment: '',
-    link: null
+    link: null,
+    errorMessage: null
   }
 
   constructor (props) {
@@ -137,12 +138,21 @@ class Publish extends React.Component {
 
   handlePublish = async () => {
     const {comment, link} = this.state
-    await services.publish({comment, link})
+    if (!comment && !link) {
+      return
+    }
+    try {
+      await services.publish({comment, link})
+    } catch (e) {
+      if (e.message.match(/^unknown account #0/)) {
+        this.setState({errorMessage: <Typography variant="body1" color="error">Wallet not connected. <a>What's a wallet?</a></Typography>})
+      }
+    }
   }
 
   render () {
     const {classes, address, profile} = this.props
-    const {isDragging, isPreviewing, comment, link} = this.state
+    const {isDragging, isPreviewing, comment, link, errorMessage} = this.state
 
     const post = {
       thumbnail: profile && profile.thumbnail,
@@ -191,10 +201,14 @@ class Publish extends React.Component {
           fullWidth
           rows={3}
           multiline
-          placeholder={`What?`}
+          placeholder={`Text (optional)`}
           value={comment}
           onChange={this.handleCommentChange.bind(this)}
         />
+
+        <div>
+          {errorMessage}
+        </div>
 
         <div className={classes.buttonsContainer}>
 

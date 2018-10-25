@@ -103,20 +103,52 @@ class ErrorMessage extends React.Component {
   }
 
   render () {
-    let {classes, subscriptions, onRefresh} = this.props
+    let {classes, subscriptions, profile, onRefresh, username, editable} = this.props
     const {isLoading} = this.state
 
-    let message = ''
+    if (!subscriptions) {
+      subscriptions = []
+    }
+    if (!profile) {
+      profile = {}
+    }
+
+    let message = 'Unkown error.'
     let linkMessage = ''
+    let linkLocation = ''
+
     if (subscriptions.length === 0) {
       message = `You're not subscribed to anyone.`
       linkMessage = 'Find accounts to follow'
+      linkLocation = 'follow'
     } else if (subscriptions.length === 1) {
       message = `Your 1 subscription hasn't posted anything.`
       linkMessage = 'Find more accounts to follow'
+      linkLocation = 'follow'
     } else {
       message = `Your ${subscriptions.length} subscriptions haven't posted anything.`
       linkMessage = 'Find more accounts to follow'
+      linkLocation = 'follow'
+    }
+
+    if (profile.address === '0x0000000000000000000000000000000000000000' && profile.isTerminated) {
+      message = `User has deleted their account.`
+      linkMessage = ''
+      linkLocation = ''
+    } else if (profile.address === '0x0000000000000000000000000000000000000000' && username && username.length < 40) {
+      message = <span>Username <strong>{username}</strong> isn't registered.</span>
+      linkMessage = 'Register it now'
+      linkLocation = 'publish'
+    } else if (profile.address === '0x0000000000000000000000000000000000000000') {
+      message = <span>Username <strong>{username}</strong> is invalid.</span>
+      linkMessage = ''
+      linkLocation = ''
+    }
+
+    if (editable) {
+      message = `Connect your wallet.`
+      linkMessage = `What's a wallet?`
+      linkLocation = 'publish'
     }
 
     if (isLoading) {
@@ -135,7 +167,7 @@ class ErrorMessage extends React.Component {
         </Typography>
 
         <Typography className={classes.links} variant='display1'>
-          <a href='https://subby.io/follow' target='_blank'>{linkMessage}</a>
+          <a href={`https://subby.io/${linkLocation}`} target='_blank'>{linkMessage}</a>
           <br/>
           {onRefresh && 
             <span>

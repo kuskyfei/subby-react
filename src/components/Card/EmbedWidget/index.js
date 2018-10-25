@@ -98,6 +98,9 @@ const getWidgetFromUrl = (url, settings) => {
       if (!settings.VIMEO_EMBEDS) {
         return Link
       }
+      if (!isVimeoVideo(url)) {
+        return Link
+      }
       return Vimeo
 
     case 'youtube':
@@ -116,6 +119,10 @@ const getWidgetFromUrl = (url, settings) => {
 
 const isYoutubeVideo = (url) => {
   return url.match(/watch\?v=([^&]+)/)
+}
+
+const isVimeoVideo = (url) => {
+  return url.match(/\/([^/]+)$/)
 }
 
 const getWidgetTypeFromUrl = (url) => {

@@ -14,6 +14,8 @@ import Button from '@material-ui/core/Button'
 import MessageIcon from '@material-ui/icons/Message'
 import HelpIcon from '@material-ui/icons/Help'
 
+const services = require('../../services')
+
 const styles = theme => ({
   container: {
     marginLeft: theme.spacing.unit * 2,
@@ -112,6 +114,8 @@ class Donate extends React.Component {
     let {minimumTextDonation} = profile
 
     if (minimumTextDonation === 0) minimumTextDonation = 0.01
+    const minimumDonationIsTooSmall = ((typeof minimumTextDonation === 'number') && (minimumTextDonation.toFixed(4) < 0.0001))
+    if (minimumDonationIsTooSmall) minimumTextDonation = 0.0001
 
     this.setState({...this.state, donationAmount: minimumTextDonation})
   }
@@ -122,16 +126,27 @@ class Donate extends React.Component {
     })
   }
 
-  handleDonate = () => {
+  handleDonate = async () => {
+    const {donationText, donationAmount} = this.state
+    const {profile} = this.props
 
+    const account = profile.username || profile.address
+    const postId = profile.id
+    const text = donationText
+    const amount = donationAmount
+
+    await services.donate({account, amount, text, postId})
   }
 
   render () {
     const {classes, profile} = this.props
     const {donationText, donationAmount} = this.state
-    const {minimumTextDonation, username, address, thumbnail} = profile
+    let {minimumTextDonation, username, address, thumbnail} = profile
 
     const textDonationEnabled = minimumTextDonation !== 0
+
+    const minimumDonationIsTooSmall = ((typeof minimumTextDonation === 'number') && (minimumTextDonation !== 0) && (minimumTextDonation.toFixed(4) < 0.0001))
+    if (minimumDonationIsTooSmall) minimumTextDonation = 0.0001
 
     return (
       <form className={classes.container} noValidate autoComplete='off'>
@@ -206,7 +221,7 @@ class Donate extends React.Component {
 const HelpText = () =>
   <div>
     <p>
-      Text donations are not private, they are stored publicly on Ethereum and IPFS. They are turned off by default and require a minimum amount to prevent spam.
+      Text donations are not private, they are stored publicly on Ethereum and IPFS. They require a minimum donation amount to prevent spam.
     </p>
   </div>
 

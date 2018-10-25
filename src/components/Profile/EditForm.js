@@ -16,6 +16,8 @@ import Button from '@material-ui/core/Button'
 import CloudUploadIcon from '@material-ui/icons/CloudUpload'
 import HelpIcon from '@material-ui/icons/Help'
 
+const services = require('../../services')
+
 const styles = theme => ({
   profile: {
     marginTop: theme.spacing.unit * 3,
@@ -131,26 +133,26 @@ class EditForm extends React.Component {
     }
   }
 
-  handlePublish = () => {
+  handlePublish = async () => {
     const {profile} = this.props
-    let {username, bio, thumbnail, hideDonations, minimumDonation} = this.state
+    let {username, bio, thumbnail, hideDonations, minimumTextDonation, textDonationEnabled} = this.state
 
     if (username === profile.username) username = null
     if (bio === profile.bio) bio = null
     if (thumbnail === profile.thumbnail) thumbnail = null
     if (hideDonations === profile.hideDonations) hideDonations = null
-    if (minimumDonation === profile.minimumDonation) minimumDonation = null
+    if (!textDonationEnabled) minimumTextDonation = 0
+    if (minimumTextDonation === profile.minimumTextDonation) minimumTextDonation = null
 
-    console.log({username, bio, thumbnail, hideDonations, minimumDonation})
-
-    //await services.editProfile({username, bio, thumbnail, hideDonations, minimumDonation})
+    await services.editProfile({username, bio, thumbnail, hideDonations, minimumTextDonation})
   }
 
   render () {
     const {classes} = this.props
     let {username, usernameError, bio, thumbnail, textDonationEnabled, minimumTextDonation, address, usernameIsEditable, hideDonations} = this.state
 
-    if (minimumTextDonation && (minimumTextDonation !== 0) && (minimumTextDonation.toFixed(4) < 0.0001)) minimumTextDonation = 0.0001
+    const minimumDonationIsTooSmall = ((typeof minimumTextDonation === 'number') && (minimumTextDonation !== 0) && (minimumTextDonation.toFixed(4) < 0.0001))
+    if (minimumDonationIsTooSmall) minimumTextDonation = 0.0001
 
     return (
       <form className={classes.container} noValidate autoComplete='off'>
@@ -259,7 +261,7 @@ class EditForm extends React.Component {
         </FormControl>
 
         <Typography className={classes.message} variant='caption' gutterBottom>
-          Fans can send text messages with their donations. This is turned off by default. A minimum text donation is required to prevent spam.
+          Fans can send text messages with their donations. A minimum text donation is required to prevent spam.
         </Typography>
 
         <div className={classes.buttonsContainer}>

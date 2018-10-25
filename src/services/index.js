@@ -40,7 +40,7 @@ const mockIpfsApi = () => {
   ipfs.mockIpfsApi()
 }
 
-const {getPostsFromPublisher, getPostFromId, onDonation, getAddress, isTerminated, donate, publishPost, editProfile} = subbyJs
+const {getPostsFromPublisher, getPostFromId, onDonation, getAddress, isTerminated, terminateAccount, donate, publishPost, editProfile} = subbyJs
 const publish = publishPost
 
 const {
@@ -99,6 +99,7 @@ export {
   donate,
   publish,
   editProfile,
+  terminateAccount,
   // torrent
   getTorrent,
   getMagnetFromTorrentFile,

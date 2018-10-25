@@ -5,6 +5,8 @@ const getUsernameFromUrlParams = (urlParams) => {
 
   if (isValidAddress(account)) {
     account = cleanAddress(account)
+  } else if (!isValidUsername(account)) {
+    return ''
   }
   return account
 }
@@ -31,6 +33,16 @@ const isFeed = (urlParams) => {
 
 const isProfile = (urlParams) => {
   return queryString.parse(urlParams).p === 'profile'
+}
+
+const isValidUsername = (username) => {
+  if (typeof username !== 'string') {
+    return false
+  }
+  if (username.length > 39) {
+    return false
+  }
+  return true
 }
 
 const isValidAddress = (address) => {

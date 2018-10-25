@@ -56,7 +56,10 @@ class Feed extends React.Component {
     publisherStartAt: 0,
     isInitializing: false,
     settings: {},
-    subscriptions: null
+    subscriptions: null,
+    accountFromUrlParams: null,
+    walletDisconnected: false,
+    profileIsLoading: false
   }
 
   componentDidMount () {
@@ -99,7 +102,7 @@ class Feed extends React.Component {
     const account = getAccountFromUrlParams(location.search)
     const profile = await getProfile(account)
     actions.setPublisherProfile(profile)
-    this.setState(state => ({profileIsLoading: false}))
+    this.setState(state => ({profileIsLoading: false, accountFromUrlParams: account}))
 
     debug('handleProfile end', {account})
   }
@@ -127,7 +130,7 @@ class Feed extends React.Component {
 
     this.setState(state => ({addingMorePosts: true}))
 
-    if (isPermalink(location.search)) {
+    route: if (isPermalink(location.search)) {
       this.setState(state => ({hasMorePosts: false, addingMorePosts: true}))
       const id = getPostIdFromUrlParams(location.search)
       let post = await services.getPostFromId({publisher: username, id})
@@ -143,6 +146,10 @@ class Feed extends React.Component {
 
     else if (isProfile(location.search)) {
       const address = await services.getAddress()
+      if (!address) {
+        this.setState(state => ({walletDisconnected: true}))
+        break route
+      }
       const res = await services.getPostsFromPublisher(address, {limit: 10, startAt: publisherStartAt})
       const {posts, nextStartAt, hasMorePosts} = res
       actions.setFeed([...feed, ...posts])
@@ -165,7 +172,7 @@ class Feed extends React.Component {
 
   render () {
     const {classes, feed, location} = this.props
-    const {addingMorePosts, profileIsLoading, settings, isInitializing, subscriptions} = this.state
+    const {addingMorePosts, profileIsLoading, settings, isInitializing, subscriptions, accountFromUrlParams, walletDisconnected} = this.state
 
     if (isInitializing) {
       return <div />
@@ -187,11 +194,20 @@ class Feed extends React.Component {
       profile = this.props.publisherProfile
     }
 
-    if (subscriptions && !profile && posts.length === 0) {
-      return <ErrorMessage subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true})} />
-    }
-    if (subscriptions && subscriptions.length === 0) {
-      return <ErrorMessage subscriptions={subscriptions} />
+    // handle different errors messages
+    if (!addingMorePosts && !profileIsLoading) {
+      if (subscriptions && !profile && posts.length === 0) {
+        return <ErrorMessage subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true})} />
+      }
+      if (subscriptions && subscriptions.length === 0) {
+        return <ErrorMessage subscriptions={subscriptions} />
+      }
+      if (profile && profile.address === '0x0000000000000000000000000000000000000000') {
+        return <ErrorMessage profile={profile} username={accountFromUrlParams} />
+      }
+      if (!profile && editable && walletDisconnected) {
+        return <ErrorMessage editable={editable}/>
+      }
     }
 
     return (
