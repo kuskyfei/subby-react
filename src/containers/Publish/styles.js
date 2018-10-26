@@ -20,7 +20,8 @@ const styles = theme => ({
     alignItems: 'center'
   },
   publishButton: {
-    marginLeft: 'auto'
+    marginLeft: 'auto',
+    minWidth: 120
   },
   rightIcon: {
     marginLeft: theme.spacing.unit
@@ -78,6 +79,17 @@ const styles = theme => ({
     },
     '& textarea::placeholder': {
       color: theme.palette.text.hint
+    }
+  },
+
+  errorMessage: {
+    margin: 'auto',
+    paddingRight: 10,
+    paddingLeft: 10,
+    [theme.breakpoints.down(450)]: {
+      '& p': {
+        fontSize: 12
+      }
     }
   }
 

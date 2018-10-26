@@ -16,12 +16,12 @@ class Modal extends React.Component {
   }
 
   render () {
-    let {classes, children, trigger, maxWidth} = this.props
+    let {classes, children, trigger, maxWidth, onClose} = this.props
 
     if (typeof maxWidth === 'number') maxWidth += 'px'
 
     return (
-      <Trigger trigger={trigger}>
+      <Trigger onClose={onClose} trigger={trigger}>
 
         <Card style={{maxWidth}} className={classes.card}>
 

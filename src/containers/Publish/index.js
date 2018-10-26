@@ -39,6 +39,9 @@ class Publish extends React.Component {
     this.addGlobalClipboardPastingListener()
   }
 
+  componentDidUpdate = (prevProps) => {
+  }
+
   componentWillUnmount = () => {
     this.removeGlobalClipboardPastingListener()
   }
@@ -136,16 +139,26 @@ class Publish extends React.Component {
     this.setState({...this.state, comment: target.value})
   }
 
+  handleModalClose = () => {
+    this.setState({errorMessage: null})
+  }
+
   handlePublish = async () => {
     const {comment, link} = this.state
+    this.setState({errorMessage: null})
+
     if (!comment && !link) {
+      this.setState({errorMessage: <Typography variant="body1">Confused? <a href="https://subby.io/publish">Read the step-by-step guide</a></Typography>})
       return
     }
+
     try {
       await services.publish({comment, link})
     } catch (e) {
       if (e.message.match(/^unknown account #0/)) {
-        this.setState({errorMessage: <Typography variant="body1" color="error">Wallet not connected. <a>What's a wallet?</a></Typography>})
+        this.setState({errorMessage: <Typography variant="body1">Wallet not connected. <a href="https://subby.io/publish">What's a wallet?</a></Typography>})
+      } else {
+        console.error(e)
       }
     }
   }
@@ -164,7 +177,7 @@ class Publish extends React.Component {
     }
 
     return (
-      <Modal trigger={<PublishButton />}>
+      <Modal onClose={this.handleModalClose} trigger={<PublishButton />}>
 
         {!isPreviewing &&
           <Typography
@@ -206,15 +219,15 @@ class Publish extends React.Component {
           onChange={this.handleCommentChange.bind(this)}
         />
 
-        <div>
-          {errorMessage}
-        </div>
-
         <div className={classes.buttonsContainer}>
 
           <Tooltip title={<HelpText />} placement='top-start'>
             <HelpIcon className={classes.greyIcon} />
           </Tooltip>
+
+          <span className={classes.errorMessage}>
+            {errorMessage}
+          </span>
 
           <Button
             variant='contained'

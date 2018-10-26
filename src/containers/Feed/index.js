@@ -158,8 +158,7 @@ class Feed extends React.Component {
 
     else if (isFeed(location.search)) {
       const startAt = feed.length
-      const address = await services.getAddress()
-      const subscriptions = await services.getSubscriptions(address)
+      const subscriptions = await services.getSubscriptions()
       const subscriptionsArray = Object.keys(subscriptions) 
       this.setState(state => ({subscriptions: subscriptionsArray, addingMorePosts: true}))
       const newPosts = await services.getFeed({subscriptions, startAt, limit: 10})
@@ -243,8 +242,7 @@ class Feed extends React.Component {
 
 const getProfile = async (account) => {
   const profile = await services.getProfile(account)
-  const address = await services.getAddress()
-  const isSubscribed = await services.isSubscribed({publisher: profile, address})
+  const isSubscribed = await services.isSubscribed(profile)
   profile.isSubscribed = isSubscribed
   return profile
 }

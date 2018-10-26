@@ -40,6 +40,8 @@ class Trigger extends React.Component {
   }
 
   handleClose = () => {
+    const {onClose} = this.props
+    if (onClose) onClose()
     this.setState({ open: false })
   }
 

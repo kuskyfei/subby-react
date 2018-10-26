@@ -70,7 +70,6 @@ class Profile extends React.Component {
     const account = profile.username || profile.address
 
     this.setState({...this.state, isSubscribed: true})
-    const address = await services.getAddress()
     await services.subscribe(account)
   }
 
@@ -80,7 +79,6 @@ class Profile extends React.Component {
       return
     }
     this.setState({...this.state, isSubscribed: false})
-    const address = await services.getAddress()
     await services.unsubscribe([profile.username, profile.address])
   }
 
