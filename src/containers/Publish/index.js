@@ -20,6 +20,7 @@ import styles from './styles'
 const {fileToTypedArray, clearDataTransfer, isMagnet, isIpfsHash} = require('./util')
 const debug = require('debug')('containers:Publish')
 const services = require('../../services')
+const {settings} = require('../../settings')
 
 class Publish extends React.Component {
   state = {
@@ -148,19 +149,22 @@ class Publish extends React.Component {
     this.setState({errorMessage: null})
 
     if (!comment && !link) {
-      this.setState({errorMessage: <Typography variant="body1">Confused? <a href="https://subby.io/publish">Read the step-by-step guide</a></Typography>})
+      this.setState({errorMessage: <Typography variant="body1">Can't publish empty posts. <a href="https://subby.io/publish">Need help?</a></Typography>})
       return
     }
 
-    try {
-      await services.publish({comment, link})
-    } catch (e) {
-      if (e.message.match(/^unknown account #0/)) {
-        this.setState({errorMessage: <Typography variant="body1">Wallet not connected. <a href="https://subby.io/publish">What's a wallet?</a></Typography>})
-      } else {
-        console.error(e)
-      }
+    if (!await services.getAddress()) {
+      this.setState({errorMessage: <Typography variant="body1">Wallet not connected. <a href="https://subby.io/publish">What's a wallet?</a></Typography>})
+      return
     }
+
+    const network = await services.getNetwork()
+    if (settings.ETHEREUM_NETWORK !== network) {
+      this.setState({errorMessage: <Typography variant="body1">Network not set to {settings.ETHEREUM_NETWORK}. <a href="https://subby.io/publish">Need help?</a></Typography>})
+      return
+    }
+
+    await services.publish({comment, link})
   }
 
   render () {

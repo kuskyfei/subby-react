@@ -173,8 +173,8 @@ class Card extends React.Component {
 
     if (isLoading) return <LoadingCard classes={classes} />
 
-    const username = post.username || post.address
-    const date = (preview) ? 'Previewing...' : timeago.format(this.state.timestamp * 1000)
+    const username = post.username || post.address || '0x0000000000000000000000000000000000000000'
+    const date = (preview) ? 'Previewing...' : timeago.format(this.state.timestamp)
     let postDonationsAmount = (!post.postDonationsAmount) ? null : post.postDonationsAmount.toFixed(3)
     if (postDonationsAmount < 0.001) postDonationsAmount = null
 

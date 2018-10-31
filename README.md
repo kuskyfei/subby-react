@@ -21,17 +21,18 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
-changing metamask accounts breaks publish button
+add wrong network to write functions error
+bug with no connections feed to profile (when not logged in with metamask, doesn't give the "Connect your wallet page")
 make the post dialog go away after we click publish in metamask?
 profile not connected message
 fix metamask on compiled version
 fix ga
 update cache functions
-fix subby.js onNetworkChange and onAddressChange 
 add 'username is taken' error validation
 add a "your metamask is locked page"
 make find accounts to follow post
 make publishing content guide
+update is terminated profile error / username not taken
 
 ##todo after release
 add pagination after 200 posts

@@ -27,7 +27,8 @@ const settings = {
 
   // IndexedDb is Chrome's local database that Subby
   // uses to cache posts as well as store your subscriptions.
-  INDEXEDDB_VERSION: 1
+  INDEXEDDB_VERSION: 1,
+  ETHEREUM_NETWORK: 'rinkeby'
 }
 
 module.exports = settings

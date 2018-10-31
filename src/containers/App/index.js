@@ -53,6 +53,9 @@ class App extends Component {
       this.handleRouteChange()
 
       await services.init()
+      services.onSignerChange(async data => {
+        await services.init()
+      })
       // services.mockSmartContracts({explicit: true})
       // services.mockSmartContracts()
       this.setState({...this.state, isInitializing: false})
