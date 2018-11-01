@@ -83,14 +83,25 @@ const styles = theme => ({
   },
 
   errorMessage: {
-    margin: 'auto',
-    paddingRight: 10,
-    paddingLeft: 10,
+    paddingRight: 8,
+    paddingLeft: 8,
     [theme.breakpoints.down(450)]: {
       '& p': {
         fontSize: 12
       }
-    }
+    },
+    '& a': {
+      fontWeight: 600
+    },
+    '& strong': {
+      fontWeight: 600
+    },
+    '& p': {
+      color: 'rgb(255, 0, 0)'
+    },
+  },
+  address: {
+    wordBreak: 'break-all'
   }
 
 })

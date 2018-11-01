@@ -46,27 +46,16 @@ class App extends Component {
     isInitializing: true
   }
 
-  componentDidMount () {
-    const {actions} = this.props
+  componentDidMount() {
+    services.onSignerChange(this.init)
 
     ;(async () => {
       this.handleRouteChange()
 
-      await services.init()
-      services.onSignerChange(async data => {
-        await services.init()
-      })
+      await this.init()
+
       // services.mockSmartContracts({explicit: true})
       // services.mockSmartContracts()
-      this.setState({...this.state, isInitializing: false})
-
-      const address = await services.getAddress()
-      if (!address) {
-        return
-      }
-      const profile = await services.getProfile(address)
-      actions.setAddress(address)
-      actions.setProfile(profile)
 
       // setInterval(() =>
       //   services.updateCache({address})
@@ -76,7 +65,30 @@ class App extends Component {
     })()
   }
 
-  componentDidUpdate (prevProps) {
+  init = async () => {
+    debug('init start')
+
+    this.setState({isInitializing: true})
+    await services.init()
+
+    const {actions} = this.props
+
+    const address = await services.getAddress()
+    if (!address) {
+      actions.setAddress(null)
+      actions.setProfile(null)
+      this.setState({isInitializing: false})
+      return
+    }
+    const profile = await services.getProfile(address)
+    actions.setAddress(address)
+    actions.setProfile(profile)
+    this.setState({isInitializing: false})
+
+    debug('init end', {address, profile})
+  }
+
+  componentDidUpdate(prevProps) {
     this.handleRouteChange(prevProps)
     this.scrollToTopOnUrlParamsChange(prevProps)
     this.handleUrlParamsChange(prevProps)
@@ -88,7 +100,7 @@ class App extends Component {
     debug('unmount')
   }
 
-  handleRouteChange (prevProps) {
+  handleRouteChange(prevProps) {
     if (!isRouteChange(this.props, prevProps)) {
       return
     }
@@ -116,7 +128,7 @@ class App extends Component {
     services.ga.pageView()
   }
 
-  render () {
+  render() {
     const {isInitializing, route: Route} = this.state
     const {headerIsLoading, classes} = this.props
 

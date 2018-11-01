@@ -17,6 +17,8 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload'
 import HelpIcon from '@material-ui/icons/Help'
 
 const services = require('../../services')
+const {settings} = require('../../settings')
+const {onFinishedTyping} = require('./util')
 
 const styles = theme => ({
   profile: {
@@ -70,7 +72,8 @@ const styles = theme => ({
     marginTop: theme.spacing.unit * 3
   },
   publishButton: {
-    marginLeft: 'auto'
+    marginLeft: 'auto',
+    minWidth: 120
   },
   rightIcon: {
     marginLeft: theme.spacing.unit
@@ -78,6 +81,28 @@ const styles = theme => ({
   greyIcon: {
     color: theme.palette.grey['300'],
     fontSize: 36
+  },
+
+  errorMessage: {
+    paddingRight: 8,
+    paddingLeft: 8,
+    '& a': {
+      fontWeight: 600
+    },
+    '& strong': {
+      fontWeight: 600,
+    },
+    '& p': {
+      color: 'rgb(255, 0, 0)'
+    },
+    [theme.breakpoints.down(450)]: {
+      '& p': {
+        fontSize: 12
+      }
+    }
+  },
+  address: {
+    wordBreak: 'break-all'
   }
 })
 
@@ -91,7 +116,8 @@ class EditForm extends React.Component {
     hideDonations: '',
     minimumTextDonation: '',
     address: '',
-    usernameIsEditable: true
+    usernameIsEditable: true,
+    errorMessage: null
   }
 
   componentDidMount = () => {
@@ -131,11 +157,57 @@ class EditForm extends React.Component {
         usernameError: 'Over 39 characters'
       })
     }
+
+    onFinishedTyping(async () => {
+      const profile = await services.getProfile(username)
+      const usernameAvailable = profile.address === '0x0000000000000000000000000000000000000000' && !profile.isTerminated
+      if (!usernameAvailable) {
+        this.setState({
+          ...this.state,
+          username,
+          usernameError: 'Username taken'
+        })
+      }
+    })
   }
 
   handlePublish = async () => {
-    const {profile} = this.props
-    let {username, bio, thumbnail, hideDonations, minimumTextDonation, textDonationEnabled} = this.state
+    this.setState({errorMessage: null})
+
+    const {profile, classes} = this.props
+    let {username, bio, thumbnail, hideDonations, minimumTextDonation, textDonationEnabled, usernameError} = this.state
+
+    if (usernameError) {
+      return
+    }
+
+    // handle errors
+    if (!this.hasChanges()) {
+      this.setState({errorMessage: <Typography variant="body1">No changes to publish. <a href="https://subby.io/publish">Need help?</a></Typography>})
+      return
+    }
+    if (Number(minimumTextDonation) <= 0 && textDonationEnabled) {
+      this.setState({errorMessage: <Typography variant="body1">Minimum text donation must be greater than 0. <a href="https://subby.io/publish">Need help?</a></Typography>})
+      return
+    }
+    const address = await services.getAddress()
+    if (!await services.getAddress()) {
+      this.setState({errorMessage: <Typography variant="body1">Wallet not connected. <a href="https://subby.io/publish">Need help?</a></Typography>})
+      return
+    }
+    const network = await services.getNetwork()
+    if (settings.ETHEREUM_NETWORK !== network) {
+      this.setState({errorMessage: <Typography variant="body1">Network not set to {settings.ETHEREUM_NETWORK}. <a href="https://subby.io/publish">Need help?</a></Typography>})
+      return
+    }
+    if (profile.isTerminated) {
+      this.setState({errorMessage: <Typography variant="body1">Cannot edit a terminated account</Typography>})
+      return
+    }
+    if (address !== profile.address) {
+      this.setState({errorMessage: <Typography variant="body1">Not logged in to <strong className={classes.address}>{profile.address}</strong></Typography>})
+      return
+    }
 
     if (username === profile.username) username = null
     if (bio === profile.bio) bio = null
@@ -143,13 +215,29 @@ class EditForm extends React.Component {
     if (hideDonations === profile.hideDonations) hideDonations = null
     if (!textDonationEnabled) minimumTextDonation = 0
     if (minimumTextDonation === profile.minimumTextDonation) minimumTextDonation = null
-
     await services.editProfile({username, bio, thumbnail, hideDonations, minimumTextDonation})
   }
 
+  hasChanges = () => {
+    const {profile} = this.props
+    let {username, bio, thumbnail, minimumTextDonation, hideDonations, textDonationEnabled} = this.state
+
+    if (!textDonationEnabled) minimumTextDonation = 0
+
+    const hasChanges = (
+      username === profile.username 
+      && bio === profile.bio 
+      && thumbnail === profile.thumbnail 
+      && hideDonations === profile.hideDonations 
+      && minimumTextDonation === profile.minimumTextDonation
+    ) ? false : true
+
+    return hasChanges
+  }
+
   render () {
-    const {classes} = this.props
-    let {username, usernameError, bio, thumbnail, textDonationEnabled, minimumTextDonation, address, usernameIsEditable, hideDonations} = this.state
+    const {classes, profile} = this.props
+    let {username, usernameError, bio, thumbnail, textDonationEnabled, minimumTextDonation, address, usernameIsEditable, hideDonations, errorMessage} = this.state
 
     const minimumDonationIsTooSmall = ((typeof minimumTextDonation === 'number') && (minimumTextDonation !== 0) && (minimumTextDonation.toFixed(4) < 0.0001))
     if (minimumDonationIsTooSmall) minimumTextDonation = 0.0001
@@ -269,6 +357,10 @@ class EditForm extends React.Component {
           <Tooltip title={<HelpText />} placement='top-start'>
             <HelpIcon className={classes.greyIcon} />
           </Tooltip>
+
+          <span className={classes.errorMessage}>
+            {errorMessage}
+          </span>
 
           <Button
             variant='contained'

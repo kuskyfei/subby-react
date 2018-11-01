@@ -110,7 +110,8 @@ class Card extends React.Component {
     timestamp: null,
     permalinkTooltipOpen: false,
     unsubscribeTooltipOpen: false,
-    cardMenuAnchorEl: null
+    cardMenuAnchorEl: null,
+    errorMessage: null
   }
 
   componentDidMount () {

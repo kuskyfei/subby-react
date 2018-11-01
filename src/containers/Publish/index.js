@@ -146,21 +146,30 @@ class Publish extends React.Component {
 
   handlePublish = async () => {
     const {comment, link} = this.state
+    const {classes, profile} = this.props
     this.setState({errorMessage: null})
 
+    // handle errors
     if (!comment && !link) {
-      this.setState({errorMessage: <Typography variant="body1">Can't publish empty posts. <a href="https://subby.io/publish">Need help?</a></Typography>})
+      this.setState({errorMessage: <Typography variant="body1">Cannot publish empty posts. <a href="https://subby.io/publish">Need help?</a></Typography>})
       return
     }
-
-    if (!await services.getAddress()) {
-      this.setState({errorMessage: <Typography variant="body1">Wallet not connected. <a href="https://subby.io/publish">What's a wallet?</a></Typography>})
+    const address = await services.getAddress()
+    if (!address) {
+      this.setState({errorMessage: <Typography variant="body1">Wallet not connected. <a href="https://subby.io/publish">Need help?</a></Typography>})
       return
     }
-
     const network = await services.getNetwork()
     if (settings.ETHEREUM_NETWORK !== network) {
       this.setState({errorMessage: <Typography variant="body1">Network not set to {settings.ETHEREUM_NETWORK}. <a href="https://subby.io/publish">Need help?</a></Typography>})
+      return
+    }
+    if (profile.isTerminated) {
+      this.setState({errorMessage: <Typography variant="body1">Cannot publish from terminated account</Typography>})
+      return
+    }
+    if (address !== profile.address) {
+      this.setState({errorMessage: <Typography variant="body1">Not logged in to <strong className={classes.address}>{profile.address}</strong></Typography>})
       return
     }
 

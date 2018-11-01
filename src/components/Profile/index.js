@@ -86,6 +86,10 @@ class Profile extends React.Component {
     const {classes, profile, editable, isLoading} = this.props
     const {isSubscribed} = this.state
 
+    if (profile.address === '0x0000000000000000000000000000000000000000') {
+      return <div />
+    }
+
     const username = profile.username || profile.address
     if (isSubscribed === true) profile.isSubscribed = true
     if (isSubscribed === false) profile.isSubscribed = false

@@ -14,7 +14,10 @@ import Button from '@material-ui/core/Button'
 import MessageIcon from '@material-ui/icons/Message'
 import HelpIcon from '@material-ui/icons/Help'
 
+const BigNumber = require('bignumber.js')
+
 const services = require('../../services')
+const {settings} = require('../../settings')
 
 const styles = theme => ({
   container: {
@@ -61,7 +64,8 @@ const styles = theme => ({
     marginTop: theme.spacing.unit * 3
   },
   publishButton: {
-    marginLeft: 'auto'
+    marginLeft: 'auto',
+    minWidth: 117
   },
   rightIcon: {
     marginLeft: theme.spacing.unit
@@ -100,6 +104,28 @@ const styles = theme => ({
     '& textarea': {
       cursor: 'not-allowed'
     }
+  },
+
+  errorMessage: {
+    paddingRight: 8,
+    paddingLeft: 8,
+    '& a': {
+      fontWeight: 600
+    },
+    '& strong': {
+      fontWeight: 600
+    },
+    '& p': {
+      color: 'rgb(255, 0, 0)'
+    },
+    [theme.breakpoints.down(450)]: {
+      '& p': {
+        fontSize: 12
+      }
+    }
+  },
+  address: {
+    wordBreak: 'break-all'
   }
 })
 
@@ -127,20 +153,52 @@ class Donate extends React.Component {
   }
 
   handleDonate = async () => {
+    this.setState({errorMessage: null})
+
+    const {classes, profile} = this.props
+    let {minimumTextDonation} = profile
     const {donationText, donationAmount} = this.state
-    const {profile} = this.props
+    const minimumTextDonationBN = new BigNumber(minimumTextDonation)
+    const donationAmountBN = new BigNumber(donationAmount)
+
+    // handle errors
+    if (donationAmountBN.lessThan(minimumTextDonationBN) && donationText !== '') {
+      const minimumDonationIsTooSmall = ((typeof minimumTextDonation === 'number') && (minimumTextDonation !== 0) && (minimumTextDonation.toFixed(4) < 0.0001))
+      if (minimumDonationIsTooSmall) minimumTextDonation = 0.0001
+
+      this.setState({errorMessage: <Typography variant="body1">Donate more than <strong>{minimumTextDonation}</strong> to include text</Typography>})
+      return
+    }
+    const senderAddress = await services.getAddress()
+    if (!senderAddress) {
+      this.setState({errorMessage: <Typography variant="body1">Wallet not connected. <a href="https://subby.io/publish">Need help?</a></Typography>})
+      return
+    }
+    const network = await services.getNetwork()
+    if (settings.ETHEREUM_NETWORK !== network) {
+      this.setState({errorMessage: <Typography variant="body1">Network not set to {settings.ETHEREUM_NETWORK}. <a href="https://subby.io/publish">Need help?</a></Typography>})
+      return
+    }
+    if (profile.address === '0x0000000000000000000000000000000000000000') {
+      this.setState({errorMessage: <Typography variant="body1">Cannot donate to user <strong className={classes.address}>{profile.address}</strong></Typography>})
+      return
+    }
+    const senderProfile = await services.getProfile(senderAddress)
+    if (senderProfile.isTerminated) {
+      this.setState({errorMessage: <Typography variant="body1">Cannot donate from terminated account</Typography>})
+      return
+    }
 
     const account = profile.username || profile.address
     const postId = profile.id
     const text = donationText
     const amount = donationAmount
-
     await services.donate({account, amount, text, postId})
   }
 
   render () {
     const {classes, profile} = this.props
-    const {donationText, donationAmount} = this.state
+    const {donationText, donationAmount, errorMessage} = this.state
     let {minimumTextDonation, username, address, thumbnail} = profile
 
     const textDonationEnabled = minimumTextDonation !== 0
@@ -201,6 +259,10 @@ class Donate extends React.Component {
           <Tooltip title={<HelpText />} placement='top-start'>
             <HelpIcon className={classes.greyIcon} />
           </Tooltip>
+
+          <span className={classes.errorMessage}>
+            {errorMessage}
+          </span>
 
           <Button
             variant='contained'

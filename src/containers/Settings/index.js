@@ -53,8 +53,8 @@ class Settings extends React.Component {
       if (!address) {
         return
       }
-      const isTerminated = await services.isTerminated(address)
-      this.setState({isTerminated})
+      const profile = await services.getProfile(address)
+      this.setState({isTerminated: profile.isTerminated})
     })()
 
     debug('mounted')
@@ -83,11 +83,11 @@ class Settings extends React.Component {
   }
 
   handleTerminate = async () => {
-    console.log('Terminate')
     await services.terminateAccount()
   }
 
   render () {
+    const {isTerminated} = this.state
     const {classes} = this.props
 
     return (
@@ -294,7 +294,8 @@ class Settings extends React.Component {
             <FormControlLabel
               control={
                 <Switch
-                  checked={Boolean(this.state.isTerminated)}
+                  disabled={isTerminated}
+                  checked={Boolean(isTerminated)}
                   onChange={this.handleTerminate}
                   color='primary'
                 />

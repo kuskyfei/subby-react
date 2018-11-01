@@ -81,14 +81,8 @@ const styles = theme => ({
     }
   },
 
-  refresh: {
-    fontSize: '1.5rem',
-    [theme.breakpoints.down(500 + theme.spacing.unit * 2 * 2)]: {
-      fontSize: '1.3rem'
-    },
-    [theme.breakpoints.down(400 + theme.spacing.unit * 2 * 2)]: {
-      fontSize: '1.2rem'
-    }
+  loading: {
+    margin: 'auto',
   },
 
   username: {
@@ -102,59 +96,21 @@ class ErrorMessage extends React.Component {
   }
 
   render () {
-    let {classes, subscriptions, onRefresh, error, username} = this.props
-
-    if (!subscriptions) {
-      subscriptions = []
-    }
+    let {classes, error} = this.props
 
     let message = 'Unknown error'
     let linkMessage = ''
     let linkLocation = ''
-    let refresh = false
 
-    if (error === 'noPosts') {
-      if (subscriptions.length === 0) {
-        message = `You're not subscribed to anyone.`
-        linkMessage = 'Find accounts to follow'
-        linkLocation = 'follow'
-      } else if (subscriptions.length === 1) {
-        message = `Your 1 subscription hasn't posted anything.`
-        linkMessage = 'Find more accounts to follow'
-        linkLocation = 'follow'
-        refresh = true
-      } else {
-        message = `Your ${subscriptions.length} subscriptions haven't posted anything.`
-        linkMessage = 'Find more accounts to follow'
-        linkLocation = 'follow'
-        refresh = true
-      }
-    }
-
-    if (error === 'isTerminated') {
-      message = `User has deleted their account`
-      linkMessage = ''
-      linkLocation = ''
+    if (error === 'notConnected') {
+      message = `Connect your wallet.`
+      linkMessage = `What's a wallet?`
+      linkLocation = 'publish'
     }
     if (error === 'profileTerminated') {
       message = `You terminated your account`
       linkMessage = ''
       linkLocation = ''
-    }
-    if (error === 'unregisteredUsername') {
-      message = <span>Username <strong className={classes.username}>{username}</strong> isn't registered.</span>
-      linkMessage = 'Register it now'
-      linkLocation = 'publish'
-    }
-    if (error === 'invalidUsername') {
-      message = <span>Username <strong className={classes.username}>{username}</strong> is invalid.</span>
-      linkMessage = ''
-      linkLocation = ''
-    }
-    if (error === 'notConnected') {
-      message = `Connect your wallet.`
-      linkMessage = `What's a wallet?`
-      linkLocation = 'publish'
     }
 
     return (
@@ -166,12 +122,6 @@ class ErrorMessage extends React.Component {
 
         <Typography className={classes.links} variant='display1'>
           <a href={`https://subby.io/${linkLocation}`} target='_blank'>{linkMessage}</a>
-          <br/>
-          {refresh && 
-            <span className={classes.refresh}>
-              or <a onClick={onRefresh}>Refresh</a>
-            </span>
-          }
         </Typography>
 
       </div>

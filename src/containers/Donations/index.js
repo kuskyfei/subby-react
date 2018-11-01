@@ -3,7 +3,7 @@
 // react
 import React from 'react'
 import {connect} from 'react-redux'
-import {bindActionCreators, compose} from 'redux'
+import {compose} from 'redux'
 import {withRouter} from 'react-router-dom'
 import Typography from '@material-ui/core/Typography'
 
@@ -12,6 +12,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
 import {Feed as FeedComponent, Donation} from '../../components'
+import ErrorMessage from './ErrorMessage'
 
 // api
 const services = require('../../services')
@@ -39,18 +40,16 @@ const styles = theme => ({
 
 class Donations extends React.Component {
   state = {
-    donations: []
+    donations: [],
   }
 
   donations = []
 
   componentDidMount () {
-    ;(async () => {
-      this.onDonation = services.onDonation({}, (donation) => {
-        this.donations.push(donation)
-        this.setState({donations: this.donations})
-      })
-    })()
+    this.onDonation = services.onDonation({}, (donation) => {
+      this.donations.push(donation)
+      this.setState({donations: this.donations})
+    })
 
     debug('mounted')
   }
@@ -65,7 +64,7 @@ class Donations extends React.Component {
   }
 
   render () {
-    const {classes} = this.props
+    const {classes, address, profile} = this.props
     let {donations} = this.state
 
     donations = donations.slice(donations.length - DONATIONS_PER_PAGE, donations.length)
@@ -74,6 +73,13 @@ class Donations extends React.Component {
 
     for (const donation of donations) {
       donationCards.push(<Donation donation={donation}/>)
+    }
+
+    if (!address) {
+      return <ErrorMessage error='notConnected'/>
+    }
+    if (profile && profile.isTerminated) {
+      return <ErrorMessage error='profileTerminated'/>
     }
 
     return (
@@ -92,7 +98,13 @@ class Donations extends React.Component {
   }
 }
 
+const mapStateToProps = state => ({
+  address: state.app.address,
+  profile: state.app.profile
+})
+
 const enhance = compose(
+  connect(mapStateToProps),
   withStyles(styles)
 )
 

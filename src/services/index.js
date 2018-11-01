@@ -45,7 +45,6 @@ const {
   getPostFromId, 
   onDonation, 
   getAddress, 
-  isTerminated, 
   terminateAccount, 
   donate, 
   publishPost, 
@@ -105,7 +104,6 @@ export {
   updateBackgroundFeedCache,
   // subby.js
   getAddress,
-  isTerminated,
   getPostsFromPublisher,
   getPostFromId,
   onDonation,

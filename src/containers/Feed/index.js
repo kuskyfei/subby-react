@@ -62,7 +62,7 @@ class Feed extends React.Component {
     profileIsLoading: false
   }
 
-  componentDidMount () {
+  componentDidMount() {
     ;(async () => {
       this.setState(state => ({isInitializing: true}))
       const settings = await services.getSettings()
@@ -75,17 +75,18 @@ class Feed extends React.Component {
     debug('mounted')
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     this.handleRouteChange(prevProps)
+    this.handleProfileChange(prevProps)
 
     debug('updated')
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     debug('unmounted')
   }
 
-  async handleProfile ({reset} = {}) {
+  async handleProfile({reset} = {}) {
     const {location, actions} = this.props
     debug('handleProfile start', location)
 
@@ -107,7 +108,7 @@ class Feed extends React.Component {
     debug('handleProfile end', {account})
   }
 
-  async addPostsToFeed ({reset} = {}) {
+  async addPostsToFeed({reset} = {}) {
     debug('addPostsToFeed start', this.props, this.state)
     let {location, actions, feed} = this.props
     let {hasMorePosts, publisherStartAt} = this.state
@@ -134,6 +135,9 @@ class Feed extends React.Component {
       this.setState(state => ({hasMorePosts: false, addingMorePosts: true}))
       const id = getPostIdFromUrlParams(location.search)
       let post = await services.getPostFromId({publisher: username, id})
+      if (post.address === '0x0000000000000000000000000000000000000000') {
+        break route
+      }
       actions.setFeed([post])
     }
 
@@ -169,12 +173,17 @@ class Feed extends React.Component {
     debug('addPostsToFeed end', this.props, this.state)
   }
 
-  render () {
+  render() {
     const {classes, feed, location} = this.props
     const {addingMorePosts, profileIsLoading, settings, isInitializing, subscriptions, accountFromUrlParams, walletDisconnected} = this.state
 
     if (isInitializing) {
       return <div />
+    }
+
+    const error = this.getError()
+    if (error) {
+      return <ErrorMessage error={error} username={accountFromUrlParams} subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true})} />
     }
 
     const posts = []
@@ -193,22 +202,6 @@ class Feed extends React.Component {
       profile = this.props.publisherProfile
     }
 
-    // handle different errors messages
-    if (!addingMorePosts && !profileIsLoading) {
-      if (subscriptions && !profile && posts.length === 0) {
-        return <ErrorMessage subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true})} />
-      }
-      if (subscriptions && subscriptions.length === 0) {
-        return <ErrorMessage subscriptions={subscriptions} />
-      }
-      if (profile && profile.address === '0x0000000000000000000000000000000000000000') {
-        return <ErrorMessage profile={profile} username={accountFromUrlParams} />
-      }
-      if (!profile && editable && walletDisconnected) {
-        return <ErrorMessage editable={editable}/>
-      }
-    }
-
     return (
       <div className={classes.layout}>
 
@@ -223,7 +216,7 @@ class Feed extends React.Component {
     )
   }
 
-  handleRouteChange (prevProps) {
+  handleRouteChange(prevProps) {
     if (!isRouteChange(this.props, prevProps)) {
       return
     }
@@ -237,6 +230,63 @@ class Feed extends React.Component {
     this.handleProfile({reset: true})
 
     debug('feed changed')
+  }
+
+  handleProfileChange = (prevProps) => {
+    const {location, profile} = this.props
+    const {address} = profile || {}
+    const {profile: prevProfile} = prevProps || {}
+    const {address: prevAddress} = prevProfile || {}
+
+    debug('handleProfileChange', {prevProfile, profile})
+
+    if (!prevProps) {
+      return
+    }
+    if (!isProfile(location.search)) {
+      return
+    }
+    if (prevAddress === address) {
+      return
+    }
+
+    this.addPostsToFeed({reset: true})
+    debug('handleProfileChange end')
+  }
+
+  getError = () => {
+    const {feed, publisherProfile, profile, location} = this.props
+    const {addingMorePosts, profileIsLoading, settings, isInitializing, subscriptions, accountFromUrlParams, walletDisconnected} = this.state
+
+    debug('feed error', {addingMorePosts, profileIsLoading, subscriptions, publisherProfile, profile, walletDisconnected})
+
+    if (addingMorePosts) {
+      return
+    }
+    if (profileIsLoading) {
+      return
+    }
+    if (isInitializing) {
+      return
+    }
+    if (isProfile(location.search) && walletDisconnected) {
+      return 'notConnected'
+    }
+    if (isFeed(location.search) && feed && feed.length === 0) {
+      return 'noPosts'
+    }
+    if (publisherProfile && publisherProfile.isTerminated) {
+      return 'isTerminated'
+    }
+    if (isProfile(location.search) && profile && profile.isTerminated) {
+      return 'profileTerminated'
+    }
+    if (publisherProfile && publisherProfile.address === '0x0000000000000000000000000000000000000000' && accountFromUrlParams && accountFromUrlParams.length < 40) {
+      return 'unregisteredUsername'
+    }
+    if (publisherProfile && publisherProfile.address === '0x0000000000000000000000000000000000000000') {
+      return 'invalidUsername'
+    }
   }
 }
 

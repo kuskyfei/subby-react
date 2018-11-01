@@ -21,18 +21,13 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
-add wrong network to write functions error
-bug with no connections feed to profile (when not logged in with metamask, doesn't give the "Connect your wallet page")
-make the post dialog go away after we click publish in metamask?
-profile not connected message
-fix metamask on compiled version
+card unsubcribe button not working
+fix metamask on compiled version // error was probably mocks enabled
 fix ga
 update cache functions
-add 'username is taken' error validation
-add a "your metamask is locked page"
 make find accounts to follow post
 make publishing content guide
-update is terminated profile error / username not taken
+bug with end of feed restarting over and over
 
 ##todo after release
 add pagination after 200 posts
