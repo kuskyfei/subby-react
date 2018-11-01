@@ -47,13 +47,12 @@ const {
   getAddress, 
   terminateAccount, 
   donate, 
-  publishPost, 
+  publish, 
   editProfile,
   onSignerChange,
   getSignerNetwork
 } = subbyJs
 const getNetwork = getSignerNetwork
-const publish = publishPost
 
 const {
   setSettings,
