@@ -23,7 +23,6 @@ const getProfile = async (account) => {
   // and set the cache
   if (await cache.profileCacheIsExpired(account)) {
     profile = await subbyJs.getProfile(account)
-
     indexedDb.setProfileCache(profile)
   }
 

@@ -1,10 +1,9 @@
 const {
+  editProfile,
   setSettings,
   setSubscriptions,
   subscribe,
-  unsubscribe,
-  donate,
-  publish
+  unsubscribe
 } = require('./write')
 
 const {
@@ -19,16 +18,16 @@ const {
 
 const {
   updateCache,
+  UpdateCacheLoop,
   updateBackgroundFeedCache
 } = require('./cache')
 
 export {
+  editProfile,
   setSettings,
   setSubscriptions,
   subscribe,
   unsubscribe,
-  donate,
-  publish,
 
   getAddress,
   getProfile,
@@ -39,5 +38,6 @@ export {
   getFeed,
 
   updateCache,
+  UpdateCacheLoop,
   updateBackgroundFeedCache
 }

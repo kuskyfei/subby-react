@@ -30,9 +30,6 @@ const getWidgetFromUrl = (url, settings) => {
   }
 
   if (isTorrent(url)) {
-    if (!settings.WEB_TORRENT_EMBEDS) {
-      return Magnet
-    }
     return Torrent
   }
 

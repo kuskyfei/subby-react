@@ -13,7 +13,8 @@ const {testPost, testPostId, resetDb, getDb, mockTime, getDuplicatePosts} = requ
 
 const restoreMocks = {}
 
-const ADDRESSES = ['0x79d5c59a00d65ea9ac571ad67db5a8f3afabacea']
+const ADDRESSES = ['0x79d5c59a00d65ea9ac571ad67db5a8f3afabacea', '0x1234567890123456789012345678901234567890']
+const PUBLISHERS = ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222', 'john', 'john2', 'john3']
 
 describe('services', () => {
   beforeEach(async () => {
@@ -33,7 +34,7 @@ describe('services', () => {
   describe('get profile', () => {
     test('cache expires', async () => {
       const firstRequestTime = 1000000000
-      const profile = {"address": "0x79d5c59a00d65ea9ac571ad67db5a8f3afabacea", "bio": "Provident ducimus iure ducimus similique aut neque sunt non. Sed mollitia vel voluptates fugiat nostrum nihil expedita labore quo. Fugiat minima nisi deserunt voluptatem ullam quia. antwan.org", "hideDonations": false, "minimumTextDonation": 0.05, "thumbnail": "https://i.imgur.com/I5BH2CW.jpg", "totalDonationsAmount": 0, "username": "Antwan.Stamm"}
+      const profile = {"address": "0x79d5c59a00d65ea9ac571ad67db5a8f3afabacea", "bio": "Provident ducimus iure ducimus similique aut neque sunt non. Sed mollitia vel voluptates fugiat nostrum nihil expedita labore quo. Fugiat minima nisi deserunt voluptatem ullam quia. antwan.org", "hideDonations": false, "isTerminated": false, "minimumTextDonation": 0.05, "thumbnail": "https://i.imgur.com/I5BH2CW.jpg", "totalDonationsAmount": 0, "username": "Antwan.Stamm"}
 
       // first request with empty cache
       mockTime(firstRequestTime)
@@ -74,6 +75,48 @@ describe('services', () => {
       expect(db3.profiles[res1.username].lastProfileCacheTimestamp).toEqual(newTime)
       // everything else should be the same
       expect(res3).toEqual(res1)
+    })
+  })
+
+  describe('editProfile', () => {
+    test('updates cache', async () => {
+      await services.editProfile({})
+      const db = await getDb()
+      expect(Object.keys(db.profiles).length).toEqual(2)
+    })
+  })
+
+  describe('update cache', () => {
+    beforeAll(() => {
+      jest.setTimeout(5 * minute)
+    })
+    afterAll(() => {
+      jest.setTimeout(5000)
+    })
+
+    test('profile + no subscriptions', async () => {
+      const firstRequestTime = 1000000000
+      mockTime(firstRequestTime)
+
+      await services.updateCache(ADDRESSES[0])
+
+      const db1 = await getDb()
+      expect(!!db1.profiles['0x79d5c59a00d65ea9ac571ad67db5a8f3afabacea']).toEqual(true)
+      expect(!!db1.profiles['Antwan.Stamm']).toEqual(true)
+    })
+
+    test('no profile + subscriptions', async () => {
+      const firstRequestTime = 1000000000
+      mockTime(firstRequestTime)
+
+      // subsribe first
+      for (const publisher of PUBLISHERS) {
+        await services.subscribe(publisher)
+      }
+
+      await services.updateCache()
+      const db1 = await getDb()
+      expect(db1.backgroundFeed.posts.length).toEqual(500)
     })
   })
 

@@ -161,6 +161,7 @@ class EditForm extends React.Component {
     onFinishedTyping(async () => {
       const profile = await services.getProfile(username)
       const usernameAvailable = profile.address === '0x0000000000000000000000000000000000000000' && !profile.isTerminated
+
       if (!usernameAvailable) {
         this.setState({
           ...this.state,

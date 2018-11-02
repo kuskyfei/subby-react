@@ -162,6 +162,10 @@ class Donate extends React.Component {
     const donationAmountBN = new BigNumber(donationAmount)
 
     // handle errors
+    if (window.location.protocol === 'file:' && !window.web3) {
+      this.setState({errorMessage: <Typography variant="body1">MetaMask does not allow <strong>file://</strong> protocol, use <strong>http(s)://</strong></Typography>})
+      return
+    }
     if (donationAmountBN.lessThan(minimumTextDonationBN) && donationText !== '') {
       const minimumDonationIsTooSmall = ((typeof minimumTextDonation === 'number') && (minimumTextDonation !== 0) && (minimumTextDonation.toFixed(4) < 0.0001))
       if (minimumDonationIsTooSmall) minimumTextDonation = 0.0001

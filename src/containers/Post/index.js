@@ -6,6 +6,7 @@ import {Card} from '../../components'
 
 // api
 const services = require('../../services')
+const {settings} = require('../../settings')
 
 // util
 const {isIpfsContent, isTorrent, getHash, downloadBlob} = require('./util')
@@ -51,6 +52,7 @@ class Post extends React.Component {
     const {post} = this.props
     if (!post.link) return
     if (!isTorrent(post.link)) return
+    if (!settings.WEB_TORRENT_EMBEDS) return
 
     const torrent = await services.getTorrent(post.link)
 

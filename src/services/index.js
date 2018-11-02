@@ -48,7 +48,6 @@ const {
   terminateAccount, 
   donate, 
   publish, 
-  editProfile,
   onSignerChange,
   getSignerNetwork
 } = subbyJs
@@ -59,6 +58,7 @@ const {
   setSubscriptions,
   subscribe,
   unsubscribe,
+  editProfile,
 
   getProfile,
   getSubscriptions,
@@ -68,6 +68,7 @@ const {
   isSubscribed,
 
   updateCache,
+  UpdateCacheLoop,
   updateBackgroundFeedCache
 } = require('./cache')
 
@@ -91,6 +92,7 @@ export {
   setSubscriptions,
   subscribe,
   unsubscribe,
+  editProfile,
   // cache read
   getProfile,
   getSubscriptions,
@@ -100,6 +102,7 @@ export {
   getFeed,
   // cache
   updateCache,
+  UpdateCacheLoop,
   updateBackgroundFeedCache,
   // subby.js
   getAddress,
@@ -108,7 +111,6 @@ export {
   onDonation,
   donate,
   publish,
-  editProfile,
   terminateAccount,
   onSignerChange,
   getNetwork,

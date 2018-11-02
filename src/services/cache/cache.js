@@ -1,7 +1,7 @@
 const subbyJs = require('subby.js')
 const indexedDb = require('../indexedDb')
 const {cacheIsExpired} = require('./util')
-const {getSubscriptions} = require('./read')
+const read = require('./read')
 const debug = require('debug')('services:cache:cache')
 
 const profileCacheTime = window.SUBBY_GLOBAL_SETTINGS.PROFILE_CACHE_TIME
@@ -11,27 +11,43 @@ const feedCacheBufferSize = window.SUBBY_GLOBAL_SETTINGS.FEED_CACHE_BUFFER_SIZE
 
 const subbyJsPostLimit = 100
 
+const UpdateCacheLoop = function(account) {
+  let stopped = false
+  const stop = () => stopped = true
+  const start = async () => {
+    if (stopped) {
+      return
+    }
+    await updateCache(account)
+    const minute = 60*1000
+    setTimeout(start, minute)
+  }
+  return {stop, start}
+}
+
 const updateCache = async (account) => {
   debug('updateCache')
-
-  if (await profileCacheIsExpired(account)) {
+  if (account && await profileCacheIsExpired(account)) {
     await updateProfileCache(account)
   }
-  if (await ethereumSubscriptionsCacheIsExpired(account)) {
-    await updateSubscriptionsCache(account)
-  }
   if (await backgroundFeedCacheIsExpired()) {
-    const subscriptions = await getSubscriptions(account)
+    const subscriptions = await read.getSubscriptions()
     await updateBackgroundFeedCache(subscriptions)
   }
 }
 
-const updateProfileCache = () => {
+const updateProfileCache = async (account) => {
   debug('updateProfileCache')
+  const profile = await subbyJs.getProfile(account)
+  indexedDb.setProfileCache(profile)
 }
 
 const updateBackgroundFeedCache = async (subscriptions) => {
   debug('updateBackgroundFeedCache start')
+
+  if (!Array.isArray(subscriptions)) {
+    subscriptions = Object.keys(subscriptions)
+  }
 
   await populateFeedCache({
     subscriptions,
@@ -119,6 +135,7 @@ const backgroundFeedCacheIsExpired = async () => {
 
 export {
   updateCache,
+  UpdateCacheLoop,
   updateProfileCache,
   profileCacheIsExpired,
   backgroundFeedCacheIsExpired,

@@ -8,6 +8,7 @@ import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import classnames from 'classnames'
 
 const styles = theme => ({
   layout: {
@@ -102,7 +103,7 @@ class ErrorMessage extends React.Component {
   }
 
   render () {
-    let {classes, subscriptions, onRefresh, error, username} = this.props
+    let {classes, subscriptions, onRefresh, error, username, className} = this.props
 
     if (!subscriptions) {
       subscriptions = []
@@ -112,6 +113,12 @@ class ErrorMessage extends React.Component {
     let linkMessage = ''
     let linkLocation = ''
     let refresh = false
+
+    if (error === 'fileProtocol') {
+      message = <span>MetaMask does not allow <strong>file://</strong> protocol, use <strong>http(s)://</strong></span>
+      linkMessage = ''
+      linkLocation = ''
+    }
 
     if (error === 'noPosts') {
       if (subscriptions.length === 0) {
@@ -131,6 +138,13 @@ class ErrorMessage extends React.Component {
       }
     }
 
+    if (error === 'noMorePosts') {
+      message = `No more posts.`
+      linkMessage = 'Find more accounts to follow'
+      linkLocation = 'follow'
+      refresh = true
+    }
+
     if (error === 'isTerminated') {
       message = `User has deleted their account`
       linkMessage = ''
@@ -147,7 +161,7 @@ class ErrorMessage extends React.Component {
       linkLocation = 'publish'
     }
     if (error === 'invalidUsername') {
-      message = <span>Username <strong className={classes.username}>{username}</strong> is invalid.</span>
+      message = <span>Username <strong className={classes.username}>{username}</strong> is invalid</span>
       linkMessage = ''
       linkLocation = ''
     }
@@ -158,7 +172,7 @@ class ErrorMessage extends React.Component {
     }
 
     return (
-      <div className={classes.layout}>
+      <div className={classnames(classes.layout, className)}>
 
         <Typography className={classes.links} variant='display1'>
           {message}

@@ -46,6 +46,13 @@ const styles = theme => ({
       marginLeft: 'auto',
       marginRight: 'auto'
     }
+  },
+  bottomError: {
+    paddingTop: 0,
+    paddingBottom: 32,
+    [theme.breakpoints.down(600 + theme.spacing.unit * 3 * 2)]: {
+      paddingBottom: 12
+    },
   }
 })
 
@@ -161,12 +168,16 @@ class Feed extends React.Component {
     }
 
     else if (isFeed(location.search)) {
+      const limit = 10
       const startAt = feed.length
       const subscriptions = await services.getSubscriptions()
       const subscriptionsArray = Object.keys(subscriptions) 
       this.setState(state => ({subscriptions: subscriptionsArray, addingMorePosts: true}))
-      const newPosts = await services.getFeed({subscriptions, startAt, limit: 10})
+      const newPosts = await services.getFeed({subscriptions, startAt, limit})
       actions.setFeed([...feed, ...newPosts])
+      if (newPosts.length < limit) {
+        this.setState(state => ({hasMorePosts: false}))
+      }
     }
 
     this.setState(state => ({addingMorePosts: false}))
@@ -175,7 +186,7 @@ class Feed extends React.Component {
 
   render() {
     const {classes, feed, location} = this.props
-    const {addingMorePosts, profileIsLoading, settings, isInitializing, subscriptions, accountFromUrlParams, walletDisconnected} = this.state
+    const {addingMorePosts, profileIsLoading, settings, isInitializing, subscriptions, accountFromUrlParams, walletDisconnected, hasMorePosts} = this.state
 
     if (isInitializing) {
       return <div />
@@ -211,6 +222,10 @@ class Feed extends React.Component {
           {posts}
           {addingMorePosts && <Post isLoading />}
         </FeedComponent>
+
+        {isFeed(location.search) && !hasMorePosts && 
+          <ErrorMessage className={classes.bottomError} error='noMorePosts' subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true})} />
+        }
 
       </div>
     )
@@ -268,6 +283,9 @@ class Feed extends React.Component {
     }
     if (isInitializing) {
       return
+    }
+    if (isProfile(location.search) && window.location.protocol === 'file:' && !window.web3) {
+      return 'fileProtocol'
     }
     if (isProfile(location.search) && walletDisconnected) {
       return 'notConnected'

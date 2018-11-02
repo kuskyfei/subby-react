@@ -81,6 +81,9 @@ class Donations extends React.Component {
     if (profile && profile.isTerminated) {
       return <ErrorMessage error='profileTerminated'/>
     }
+    if (window.location.protocol === 'file:' && !window.web3) {
+      return <ErrorMessage error='fileProtocol'/>
+    }
 
     return (
       <div className={classes.layout}>
@@ -92,7 +95,6 @@ class Donations extends React.Component {
         <FeedComponent postCount={donations.length}>
           {donationCards}
         </FeedComponent>
-
       </div>
     )
   }

@@ -2,8 +2,17 @@ const indexedDb = require('../indexedDb')
 const {arrayToObjectWithItemsAsProps} = require('./util')
 const {getSubscriptions} = require('./read')
 const subbyJs = require('subby.js')
+const {updateProfileCache} = require('./cache')
 
 const debug = require('debug')('services:cache:write')
+
+const editProfile = async (...args) => {
+  const res = await subbyJs.editProfile(...args)
+  const address = await subbyJs.getAddress()
+  await updateProfileCache(address)
+
+  return res
+}
 
 const subscribe = async (publisher) => {
   debug('subscribe', {publisher})
@@ -13,6 +22,12 @@ const subscribe = async (publisher) => {
 
 const unsubscribe = async (...publishers) => {
   debug('unsubscribe', publishers)
+
+  // we accept an array as first argument or
+  // a series of strings
+  if (Array.isArray(publishers[0])) {
+    publishers = publishers[0]
+  }
 
   for (const publisher of publishers) {
     await indexedDb.removeFromLocalSubscriptions(publisher)
@@ -37,6 +52,7 @@ const setSettings = async (settings) => {
 }
 
 export {
+  editProfile,
   setSettings,
   setSubscriptions,
   subscribe,

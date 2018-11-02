@@ -57,10 +57,6 @@ class App extends Component {
       // services.mockSmartContracts({explicit: true})
       // services.mockSmartContracts()
 
-      // setInterval(() =>
-      //   services.updateCache({address})
-      //   , 10000)
-
       debug('mounted')
     })()
   }
@@ -74,6 +70,8 @@ class App extends Component {
     const {actions} = this.props
 
     const address = await services.getAddress()
+    this.handleUpdateCache(address)
+
     if (!address) {
       actions.setAddress(null)
       actions.setProfile(null)
@@ -86,6 +84,14 @@ class App extends Component {
     this.setState({isInitializing: false})
 
     debug('init end', {address, profile})
+  }
+
+  handleUpdateCache = (account) => {
+    if (this.updateCacheLoop) {
+      this.updateCacheLoop.stop()
+    }
+    this.updateCacheLoop = new services.UpdateCacheLoop(account)
+    this.updateCacheLoop.start()
   }
 
   componentDidUpdate(prevProps) {

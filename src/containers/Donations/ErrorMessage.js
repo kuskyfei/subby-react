@@ -102,6 +102,11 @@ class ErrorMessage extends React.Component {
     let linkMessage = ''
     let linkLocation = ''
 
+    if (error === 'fileProtocol') {
+      message = <span>MetaMask does not allow <strong>file://</strong> protocol, use <strong>http(s)://</strong></span>
+      linkMessage = ''
+      linkLocation = ''
+    }
     if (error === 'notConnected') {
       message = `Connect your wallet.`
       linkMessage = `What's a wallet?`

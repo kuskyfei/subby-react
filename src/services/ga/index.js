@@ -1,6 +1,6 @@
 const ReactGA = require('react-ga')
 const services = require('../../services')
-const gaId = 'UA-000000-01'
+const gaId = 'UA-128596742-1'
 
 let isInitialized = false
 
@@ -17,7 +17,7 @@ const isEnabled = async () => {
 }
 
 const pageView = async () => {
-  if (!isEnabled) {
+  if (!isEnabled()) {
     return
   }
   ReactGA.pageview(window.location.pathname + window.location.search)

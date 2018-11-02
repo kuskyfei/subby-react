@@ -150,6 +150,10 @@ class Publish extends React.Component {
     this.setState({errorMessage: null})
 
     // handle errors
+    if (window.location.protocol === 'file:' && !window.web3) {
+      this.setState({errorMessage: <Typography variant="body1">MetaMask does not allow <strong>file://</strong> protocol, use <strong>http(s)://</strong></Typography>})
+      return
+    }
     if (!comment && !link) {
       this.setState({errorMessage: <Typography variant="body1">Cannot publish empty posts. <a href="https://subby.io/publish">Need help?</a></Typography>})
       return

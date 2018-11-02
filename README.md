@@ -21,13 +21,9 @@ localStorage.debug = 'containers:Feed'
 
 ##todo
 
-card unsubcribe button not working
-fix metamask on compiled version // error was probably mocks enabled
-fix ga
-update cache functions
+fix bugs with posting embed content preview
 make find accounts to follow post
 make publishing content guide
-bug with end of feed restarting over and over
 
 ##todo after release
 add pagination after 200 posts
