@@ -20,8 +20,7 @@ const settings = {
 
   UPDATE_NOTIFICATIONS: true,
 
-  PROFILE_CACHE_TIME: 60 * minute,
-  ETHEREUM_SUBSCRIPTIONS_CACHE_TIME: 5 * minute,
+  PROFILE_CACHE_TIME: 0.5 * minute,
   FEED_CACHE_TIME: 5 * minute,
   FEED_CACHE_BUFFER_SIZE: 500,
 

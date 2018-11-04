@@ -69,6 +69,7 @@ const {
 
   updateCache,
   UpdateCacheLoop,
+  updateProfileCache,
   updateBackgroundFeedCache
 } = require('./cache')
 
@@ -103,6 +104,7 @@ export {
   // cache
   updateCache,
   UpdateCacheLoop,
+  updateProfileCache,
   updateBackgroundFeedCache,
   // subby.js
   getAddress,

@@ -7,11 +7,13 @@ const {updateProfileCache} = require('./cache')
 const debug = require('debug')('services:cache:write')
 
 const editProfile = async (...args) => {
-  const res = await subbyJs.editProfile(...args)
+  const tx = await subbyJs.editProfile(...args)
+  await tx.wait()
   const address = await subbyJs.getAddress()
   await updateProfileCache(address)
 
-  return res
+  debug('editProfile cache updated', {address, args})
+  return tx
 }
 
 const subscribe = async (publisher) => {

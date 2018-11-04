@@ -241,7 +241,7 @@ class Card extends React.Component {
         }
 
         {post.comment === 'loading' &&
-          <EmbedWidget url='loading' />
+          <EmbedWidget url='loading' settings={settings}/>
         }
 
         {!preview &&

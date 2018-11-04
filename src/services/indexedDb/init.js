@@ -42,7 +42,11 @@ const db = require('./db')
 // init cannot be a constant or otherwise it can't
 // be mocked properly
 let init = async ({version}) => {
+
   db.db = await idb.open('subby', version, upgradeDb => {
+
+    console.log(upgradeDb)
+
     if (!upgradeDb.objectStoreNames.contains('profiles')) {
       upgradeDb.createObjectStore('profiles')
     }
@@ -61,6 +65,9 @@ let init = async ({version}) => {
   })
 }
 
+// if you delete the db you need to make sure the site 
+// is closed in all tabs or it will no longer
+// open until you close all tabs
 const deleteEverything = () => new Promise(async resolve => {
   await db.db.close()
 

@@ -19,6 +19,7 @@ const {
 const {
   updateCache,
   UpdateCacheLoop,
+  updateProfileCache,
   updateBackgroundFeedCache
 } = require('./cache')
 
@@ -39,5 +40,6 @@ export {
 
   updateCache,
   UpdateCacheLoop,
+  updateProfileCache,
   updateBackgroundFeedCache
 }

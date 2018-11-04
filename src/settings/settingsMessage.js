@@ -48,7 +48,6 @@ const settingsMessage = `<script>
     // big of a number will prevent Subby from fetching
     // the most recent information from Ethereum.
     PROFILE_CACHE_TIME: ${settings.PROFILE_CACHE_TIME},
-    ETHEREUM_SUBSCRIPTIONS_CACHE_TIME: ${settings.ETHEREUM_SUBSCRIPTIONS_CACHE_TIME},
     FEED_CACHE_TIME: ${settings.FEED_CACHE_TIME},
     FEED_CACHE_BUFFER_SIZE: ${settings.FEED_CACHE_BUFFER_SIZE}
 

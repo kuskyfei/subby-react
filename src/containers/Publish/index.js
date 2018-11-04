@@ -28,7 +28,8 @@ class Publish extends React.Component {
     isPreviewing: false,
     comment: '',
     link: null,
-    errorMessage: null
+    errorMessage: null,
+    settings: null
   }
 
   constructor (props) {
@@ -57,7 +58,7 @@ class Publish extends React.Component {
 
   handleLinkDragEnter = (e) => {
     e.preventDefault()
-    this.setState({...this.state, isDragging: true})
+    this.setState({isDragging: true})
   }
 
   handleLinkDragOver = (e) => {
@@ -67,14 +68,14 @@ class Publish extends React.Component {
   handleLinkDragLeave = (e) => {
     e.stopPropagation()
     e.preventDefault()
-    this.setState({...this.state, isDragging: false})
+    this.setState({isDragging: false})
   }
 
   handleLinkDrop = async (e) => {
     debug('handleLinkDrop')
     e.preventDefault()
 
-    this.setState({...this.state, isDragging: false, isPreviewing: true, link: 'loading:Uploading'})
+    this.setState({isDragging: false, isPreviewing: true, link: 'loading:Uploading'})
 
     const {dataTransfer} = e
     const file = dataTransfer.items[0].getAsFile()
@@ -91,7 +92,8 @@ class Publish extends React.Component {
 
   handleTorrentFile = async (file) => {
     const magnet = await services.getMagnetFromTorrentFile(file)
-    this.setState({...this.state, isDragging: false, isPreviewing: true, link: magnet})
+    const settings = await services.getSettings()
+    this.setState({isDragging: false, isPreviewing: true, link: magnet, settings})
     debug('handleTorrentFile', magnet)
   }
 
@@ -99,11 +101,12 @@ class Publish extends React.Component {
     const typedArray = await fileToTypedArray(file)
     const res = await services.ipfs.uploadTypedArray(typedArray)
     const ipfsHash = res[0].hash
+    const settings = await services.getSettings()
 
-    this.setState({...this.state, isDragging: false, isPreviewing: true, link: `ipfs:${ipfsHash}`})
+    this.setState({isDragging: false, isPreviewing: true, link: `ipfs:${ipfsHash}`, settings})
   }
 
-  handleLinkPaste = (e) => {
+  handleLinkPaste = async (e) => {
     const pastedValue = e.clipboardData.getData('text/plain')
     debug('handleLinkPaste', pastedValue)
 
@@ -117,7 +120,9 @@ class Publish extends React.Component {
       link = 'ipfs:' + link
     }
 
-    this.setState({...this.state, isPreviewing: true, link: link})
+    const settings = await services.getSettings()
+
+    this.setState({isPreviewing: true, link: link, settings})
   }
 
   handleGlobalClipboardPasting = (e) => {
@@ -133,11 +138,11 @@ class Publish extends React.Component {
   cancelPostPreview = () => {
     debug('cancelPostPreview')
 
-    this.setState({...this.state, isPreviewing: false})
+    this.setState({isPreviewing: false})
   }
 
   handleCommentChange = ({target}) => {
-    this.setState({...this.state, comment: target.value})
+    this.setState({comment: target.value})
   }
 
   handleModalClose = () => {
@@ -182,7 +187,7 @@ class Publish extends React.Component {
 
   render () {
     const {classes, address, profile} = this.props
-    const {isDragging, isPreviewing, comment, link, errorMessage} = this.state
+    const {isDragging, isPreviewing, comment, link, errorMessage, settings} = this.state
 
     const post = {
       thumbnail: profile && profile.thumbnail,
@@ -222,7 +227,7 @@ class Publish extends React.Component {
 
         {isPreviewing &&
           <Preview>
-            <Post post={post} preview onPreviewClose={this.cancelPostPreview.bind(this)} />
+            <Post post={post} settings={settings} preview onPreviewClose={this.cancelPostPreview.bind(this)} />
           </Preview>
         }
 

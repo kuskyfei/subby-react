@@ -6,7 +6,6 @@ import {Card} from '../../components'
 
 // api
 const services = require('../../services')
-const {settings} = require('../../settings')
 
 // util
 const {isIpfsContent, isTorrent, getHash, downloadBlob} = require('./util')
@@ -49,6 +48,7 @@ class Post extends React.Component {
   }
 
   handleTorrent = async () => {
+    const settings = await services.getSettings()
     const {post} = this.props
     if (!post.link) return
     if (!isTorrent(post.link)) return

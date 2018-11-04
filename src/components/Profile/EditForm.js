@@ -216,7 +216,9 @@ class EditForm extends React.Component {
     if (hideDonations === profile.hideDonations) hideDonations = null
     if (!textDonationEnabled) minimumTextDonation = 0
     if (minimumTextDonation === profile.minimumTextDonation) minimumTextDonation = null
+
     await services.editProfile({username, bio, thumbnail, hideDonations, minimumTextDonation})
+    await services.updateProfileCache(address)
   }
 
   hasChanges = () => {

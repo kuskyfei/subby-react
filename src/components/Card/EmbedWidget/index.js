@@ -14,7 +14,7 @@ import {
 const {extractRootDomain, stripUrlQuery} = require('./util')
 
 const EmbedWidget = (props) => {
-  const settings = props.settings || {}
+  const settings = props.settings
   const Widget = getWidgetFromUrl(props.url, settings)
 
   return <Widget url={props.url} />
@@ -30,6 +30,9 @@ const getWidgetFromUrl = (url, settings) => {
   }
 
   if (isTorrent(url)) {
+    if (!settings.WEB_TORRENT_EMBEDS) {
+      return Magnet
+    }
     return Torrent
   }
 

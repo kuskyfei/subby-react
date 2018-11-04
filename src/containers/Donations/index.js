@@ -34,7 +34,12 @@ const styles = theme => ({
     }
   },
   message: {
-    paddingTop: theme.spacing.unit * 4,
+    marginTop: theme.spacing.unit * 3,
+    marginBottom: theme.spacing.unit * 3,
+    [theme.breakpoints.up(600 + theme.spacing.unit * 3 * 2)]: {
+      marginTop: theme.spacing.unit * 6,
+      marginBottom: theme.spacing.unit * 6,
+    },
   }
 })
 
@@ -45,25 +50,29 @@ class Donations extends React.Component {
 
   donations = []
 
-  componentDidMount () {
-    this.onDonation = services.onDonation({}, (donation) => {
-      this.donations.push(donation)
-      this.setState({donations: this.donations})
-    })
+  componentDidMount() {
+    ;(async () => {
+      const recipientAddress = await services.getAddress()
+      this.onDonation = services.onDonation({recipientAddress, fromBlock: 0}, (donation) => {
+        this.donations.push(donation)
+        this.setState({donations: this.donations})
+        debug('onDonation', {donation})
+      })
+    })()
 
     debug('mounted')
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     debug('updated')
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.onDonation.off()
     debug('unmounted')
   }
 
-  render () {
+  render() {
     const {classes, address, profile} = this.props
     let {donations} = this.state
 
@@ -87,11 +96,9 @@ class Donations extends React.Component {
 
     return (
       <div className={classes.layout}>
-        {donationCards.length === 0 &&
-          <Typography className={classes.message} variant='body1' align='center'>
-            When you receive a donation, it will appear below.
-          </Typography>
-        }
+        <Typography className={classes.message} variant='body1' align='center'>
+          When you receive a donation, it will appear below.
+        </Typography>
         <FeedComponent postCount={donations.length}>
           {donationCards}
         </FeedComponent>

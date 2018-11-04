@@ -64,7 +64,7 @@ class App extends Component {
   init = async () => {
     debug('init start')
 
-    this.setState({isInitializing: true})
+    this.setState(state => ({isInitializing: true}))
     await services.init()
 
     const {actions} = this.props
@@ -75,13 +75,13 @@ class App extends Component {
     if (!address) {
       actions.setAddress(null)
       actions.setProfile(null)
-      this.setState({isInitializing: false})
+      this.setState(state => ({isInitializing: false}))
       return
     }
     const profile = await services.getProfile(address)
     actions.setAddress(address)
     actions.setProfile(profile)
-    this.setState({isInitializing: false})
+    this.setState(state => ({isInitializing: false}))
 
     debug('init end', {address, profile})
   }
@@ -112,7 +112,7 @@ class App extends Component {
     }
     const urlParams = queryString.parse(this.props.location.search)
     const Route = getRouteComponentFromUrlParams(urlParams)
-    this.setState({...this.state, route: Route})
+    this.setState(state => ({route: Route}))
 
     debug('urlParams', urlParams)
     debug('route changed')

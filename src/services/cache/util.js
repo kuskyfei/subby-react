@@ -1,3 +1,5 @@
+const debug = require('debug')('services:cache:cache')
+
 const formatSubscriptionsForGetFeed = (subscriptions) => {
   if (Array.isArray(subscriptions)) {
     return subscriptions
@@ -10,6 +12,7 @@ const formatSubscriptionsForGetFeed = (subscriptions) => {
 }
 
 const cacheIsExpired = (lastCacheTimestamp, cacheTime) => {
+  debug('cacheIsExpired', {lastCacheTimestamp, cacheTime})
   if (!lastCacheTimestamp) return true
   const expiresAtTimestamp = lastCacheTimestamp + cacheTime
   const cacheIsExpired = Date.now() > expiresAtTimestamp
