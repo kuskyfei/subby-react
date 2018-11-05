@@ -122,7 +122,13 @@ const isYoutubeVideo = (url) => {
 }
 
 const isVimeoVideo = (url) => {
-  return url.match(/\/([^/]+)$/)
+  if (!url.match(/\/([^/]+)$/)) {
+    return false
+  }
+  if (!url.match(/\/\d+$/)) {
+    return false
+  }
+  return true
 }
 
 const getWidgetTypeFromUrl = (url) => {

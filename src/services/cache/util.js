@@ -58,11 +58,18 @@ const getActiveSubscriptionsFromSubscriptions = ({localSubscriptions, ethereumSu
   return activeSubscriptions
 }
 
+const profileHasChanged = (profile1, profile2) => {
+  profile1 = JSON.stringify({...profile1, lastProfileCacheTimestamp: null})
+  profile2 = JSON.stringify({...profile2, lastProfileCacheTimestamp: null})
+  return profile1 !== profile2
+}
+
 export {
   arrayToObjectWithItemsAsProps,
   getActiveSubscriptionsFromSubscriptions,
   mergeEthereumSubscriptionsCache,
   formatSubscriptionsForGetFeed,
   cacheIsExpired,
-  filterRequestedPosts
+  filterRequestedPosts,
+  profileHasChanged
 }

@@ -93,7 +93,7 @@ class Feed extends React.Component {
     debug('unmounted')
   }
 
-  async handleProfile({reset} = {}) {
+  handleProfile = async ({reset} = {}) => {
     const {location, actions} = this.props
     debug('handleProfile start', location)
 

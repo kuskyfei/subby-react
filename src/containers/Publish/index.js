@@ -183,6 +183,9 @@ class Publish extends React.Component {
     }
 
     await services.publish({comment, link})
+
+    window.dispatchEvent(new CustomEvent('transaction', {detail: {type: 'publish'}}))
+    this.setState(state => ({comment: '', link: null}))
   }
 
   render () {

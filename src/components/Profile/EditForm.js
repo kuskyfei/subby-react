@@ -218,7 +218,7 @@ class EditForm extends React.Component {
     if (minimumTextDonation === profile.minimumTextDonation) minimumTextDonation = null
 
     await services.editProfile({username, bio, thumbnail, hideDonations, minimumTextDonation})
-    await services.updateProfileCache(address)
+    window.dispatchEvent(new CustomEvent('transaction', {detail: {type: 'editProfile'}}))
   }
 
   hasChanges = () => {

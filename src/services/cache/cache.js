@@ -1,6 +1,6 @@
 const subbyJs = require('subby.js')
 const indexedDb = require('../indexedDb')
-const {cacheIsExpired} = require('./util')
+const {cacheIsExpired, profileHasChanged} = require('./util')
 const read = require('./read')
 const debug = require('debug')('services:cache:cache')
 
@@ -37,9 +37,16 @@ const updateCache = async (account) => {
 }
 
 const updateProfileCache = async (account) => {
-  debug('updateProfileCache')
+  debug('updateProfileCache', {account})
+  const profileCache = await indexedDb.getProfileCache(account)
   const profile = await subbyJs.getProfile(account)
   indexedDb.setProfileCache(profile)
+
+  if (!profileHasChanged(profileCache, profile)) {
+    return
+  }
+  window.dispatchEvent(new CustomEvent('updateProfileCache', {detail: profile}))
+  debug('updateProfileCache end', {profile, profileCache})
 }
 
 const updateBackgroundFeedCache = async (subscriptions) => {

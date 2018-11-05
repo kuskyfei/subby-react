@@ -198,6 +198,8 @@ class Donate extends React.Component {
     const text = donationText
     const amount = donationAmount
     await services.donate({account, amount, text, postId})
+
+    window.dispatchEvent(new CustomEvent('transaction', {detail: {type: 'donate'}}))
   }
 
   render () {

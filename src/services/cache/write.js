@@ -8,11 +8,12 @@ const debug = require('debug')('services:cache:write')
 
 const editProfile = async (...args) => {
   const tx = await subbyJs.editProfile(...args)
-  await tx.wait()
-  const address = await subbyJs.getAddress()
-  await updateProfileCache(address)
+  tx.wait().then(async () => {
+    const address = await subbyJs.getAddress()
+    updateProfileCache(address)
+    debug('editProfile cache updated', {address, args})
+  })
 
-  debug('editProfile cache updated', {address, args})
   return tx
 }
 

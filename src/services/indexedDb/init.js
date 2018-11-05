@@ -42,11 +42,7 @@ const db = require('./db')
 // init cannot be a constant or otherwise it can't
 // be mocked properly
 let init = async ({version}) => {
-
   db.db = await idb.open('subby', version, upgradeDb => {
-
-    console.log(upgradeDb)
-
     if (!upgradeDb.objectStoreNames.contains('profiles')) {
       upgradeDb.createObjectStore('profiles')
     }

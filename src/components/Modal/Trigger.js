@@ -46,9 +46,11 @@ class Trigger extends React.Component {
   }
 
   componentDidMount = () => {
+    window.addEventListener('transaction', this.handleClose)
   }
 
   componentWillUnmount = () => {
+    window.removeEventListener('transaction', this.handleClose)
   }
 
   render () {

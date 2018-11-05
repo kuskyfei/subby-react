@@ -48,8 +48,8 @@ describe('services', () => {
       expect(profile).toEqual(db1.profiles[res1.address])
       expect(profile).toEqual(db1.profiles[res1.username])
 
-      // second request with non-expired cache 1 minute later
-      mockTime(firstRequestTime + minute)
+      // second request with non-expired cache 100 ms later
+      mockTime(firstRequestTime + 100)
 
       const res2 = await services.getProfile(ADDRESSES[0])
       const db2 = await getDb()
@@ -75,14 +75,6 @@ describe('services', () => {
       expect(db3.profiles[res1.username].lastProfileCacheTimestamp).toEqual(newTime)
       // everything else should be the same
       expect(res3).toEqual(res1)
-    })
-  })
-
-  describe('editProfile', () => {
-    test('updates cache', async () => {
-      await services.editProfile({})
-      const db = await getDb()
-      expect(Object.keys(db.profiles).length).toEqual(2)
     })
   })
 

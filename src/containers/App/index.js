@@ -48,6 +48,7 @@ class App extends Component {
 
   componentDidMount() {
     services.onSignerChange(this.init)
+    window.addEventListener('updateProfileCache', this.handleProfileChange)
 
     ;(async () => {
       this.handleRouteChange()
@@ -103,6 +104,7 @@ class App extends Component {
   }
 
   componentWillUnmount = (prevProps) => {
+    window.removeEventListener('scroll', this.handleProfileChange)
     debug('unmount')
   }
 
@@ -132,6 +134,19 @@ class App extends Component {
     }
 
     services.ga.pageView()
+  }
+
+  handleProfileChange = async (e) => {
+    const {address, actions} = this.props
+    if (!address) {
+      return
+    }
+    const profile = e.detail
+    if (address !== profile.address) {
+      return
+    }
+    actions.setProfile(profile)
+    debug('handleProfileChange end', {profile})
   }
 
   render() {
@@ -186,7 +201,8 @@ const getRouteComponentFromUrlParams = (urlParams) => {
 }
 
 const mapStateToProps = state => ({
-  headerIsLoading: state.header.isLoading
+  headerIsLoading: state.header.isLoading,
+  address: state.app.address
 })
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch)

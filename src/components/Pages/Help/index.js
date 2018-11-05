@@ -115,7 +115,7 @@ class Help extends React.Component {
                 Step 2
               </Typography>
               <Typography variant='body1' gutterBottom>
-                They broadcast a link to this content on the Ethereum network for a small fee (approx. 2c worth of gas.)
+                They broadcast a link to this content on the Ethereum network for a small fee (approx. 10c worth of gas.)
               </Typography>
             </Paper>
           </Grid>
