@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {withStyles} from '@material-ui/core/styles'
 import Modal from '@material-ui/core/Modal'
+import IconButton from '@material-ui/core/IconButton'
+import ArrowBackIcon from '@material-ui/icons/ArrowBack'
 
 const styles = theme => ({
   modal: {
@@ -16,11 +18,27 @@ const styles = theme => ({
     [theme.breakpoints.down(600)]: {
       top: '7.5%',
       marginBottom: '7.5%'
+    },
+    [theme.breakpoints.down(450)]: {
+      top: '0',
+      marginBottom: '0'
     }
   },
 
   container: {
     display: 'contents'
+  },
+
+  closeButton: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    [theme.breakpoints.up(450)]: {
+      display: 'none'
+    }
+  },
+  closeIcon: {
+    color: theme.palette.grey['300'],
   }
 })
 
@@ -29,6 +47,15 @@ const StyledModal = withStyles({
     overflow: 'scroll'
   }
 })(Modal)
+
+const StyledIconButton = withStyles({
+  root: {
+    color: 'rgba(0, 0, 0, 0.1)',
+    '&:hover': {
+      backgroundColor: 'rgba(0, 0, 0, 0.02)'
+    }
+  }
+})(IconButton)
 
 class Trigger extends React.Component {
   state = {
@@ -70,6 +97,12 @@ class Trigger extends React.Component {
           onClose={this.handleClose}
         >
           <div className={classes.modal}>
+            <StyledIconButton
+              className={classes.closeButton}
+              onClick={this.handleClose}
+            >
+              <ArrowBackIcon className={classes.closeIcon}/>
+            </StyledIconButton>
             {this.props.children}
           </div>
         </StyledModal>
