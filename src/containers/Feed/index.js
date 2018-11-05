@@ -115,7 +115,7 @@ class Feed extends React.Component {
     debug('handleProfile end', {account})
   }
 
-  async addPostsToFeed({reset} = {}) {
+  async addPostsToFeed({reset, ignoreCache} = {}) {
     debug('addPostsToFeed start', this.props, this.state)
     let {location, actions, feed} = this.props
     let {hasMorePosts, publisherStartAt} = this.state
@@ -173,7 +173,7 @@ class Feed extends React.Component {
       const subscriptions = await services.getSubscriptions()
       const subscriptionsArray = Object.keys(subscriptions) 
       this.setState(state => ({subscriptions: subscriptionsArray, addingMorePosts: true}))
-      const newPosts = await services.getFeed({subscriptions, startAt, limit})
+      const newPosts = await services.getFeed({subscriptions, startAt, limit, ignoreCache})
       actions.setFeed([...feed, ...newPosts])
       if (newPosts.length < limit) {
         this.setState(state => ({hasMorePosts: false}))
@@ -194,7 +194,7 @@ class Feed extends React.Component {
 
     const error = this.getError()
     if (error) {
-      return <ErrorMessage error={error} username={accountFromUrlParams} subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true})} />
+      return <ErrorMessage error={error} username={accountFromUrlParams} subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true, ignoreCache: true})} />
     }
 
     const posts = []
@@ -224,7 +224,7 @@ class Feed extends React.Component {
         </FeedComponent>
 
         {isFeed(location.search) && !hasMorePosts && 
-          <ErrorMessage className={classes.bottomError} error='noMorePosts' subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true})} />
+          <ErrorMessage className={classes.bottomError} error='noMorePosts' subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true, ignoreCache: true})} />
         }
 
       </div>

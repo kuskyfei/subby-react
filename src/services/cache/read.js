@@ -88,7 +88,7 @@ const getSettings = async () => {
   return settings
 }
 
-const getFeed = async ({subscriptions, startAt = 0, limit = 20}, cb) => {
+const getFeed = async ({subscriptions, startAt = 0, limit = 20, ignoreCache}, cb) => {
   debug('getFeed', {subscriptions, startAt, limit})
   // subscriptions can either be an array or object with publishers as keys
   // but needs to be converted to array
@@ -107,6 +107,9 @@ const getFeed = async ({subscriptions, startAt = 0, limit = 20}, cb) => {
     useBackgroundFeedCache = false
   }
   if (!backgroundFeedCacheContainsRequestedPosts) {
+    useBackgroundFeedCache = false
+  }
+  if (ignoreCache) {
     useBackgroundFeedCache = false
   }
 
