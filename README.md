@@ -108,11 +108,10 @@ npm test
   - hasMorePostsOnEthereum
   - lastFeedCacheCursor
 - localSubscriptions // object store
-  - usernameOrAddress
-    - subscriptions
-      - subscription1
-      - subscription2
-      - etc...
+  - subscriptions
+    - subscription1
+    - subscription2
+    - etc...
 - settings // object store
   - settings
 
