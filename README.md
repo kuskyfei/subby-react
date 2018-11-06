@@ -8,22 +8,22 @@ Subby is a decentralized, open source and non-tokenized application that protect
 Subby is completely decentralized, it communicates directly with Ethereum and IPFS. It is compiled to a standalone subby.html file that can be run from a user's computer, and is not dependent on any single API or server. Is is impossible to censor.
 
 ## Monetization
-Subby does not include any monetization scheme or token to enrich the developers. It uses Ether.
+Subby does not include any monetization scheme or token to enrich the developers.
 
 ## Supported content
 - Youtube embeds
 - Vimeo embeds
 - Reddit embeds
-- Twitter embeds (not working)
+- Twitter embeds (not working yet)
 - Facebook embeds
-- Instagram embeds (not working)
+- Instagram embeds (not working yet)
 - IPFS
 - Torrents
 - Web torrents
 - Direct links to jpg, jpeg, png, gif, webm, mp4, ogg, wav, mp3, flac
 
 ## Download
-https://subby.io/download or use it hosted on GitHub at https://subby.io
+Go to https://subby.io/ and click "Download" at bottom or use it hosted on GitHub at https://subby.io
 
 ## How to compile
 ```
@@ -73,7 +73,7 @@ npm start
 ```
 
 ## Tests
-Subby-React uses Jest and Puppeteer for automated tests
+Subby-React uses Jest and Puppeteer for automated tests.
 ```
 git clone https://github.com/subby-dapp/subby-react.git && cd subby-react
 npm install

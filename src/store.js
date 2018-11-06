@@ -13,6 +13,10 @@ const configureStore = (initialState = {}) => {
     ]
   }
 
+  if (!window.__REDUX_DEVTOOLS_EXTENSION__) {
+    enhancers.splice(1,1)
+  }
+
   const store = createStore(reducers, initialState, compose(...enhancers))
 
   return store

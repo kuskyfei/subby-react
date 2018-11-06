@@ -10,7 +10,7 @@ import LinearProgress from '@material-ui/core/LinearProgress'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // components
-import {Pages} from '../../components'
+import {Pages, Snackbars} from '../../components'
 
 // containers
 import {Header, Feed, Subscriptions, Settings, Donations} from '../../containers'
@@ -171,6 +171,8 @@ class App extends Component {
             <Route />
           </main>
         }
+
+        <Snackbars />
       </div>
     )
   }
