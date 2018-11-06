@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const DelWebpackPlugin = require('del-webpack-plugin')
 const {manifest, images, settingsMessage} = require('./src/settings')
+const webpack = require('webpack')
 
 // debug
 const util = require('util') // eslint-disable-line
@@ -61,6 +62,12 @@ module.exports = function override (config, env) {
         analyzerMode: 'static',
         reportFilename: 'report.html'
       })
+    )
+
+    // ignore faker module because it's only
+    // used for mocks and takes too much space
+    config.plugins.push(
+      new webpack.IgnorePlugin(/faker/)
     )
 
     // console.log(util.inspect(config, {depth: null})) // debug
