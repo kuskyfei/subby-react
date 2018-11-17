@@ -7,6 +7,11 @@ const settingsMessage = `<script>
 
   window.SUBBY_GLOBAL_SETTINGS = {
 
+    // Specify a username and optional post ID as the 
+    // homepage. Leave blank for default. 
+    HOMEPAGE_PROFILE: '${settings.HOMEPAGE_PROFILE}',
+    HOMEPAGE_POST_ID: '${settings.HOMEPAGE_POST_ID}',
+
     // To use web3, you must connect to an Ethereum node. 
     // Leave blank to use ethers.js default provider. If 
     // you have MetaMask enabled, the MetaMask provider 
@@ -49,7 +54,11 @@ const settingsMessage = `<script>
     // the most recent information from Ethereum.
     PROFILE_CACHE_TIME: ${settings.PROFILE_CACHE_TIME},
     FEED_CACHE_TIME: ${settings.FEED_CACHE_TIME},
-    FEED_CACHE_BUFFER_SIZE: ${settings.FEED_CACHE_BUFFER_SIZE}
+    FEED_CACHE_BUFFER_SIZE: ${settings.FEED_CACHE_BUFFER_SIZE},
+
+    // When false and in http(s) protocol, viewing posts
+    // is disabled and a download button is displayed instead.
+    HTTP_POSTS: ${settings.HTTP_POSTS}
 
   }
 

@@ -7,10 +7,13 @@ import Typography from '@material-ui/core/Typography'
 import MessageIcon from '@material-ui/icons/Message'
 import PersonAddIcon from '@material-ui/icons/PersonAdd'
 import EditIcon from '@material-ui/icons/Edit'
+import GetAppIcon from '@material-ui/icons/GetApp'
 
 import {Modal, Donate} from '../../components'
 import EditForm from './EditForm'
 import Loading from './Loading'
+
+const services = require('../../services')
 
 const styles = theme => ({
   profile: {
@@ -62,24 +65,27 @@ const styles = theme => ({
 class Profile extends React.Component {
   state = {isSubscribed: null}
 
-  async handleSubscribe () {
-    const {services, profile} = this.props
-    if (!services) {
-      return
-    }
+  async handleSubscribe() {
+    const {profile} = this.props
     const account = profile.username || profile.address
 
     this.setState({...this.state, isSubscribed: true})
     await services.subscribe(account)
   }
 
-  async handleUnsubscribe () {
-    const {services, profile} = this.props
-    if (!services) {
-      return
-    }
+  async handleUnsubscribe() {
+    const {profile} = this.props
+
     this.setState({...this.state, isSubscribed: false})
     await services.unsubscribe([profile.username, profile.address])
+  }
+
+  async handleDownload() {
+    const {profile} = this.props
+
+    const username = profile.username || profile.address
+
+    await services.utils.downloadSubby({username, fileName: username})
   }
 
   render () {
@@ -110,47 +116,60 @@ class Profile extends React.Component {
           {username}
         </Typography>
 
-        {!profile.isSubscribed &&
-          <Button onClick={this.handleSubscribe.bind(this)} size='small' variant='contained' color='default' className={classes.button}>
-            Subscribe&nbsp;
-            <PersonAddIcon className={classes.iconSmall} />
-          </Button>
-        }
-        {profile.isSubscribed &&
-          <Button onClick={this.handleUnsubscribe.bind(this)} size='small' variant='contained' color='default' className={classes.button}>
-            Unsubscribe&nbsp;
-          </Button>
-        }
+        {!editable && 
+          <div className={classes.contents}>
 
-        {!editable &&
-          <Modal maxWidth={400} trigger={
-            <Button size='small' variant='contained' color='default' className={classes.button}>
-              Donate&nbsp;
-              <span className={classes.contents}>
-                {profile.minimumTextDonation !== 0 &&
-                  <MessageIcon className={classes.iconSmall} />
-                }
-                {profile.totalDonationsAmount !== 0 && 
-                  <span className={classNames(classes.count, classes.leftNudge)}>&nbsp;{profile.totalDonationsAmount}</span>
-                }
-              </span>
-            </Button>}>
+            {!profile.isSubscribed &&
+              <Button onClick={this.handleSubscribe.bind(this)} size='small' variant='contained' color='default' className={classes.button}>
+                Subscribe&nbsp;
+                <PersonAddIcon className={classes.iconSmall} />
+              </Button>
+            }
+            {profile.isSubscribed &&
+              <Button onClick={this.handleUnsubscribe.bind(this)} size='small' variant='contained' color='default' className={classes.button}>
+                Unsubscribe&nbsp;
+              </Button>
+            }
 
-            <Donate profile={profile} />
+            <Modal maxWidth={400} trigger={
+              <Button size='small' variant='contained' color='default' className={classes.button}>
+                Donate&nbsp;
+                <span className={classes.contents}>
+                  {profile.minimumTextDonation !== 0 &&
+                    <MessageIcon className={classes.iconSmall} />
+                  }
+                  {profile.totalDonationsAmount !== 0 && 
+                    <span className={classNames(classes.count, classes.leftNudge)}>&nbsp;{profile.totalDonationsAmount}</span>
+                  }
+                </span>
+              </Button>}>
 
-          </Modal>
+              <Donate profile={profile} />
+
+            </Modal>
+
+          </div>
         }
 
         {editable &&
-          <Modal trigger={
-            <Button size='small' variant='contained' color='default' className={classes.button}>
-                Edit&nbsp;
-              <EditIcon className={classes.iconSmall} />
-            </Button>}>
+          <div className={classes.contents}>
 
-            <EditForm profile={profile} />
+            <Button onClick={this.handleDownload.bind(this)} size='small' variant='contained' color='default' className={classes.button}>
+              Download&nbsp;
+              <GetAppIcon className={classes.iconSmall} />
+            </Button>
 
-          </Modal>
+            <Modal trigger={
+              <Button size='small' variant='contained' color='default' className={classes.button}>
+                  Edit&nbsp;
+                <EditIcon className={classes.iconSmall} />
+              </Button>}>
+
+              <EditForm profile={profile} />
+
+            </Modal>
+
+          </div>
         }
 
         <Typography className={classes.bio} variant='body1' gutterBottom>

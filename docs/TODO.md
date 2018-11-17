@@ -1,9 +1,14 @@
 ##todo
 
-fix bugs with posting embed content preview
-make find accounts to follow post
-make publishing content guide
-fix bug on iphone showing an address in profile without metamask
+fix twitter and IG bug
+add report pop up and blacklist
+add video to IPFS and video to web torrent
+make blacklist and sitemap generator
+look into ipfs service worker
+fix GA in file protocol
+fix comments not being ipfs
+implment disable http posts
+get it working on tor
 
 ##todo after release
 add pagination after 200 posts
@@ -27,16 +32,16 @@ remove toWei function from lib and make it for read only functions
 
 ## todo puppeteer tests
 
-- homepage gets help and sets address, profile and subscriptions
-- publish post of each type
-- header navigation loads proper pages
-- search bar loads proper page
-- feed works
-- publisher feed works
-- permalink feed works
-- my profile feed works
-- scrolling each feed till 1000 posts
-- test subscribe / unsubscribe
+homepage gets help and sets address, profile and subscriptions
+publish post of each type
+header navigation loads proper pages
+search bar loads proper page
+feed works
+publisher feed works
+permalink feed works
+my profile feed works
+scrolling each feed till 1000 posts
+test subscribe / unsubscribe
 
 ## todo jest tests
 

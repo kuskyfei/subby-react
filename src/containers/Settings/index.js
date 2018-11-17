@@ -113,6 +113,36 @@ class Settings extends React.Component {
 
             <TextField
               fullWidth
+              placeholder='john'
+              label='Homepage Profile'
+              className={classes.textField}
+              value={this.state.HOMEPAGE_PROFILE || ''}
+              onChange={this.handleValueChange('HOMEPAGE_PROFILE')}
+              margin='normal'
+              disabled={this.state.USE_DEFAULT_SETTINGS}
+            />
+
+            <Typography className={classes.message} variant='caption' gutterBottom>
+              Specify a username to use as the homepage. Leave blank for default.
+            </Typography>
+
+            <TextField
+              fullWidth
+              placeholder='43'
+              label='Homepage Post ID'
+              className={classes.textField}
+              value={this.state.HOMEPAGE_POST_ID || ''}
+              onChange={this.handleValueChange('HOMEPAGE_POST_ID')}
+              margin='normal'
+              disabled={this.state.USE_DEFAULT_SETTINGS}
+            />
+
+            <Typography className={classes.message} variant='caption' gutterBottom>
+              Specify a post ID to use as the homepage. Leave blank for default.
+            </Typography>
+
+            <TextField
+              fullWidth
               placeholder='https://example.com'
               label='Web3 Provider'
               className={classes.textField}

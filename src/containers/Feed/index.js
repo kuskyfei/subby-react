@@ -216,7 +216,7 @@ class Feed extends React.Component {
     return (
       <div className={classes.layout}>
 
-        {profile && <Profile isLoading={profileIsLoading} profile={profile} editable={editable} services={services} />}
+        {profile && <Profile isLoading={profileIsLoading} profile={profile} editable={editable} />}
 
         <FeedComponent postCount={posts.length} addPostsToFeed={this.addPostsToFeed.bind(this)} >
           {posts}

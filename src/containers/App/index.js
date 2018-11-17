@@ -55,6 +55,8 @@ class App extends Component {
 
       await this.init()
 
+      this.handleCustomHomepage()
+
       // services.mockSmartContracts({explicit: true})
       // services.mockSmartContracts()
 
@@ -118,6 +120,31 @@ class App extends Component {
 
     debug('urlParams', urlParams)
     debug('route changed')
+  }
+
+  handleCustomHomepage = async () => {
+    const {history, location} = this.props
+    if (location.search !== '') {
+      return
+    }
+
+    this.setState(state => ({isInitializing: true}))
+
+    const settings = await services.getSettings()
+
+    if (!settings.HOMEPAGE_PROFILE) {
+      this.setState(state => ({isInitializing: false}))
+      return
+    }
+
+    let newUrl = `?u=${settings.HOMEPAGE_PROFILE}`
+    if (settings.HOMEPAGE_POST_ID) {
+      newUrl += `&id=${settings.HOMEPAGE_POST_ID}`
+    }
+
+    history.push(newUrl)
+
+    this.setState(state => ({isInitializing: false}))
   }
 
   scrollToTopOnUrlParamsChange = (prevProps) => {

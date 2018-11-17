@@ -3,6 +3,7 @@ const subbyJs = require('subby.js')
 const ipfs = require('./ipfs')
 const torrent = require('./torrent')
 const debug = require('debug')('services:init')
+const utils = require('./utils')
 
 const {settings} = require('../settings')
 
@@ -121,5 +122,7 @@ export {
   getMagnetFromTorrentFile,
   prepareMagnetForEthereum,
   // ga
-  ga
+  ga,
+  // utils
+  utils
 }
