@@ -23,7 +23,7 @@ Subby does not include any monetization scheme or token to enrich the developers
 - Direct links to jpg, jpeg, png, gif, webm, mp4, ogg, wav, mp3, flac
 
 ## Download
-Go to https://subby.io/ and click "Download" at bottom or use it hosted on GitHub at https://subby.io
+Go to https://subby.io and click "Download" at bottom or use it hosted on GitHub at https://subby.io
 
 ## How to compile
 ```
