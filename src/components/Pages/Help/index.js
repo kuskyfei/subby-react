@@ -147,7 +147,7 @@ class Help extends React.Component {
 
           {window.location.protocol !== 'file:' &&
             <Typography variant='display1' gutterBottom>
-              <a href='/' download='subby.html'>Download</a>
+              <a href='' download='subby.html'>Download</a>
             </Typography>
           }
         </div>

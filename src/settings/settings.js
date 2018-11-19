@@ -27,6 +27,7 @@ const settings = {
   FEED_CACHE_TIME: 5 * minute,
   FEED_CACHE_BUFFER_SIZE: 500,
   HTTP_POSTS: true,
+  BLACKLIST: true,
 
   // IndexedDb is Chrome's local database that Subby
   // uses to cache posts as well as store your subscriptions.

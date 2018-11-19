@@ -3,12 +3,13 @@
 fix twitter and IG bug
 add report pop up and blacklist
 add video to IPFS and video to web torrent
-make blacklist and sitemap generator
+make sitemap generator
 look into ipfs service worker
 fix GA in file protocol
 fix comments not being ipfs
-implment disable http posts
+implement blacklist
 get it working on tor
+add update notification system
 
 ##todo after release
 add pagination after 200 posts

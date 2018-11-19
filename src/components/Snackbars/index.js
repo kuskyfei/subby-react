@@ -6,10 +6,19 @@ import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import CloseIcon from '@material-ui/icons/Close'
 
+const debug = require('debug')('components:Snackbar')
+
 const styles = theme => ({
   close: {
     padding: theme.spacing.unit / 2,
   },
+  snackbar: {
+    '& > div > div:nth-of-type(1)': {
+      flex: 1,
+      paddingBottom: 16,
+      paddingTop: 12
+    }
+  }
 })
 
 class Snackbars extends React.Component {
@@ -21,8 +30,28 @@ class Snackbars extends React.Component {
   }
 
   componentDidMount() {
+    window.addEventListener('snackbar', this.handleSnackbarEvent)
+
     if (!window.chrome) {
       this.newSnackbar({message: 'Subby might not work properly in non-Chrome based browsers.', autoHideDuration: 15000})
+    }    
+  }
+
+  componentWillUnmount = (prevProps) => {
+    window.removeEventListener('snackbar', this.handleSnackbarEvent)
+  }
+
+  handleSnackbarEvent = (event) => {
+    const {type} = event.detail
+
+    debug('snackbar event', event.detail)
+
+    if (type === 'somePostsUnavailable') {
+      this.newSnackbar({
+        message: 'Some posts are unavailable. Download subby.html to view your full feed.', 
+        button: <a href='' download>Download</a>,
+        autoHideDuration: 15000
+      })
     }
   }
 
@@ -70,6 +99,7 @@ class Snackbars extends React.Component {
     return (
       <div>
         <Snackbar
+          className={classes.snackbar}
           key={key}
           anchorOrigin={{
             vertical: 'bottom',

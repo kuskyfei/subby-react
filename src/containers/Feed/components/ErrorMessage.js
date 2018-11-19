@@ -10,6 +10,8 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import classnames from 'classnames'
 
+const services = require('../../../services')
+
 const styles = theme => ({
   layout: {
     textAlign: 'center',
@@ -94,6 +96,9 @@ const styles = theme => ({
 
   username: {
     wordBreak: 'break-all'
+  },
+  italic: {
+    fontStyle: 'italic'
   }
 })
 
@@ -103,7 +108,7 @@ class ErrorMessage extends React.Component {
   }
 
   render () {
-    let {classes, subscriptions, onRefresh, error, username, className} = this.props
+    let {classes, subscriptions, onRefresh, error, username, postId, className} = this.props
 
     if (!subscriptions) {
       subscriptions = []
@@ -170,6 +175,21 @@ class ErrorMessage extends React.Component {
       linkMessage = `What's a wallet?`
       linkLocation = 'publish'
     }
+    if (error === 'feedHttpPostsDisabled') {
+      message = <span className={classes.links}>Download <a onClick={() => services.utils.downloadSubby()}>subby.html</a> to view your feed</span>
+      linkMessage = ''
+      linkLocation = ''
+      refresh = false
+    }
+    if (error === 'profileHttpPostsDisabled') {
+      message = 
+        <span className={classes.links}>
+          Download <a onClick={() => services.utils.downloadSubby()}>subby.html</a> to view <span className={classnames(shouldWordBreak(username) && classes.username, classes.italic)}>{username}</span>{getS(username)} posts
+        </span>
+      linkMessage = ''
+      linkLocation = ''
+      refresh = false
+    }
 
     return (
       <div className={classnames(classes.layout, className)}>
@@ -190,6 +210,19 @@ class ErrorMessage extends React.Component {
 
       </div>
     )
+  }
+}
+
+const getS = (username) => {
+  if (username[username.length-1] === 's') {
+    return `'`
+  } else {
+    return `'s`
+  }
+}
+const shouldWordBreak = (username) => {
+  if (username.length > 15 && !username.match(/ /)) {
+    return true
   }
 }
 

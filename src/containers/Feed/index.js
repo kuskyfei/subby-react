@@ -64,7 +64,6 @@ class Feed extends React.Component {
     isInitializing: false,
     settings: {},
     subscriptions: null,
-    accountFromUrlParams: null,
     walletDisconnected: false,
     profileIsLoading: false
   }
@@ -110,7 +109,7 @@ class Feed extends React.Component {
     const account = getAccountFromUrlParams(location.search)
     const profile = await getProfile(account)
     actions.setPublisherProfile(profile)
-    this.setState(state => ({profileIsLoading: false, accountFromUrlParams: account}))
+    this.setState(state => ({profileIsLoading: false}))
 
     debug('handleProfile end', {account})
   }
@@ -171,9 +170,11 @@ class Feed extends React.Component {
       const limit = 10
       const startAt = feed.length
       const subscriptions = await services.getSubscriptions()
-      const subscriptionsArray = Object.keys(subscriptions) 
+      const subscriptionsArray = Object.keys(subscriptions)
+      const cleanSubscriptionsArray = removeBlacklisted(subscriptionsArray)
+
       this.setState(state => ({subscriptions: subscriptionsArray, addingMorePosts: true}))
-      const newPosts = await services.getFeed({subscriptions, startAt, limit, ignoreCache})
+      const newPosts = await services.getFeed({subscriptions: cleanSubscriptionsArray, startAt, limit, ignoreCache})
       actions.setFeed([...feed, ...newPosts])
       if (newPosts.length < limit) {
         this.setState(state => ({hasMorePosts: false}))
@@ -186,24 +187,36 @@ class Feed extends React.Component {
 
   render() {
     const {classes, feed, location} = this.props
-    const {addingMorePosts, profileIsLoading, settings, isInitializing, subscriptions, accountFromUrlParams, walletDisconnected, hasMorePosts} = this.state
+    const {addingMorePosts, profileIsLoading, settings, isInitializing, subscriptions, walletDisconnected, hasMorePosts} = this.state
+    const accountFromUrlParams = getAccountFromUrlParams(location.search)
+    const feedError = this.getFeedError()
+    const postsError = this.getPostsError()
 
+    // wait for init
     if (isInitializing) {
       return <div />
     }
 
-    const error = this.getError()
-    if (error) {
-      return <ErrorMessage error={error} username={accountFromUrlParams} subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true, ignoreCache: true})} />
+    // handle most errors
+    if (feedError) {
+      return <ErrorMessage error={feedError} username={accountFromUrlParams} subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true, ignoreCache: true})} />
     }
 
-    const posts = []
+    // fill the feed with posts
+    let posts = []
     for (const post of feed) {
       if (post) {
         posts.push(<Post key={post.username + post.address + post.id} post={post} settings={settings} />)
       }
     }
+    if (profileIsLoading) {
+      posts = []
+    }
+    if (postsError === 'profileHttpPostsDisabled') {
+      posts = []
+    }
 
+    // fill profile
     let profile, editable
     if (isProfile(location.search)) {
       profile = this.props.profile
@@ -223,8 +236,8 @@ class Feed extends React.Component {
           {addingMorePosts && <Post isLoading />}
         </FeedComponent>
 
-        {isFeed(location.search) && !hasMorePosts && 
-          <ErrorMessage className={classes.bottomError} error='noMorePosts' subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true, ignoreCache: true})} />
+        {postsError && 
+          <ErrorMessage className={classes.bottomError} error={postsError} username={accountFromUrlParams} subscriptions={subscriptions} onRefresh={this.addPostsToFeed.bind(this, {reset: true, ignoreCache: true})} />
         }
 
       </div>
@@ -269,19 +282,18 @@ class Feed extends React.Component {
     debug('handleProfileChange end')
   }
 
-  getError = () => {
+  getFeedError = () => {
     const {feed, publisherProfile, profile, location} = this.props
-    const {addingMorePosts, profileIsLoading, settings, isInitializing, subscriptions, accountFromUrlParams, walletDisconnected} = this.state
+    const {addingMorePosts, profileIsLoading, settings, subscriptions, walletDisconnected} = this.state
+    const accountFromUrlParams = getAccountFromUrlParams(location.search)
+    const postsAreEnabled = services.utils.postsAreEnabled()
 
-    debug('feed error', {addingMorePosts, profileIsLoading, subscriptions, publisherProfile, profile, walletDisconnected})
+    debug('feed error', {addingMorePosts, profileIsLoading, postsAreEnabled, subscriptions, publisherProfile, profile, walletDisconnected})
 
     if (addingMorePosts) {
       return
     }
     if (profileIsLoading) {
-      return
-    }
-    if (isInitializing) {
       return
     }
     if (isProfile(location.search) && window.location.protocol === 'file:' && !window.web3) {
@@ -290,7 +302,7 @@ class Feed extends React.Component {
     if (isProfile(location.search) && walletDisconnected) {
       return 'notConnected'
     }
-    if (isFeed(location.search) && feed && feed.length === 0) {
+    if (isFeed(location.search) && feed && feed.length === 0 && postsAreEnabled) {
       return 'noPosts'
     }
     if (publisherProfile && publisherProfile.isTerminated) {
@@ -305,7 +317,49 @@ class Feed extends React.Component {
     if (publisherProfile && publisherProfile.address === '0x0000000000000000000000000000000000000000') {
       return 'invalidUsername'
     }
+    if (isFeed(location.search) && !postsAreEnabled) {
+      return 'feedHttpPostsDisabled'
+    }
   }
+
+  getPostsError = () => {
+    const {location, publisherProfile} = this.props
+    const {settings, hasMorePosts, addingMorePosts, profileIsLoading} = this.state
+    const accountFromUrlParams = getAccountFromUrlParams(location.search)
+    const feedError = this.getFeedError()
+    const postsAreEnabled = services.utils.postsAreEnabled()
+    const isBlacklisted = services.utils.isBlacklisted(accountFromUrlParams, publisherProfile && publisherProfile.address, publisherProfile && publisherProfile.username)
+
+    debug('posts error', {feedError, addingMorePosts, postsAreEnabled, isBlacklisted, publisherProfile, hasMorePosts})
+
+    if (feedError) {
+      return
+    }
+    if (addingMorePosts) {
+      return
+    }
+    if (profileIsLoading) {
+      return
+    }
+    if (!isProfile(location.search) && !postsAreEnabled) {
+      return 'profileHttpPostsDisabled'
+    }
+    if (isPublisher(location.search) && isBlacklisted) {
+      return 'profileHttpPostsDisabled'
+    }
+    if (isFeed(location.search) && !hasMorePosts) {
+      return 'noMorePosts'
+    }
+  }
+}
+
+const removeBlacklisted = (subscriptions) => {
+  const cleanSubscriptions = services.utils.removeBlacklisted(subscriptions)
+  if (cleanSubscriptions.length !== subscriptions.length) {
+    window.dispatchEvent(new CustomEvent('snackbar', {detail: {type: 'somePostsUnavailable'}}))
+  } 
+
+  return cleanSubscriptions
 }
 
 const getProfile = async (account) => {

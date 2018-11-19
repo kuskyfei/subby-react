@@ -1,5 +1,16 @@
 const {version} = require('../../package.json')
 const settings = require('./settings')
+const blacklist = require('./blacklist')
+
+const prettyPrint = (string, startIndent = 0) => {
+  string = JSON.stringify(string, null, 2)
+  let startIndentString = ''
+  while (startIndent--) {
+    startIndentString += ' '
+  }
+  string = string.replace(/\r?\n/g, '\r\n' + startIndentString)
+  return string
+}
 
 const settingsMessage = `<script>
   
@@ -56,11 +67,17 @@ const settingsMessage = `<script>
     FEED_CACHE_TIME: ${settings.FEED_CACHE_TIME},
     FEED_CACHE_BUFFER_SIZE: ${settings.FEED_CACHE_BUFFER_SIZE},
 
-    // When false and in http(s) protocol, viewing posts
+    // When false and in http(s):// protocol, viewing posts
     // is disabled and a download button is displayed instead.
-    HTTP_POSTS: ${settings.HTTP_POSTS}
+    HTTP_POSTS: ${settings.HTTP_POSTS},
+    // When true and in http(s):// protocol, blacklisted users' posts
+    // are disabled and display a download button instead. In
+    // file:// protocol, nothing is ever censored.
+    BLACKLIST: ${settings.BLACKLIST}
 
   }
+
+  window.SUBBY_BLACKLIST = ${prettyPrint(blacklist, 2)}
 
 </script>`
 
