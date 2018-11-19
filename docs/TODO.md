@@ -1,15 +1,17 @@
 ##todo
 
-fix twitter and IG bug
-add report pop up and blacklist
-add video to IPFS and video to web torrent
+1. add report button
+2. get it working on tor
+3. fix comments not being ipfs
+4. fix GA in file protocol
+5. fix twitter and IG bug
+6. add video to IPFS and video to web torrent
+7. add update notification system
+fix bug when pasting something in other pop up it shows up in publish
 make sitemap generator
 look into ipfs service worker
-fix GA in file protocol
-fix comments not being ipfs
-implement blacklist
-get it working on tor
-add update notification system
+fix bug publishing when copy pasting comment it deletees the paste link box
+fix bug after publishing the publish preview is on with nothing as link
 
 ##todo after release
 add pagination after 200 posts
