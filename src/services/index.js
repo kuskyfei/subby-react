@@ -1,4 +1,4 @@
-const indexedDb = require('./indexedDb')
+let indexedDb = require('./indexedDb')
 const subbyJs = require('subby.js')
 const ipfs = require('./ipfs')
 const torrent = require('./torrent')
@@ -9,7 +9,15 @@ const {settings} = require('../settings')
 
 const init = async () => {
   debug('init start')
-  await indexedDb.init({version: settings.INDEXEDDB_VERSION})
+
+  try {
+    await indexedDb.init({version: settings.INDEXEDDB_VERSION})
+  }
+  catch (e) {
+    delete indexedDb.init
+    console.log(indexedDb)
+    console.error(`couldn't init indexedDb, all methods have been proxied`)
+  }
 
   const localUserSettings = await getSettings()
 

@@ -100,6 +100,10 @@ const styles = theme => ({
     color: theme.palette.text.primary,
     boxShadow: theme.shadows[1],
     fontSize: 12
+  },
+
+  reportText: {
+    padding: 8
   }
 })
 
@@ -228,6 +232,14 @@ class Card extends React.Component {
           onClose={this.handleCardMenuClose}
         >
           <MenuItem onClick={this.handleUnsubscribe.bind(this)}>Unsubscribe</MenuItem>
+          <Modal maxWidth={400} trigger={<MenuItem>Report</MenuItem>} onClose={this.handleCardMenuClose}>
+            <Typography className={classes.reportText}>
+              In <strong>file://</strong> protocol, Subby is decentralized and does not censor creators.
+            </Typography>
+            <Typography className={classes.reportText}>
+              In <strong>http(s)://</strong> protocol, Subby is hosted on GitHub and must comply with their <a target="_blank" href="https://help.github.com/articles/github-community-guidelines/#what-is-not-allowed">content policy</a>. Report any infringement to <i>subbydapp@gmail.com</i>.
+            </Typography>
+          </Modal>
         </Menu>
 
         <EmbedWidget settings={settings} url={post.link} />

@@ -70,9 +70,11 @@ module.exports = function override (config, env) {
       new webpack.IgnorePlugin(/faker/)
     )
 
-    // console.log(util.inspect(config, {depth: null})) // debug
-    // process.kill() // debug
-  } else { // eslint-disable-line
+    // uncomment below to debug
+    // console.log(util.inspect(config, {depth: null}))
+    // process.kill()
+
+  } else {
     config.plugins.push(new HtmlWebpackPlugin({
       inlineSource: '.(js|css)$',
       inject: 'body',

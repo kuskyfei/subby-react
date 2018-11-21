@@ -42,23 +42,34 @@ const db = require('./db')
 // init cannot be a constant or otherwise it can't
 // be mocked properly
 let init = async ({version}) => {
-  db.db = await idb.open('subby', version, upgradeDb => {
-    if (!upgradeDb.objectStoreNames.contains('profiles')) {
-      upgradeDb.createObjectStore('profiles')
-    }
-    if (!upgradeDb.objectStoreNames.contains('activeFeed')) {
-      upgradeDb.createObjectStore('activeFeed')
-    }
-    if (!upgradeDb.objectStoreNames.contains('backgroundFeed')) {
-      upgradeDb.createObjectStore('backgroundFeed')
-    }
-    if (!upgradeDb.objectStoreNames.contains('localSubscriptions')) {
-      upgradeDb.createObjectStore('localSubscriptions')
-    }
-    if (!upgradeDb.objectStoreNames.contains('settings')) {
-      upgradeDb.createObjectStore('settings')
-    }
-  })
+
+  try {
+    db.db = await idb.open('subby', version, upgradeDb => {
+      if (!upgradeDb.objectStoreNames.contains('profiles')) {
+        upgradeDb.createObjectStore('profiles')
+      }
+      if (!upgradeDb.objectStoreNames.contains('activeFeed')) {
+        upgradeDb.createObjectStore('activeFeed')
+      }
+      if (!upgradeDb.objectStoreNames.contains('backgroundFeed')) {
+        upgradeDb.createObjectStore('backgroundFeed')
+      }
+      if (!upgradeDb.objectStoreNames.contains('localSubscriptions')) {
+        upgradeDb.createObjectStore('localSubscriptions')
+      }
+      if (!upgradeDb.objectStoreNames.contains('settings')) {
+        upgradeDb.createObjectStore('settings')
+      }
+    })
+  } catch (e) {
+    console.error(Error(`couldn't init indexedDb. indexedDb has been mocked.`))
+
+    // we need to mock for browsers that don't allow indexedDb, like Tor
+    const mockObjectStore = () => ({put: () => {}, get: () => {}})
+    const mockTransaction = () => ({objectStore: mockObjectStore})
+    const mockDb = {transaction: mockTransaction}
+    db.db = mockDb
+  }
 }
 
 // if you delete the db you need to make sure the site 

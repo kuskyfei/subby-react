@@ -1,6 +1,5 @@
 ##todo
 
-1. add report button
 2. get it working on tor
 3. fix comments not being ipfs
 4. fix GA in file protocol

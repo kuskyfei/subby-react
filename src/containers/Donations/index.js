@@ -6,6 +6,7 @@ import {connect} from 'react-redux'
 import {compose} from 'redux'
 import {withRouter} from 'react-router-dom'
 import Typography from '@material-ui/core/Typography'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 // material
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -40,6 +41,12 @@ const styles = theme => ({
       marginTop: theme.spacing.unit * 6,
       marginBottom: theme.spacing.unit * 6,
     },
+  },
+  loading: {
+    margin: 'auto',
+    marginTop: 16,
+    transform: 'translateY',
+    transform: 'translateY(4px)'
   }
 })
 
@@ -97,7 +104,10 @@ class Donations extends React.Component {
     return (
       <div className={classes.layout}>
         <Typography className={classes.message} variant='body1' align='center'>
-          When you receive a donation, it will appear below.
+          When you receive a donation, it will appear below in real time.
+          <div className={classes.loading}>
+            <CircularProgress size={15} />
+          </div>
         </Typography>
         <FeedComponent postCount={donations.length}>
           {donationCards}
