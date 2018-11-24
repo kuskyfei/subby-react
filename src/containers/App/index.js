@@ -69,6 +69,7 @@ class App extends Component {
 
     this.setState(state => ({isInitializing: true}))
     await services.init()
+    services.ga.pageView()
 
     const {actions} = this.props
 

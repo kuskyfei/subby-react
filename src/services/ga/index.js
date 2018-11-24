@@ -1,26 +1,46 @@
 const ReactGA = require('react-ga')
 const services = require('../../services')
+const debug = require('debug')('services:ga')
 const gaId = 'UA-128596742-1'
-
-let isInitialized = false
 
 const isEnabled = async () => {
   const settings = await services.getSettings()
   if (!settings.GOOGLE_ANALYTICS) {
+    debug('isEnabled', false)
     return false
   }
-  if (!isInitialized) {
-    ReactGA.initialize(gaId)
-    isInitialized = true
-  }
+  init()
+  debug('isEnabled', true)
   return true
 }
 
+let isInitialized = false
+const init = () => {
+  if (!isInitialized) {
+    debug('init')
+
+    if (window.location.protocol === 'file:') {
+      ReactGA.initialize(gaId, {gaOptions: {storage: 'none'}})
+      ReactGA.set({checkProtocolTask: null})
+    } else {
+      ReactGA.initialize(gaId)
+    }
+    isInitialized = true
+  }
+}
+
 const pageView = async () => {
-  if (!isEnabled()) {
+  if (!await isEnabled()) {
     return
   }
-  ReactGA.pageview(window.location.pathname + window.location.search)
+
+  debug('pageView')
+
+  if (window.location.protocol === 'file:') {
+    ReactGA.pageview('/' + window.location.search)
+  } else {
+    ReactGA.pageview(window.location.pathname + window.location.search)
+  }
 }
 
 export {pageView}

@@ -1,7 +1,5 @@
 ##todo
 
-3. fix comments not being ipfs
-4. fix GA in file protocol
 5. fix twitter and IG bug
 6. add video to IPFS and video to web torrent
 7. add update notification system
