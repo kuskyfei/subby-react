@@ -9,10 +9,19 @@ const {
   stringToIpfsBuffer
 } = require('./util')
 
+const uploadIpfsBuffer = async (ipfsBuffer) => {
+  if (!state.ipfs) noProvider()
+
+  // IPFS buffers are special types of buffers that need a conversion
+  const res = await state.ipfs.add(ipfsBuffer)
+  const ipfsHash = res[0].hash
+  return ipfsHash
+}
+
 const uploadObject = async (object) => {
   if (!state.ipfs) noProvider()
   const buffer = objectToIpfsBuffer(object)
-  return state.ipfs.add(buffer)
+  return uploadIpfsBuffer(buffer)
 }
 
 const uploadString = async (string) => {
@@ -20,14 +29,7 @@ const uploadString = async (string) => {
   if (!state.ipfs) noProvider()
 
   const buffer = stringToIpfsBuffer(string)
-  return state.ipfs.add(buffer)
-}
-
-const uploadIpfsBuffer = async (ipfsBuffer) => {
-  if (!state.ipfs) noProvider()
-
-  // IPFS buffers are special types of buffers that need a conversion
-  return state.ipfs.add(ipfsBuffer)
+  return uploadIpfsBuffer(buffer)
 }
 
 const uploadTypedArray = async (typedArray) => {
@@ -35,7 +37,14 @@ const uploadTypedArray = async (typedArray) => {
   if (!state.ipfs) noProvider()
 
   const buffer = typedArrayToIpfsBuffer(typedArray)
-  return state.ipfs.add(buffer)
+  return uploadIpfsBuffer(buffer)
+}
+
+const uploadFilePath = (path) => {
+  if (!state.ipfs) noProvider()
+
+  const buffer = fileToIpfsBuffer(path)
+  return uploadIpfsBuffer(buffer)
 }
 
 const uploadIpfsBufferWrappedWithDirectory = async (fileName, buffer) => {
@@ -47,14 +56,6 @@ const uploadIpfsBufferWrappedWithDirectory = async (fileName, buffer) => {
   }]
 
   return state.ipfs.add(data, {wrapWithDirectory: true})
-}
-
-const uploadFilePath = (path) => {
-  if (!state.ipfs) noProvider()
-
-  const buffer = fileToIpfsBuffer(path)
-
-  return state.ipfs.add(buffer)
 }
 
 const uploadFilePathWrappedWithDirectory = (fileName, path) => {

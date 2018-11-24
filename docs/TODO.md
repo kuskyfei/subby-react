@@ -1,6 +1,5 @@
 ##todo
 
-2. get it working on tor
 3. fix comments not being ipfs
 4. fix GA in file protocol
 5. fix twitter and IG bug

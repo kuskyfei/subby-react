@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button'
 import CloudUploadIcon from '@material-ui/icons/CloudUpload'
 import HelpIcon from '@material-ui/icons/Help'
 import Tooltip from '@material-ui/core/Tooltip'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 import {Preview, PublishButton, HelpText} from './components'
 import {Modal} from '../../components'
@@ -29,7 +30,8 @@ class Publish extends React.Component {
     comment: '',
     link: null,
     errorMessage: null,
-    settings: null
+    settings: null,
+    publishButtonIsLoading: false
   }
 
   constructor (props) {
@@ -99,8 +101,7 @@ class Publish extends React.Component {
 
   handleIpfsFile = async (file) => {
     const typedArray = await fileToTypedArray(file)
-    const res = await services.ipfs.uploadTypedArray(typedArray)
-    const ipfsHash = res[0].hash
+    const ipfsHash = await services.ipfs.uploadTypedArray(typedArray)
     const settings = await services.getSettings()
 
     this.setState({isDragging: false, isPreviewing: true, link: `ipfs:${ipfsHash}`, settings})
@@ -150,7 +151,7 @@ class Publish extends React.Component {
   }
 
   handlePublish = async () => {
-    const {comment, link} = this.state
+    let {comment, link} = this.state
     const {classes, profile} = this.props
     this.setState({errorMessage: null})
 
@@ -182,6 +183,14 @@ class Publish extends React.Component {
       return
     }
 
+    // if comment is too big, send to ipfs
+    if (comment.length > 50) {
+      this.setState({errorMessage: null, publishButtonIsLoading: true})
+      comment = await services.ipfs.uploadString(comment)
+      comment = 'ipfs:' + comment
+      this.setState({errorMessage: null, publishButtonIsLoading: false})
+    }
+
     await services.publish({comment, link})
 
     window.dispatchEvent(new CustomEvent('transaction', {detail: {type: 'publish'}}))
@@ -190,7 +199,7 @@ class Publish extends React.Component {
 
   render () {
     const {classes, address, profile} = this.props
-    const {isDragging, isPreviewing, comment, link, errorMessage, settings} = this.state
+    const {isDragging, isPreviewing, comment, link, errorMessage, settings, publishButtonIsLoading} = this.state
 
     const post = {
       thumbnail: profile && profile.thumbnail,
@@ -261,7 +270,8 @@ class Publish extends React.Component {
             onClick={this.handlePublish.bind(this)}
           >
             <span className={classes.publishButtonText}>Publish</span>
-            <CloudUploadIcon className={classes.rightIcon} />
+            {!publishButtonIsLoading && <CloudUploadIcon className={classes.rightIcon} />}
+            {publishButtonIsLoading && <span className={classes.rightIcon}><span className={classes.publishButtonLoading}><CircularProgress className={classes.black} size={17} /></span></span>}
           </Button>
         </div>
 

@@ -21,7 +21,8 @@ const styles = theme => ({
   },
   publishButton: {
     marginLeft: 'auto',
-    minWidth: 120
+    minWidth: 120,
+    minHeight: 40
   },
   rightIcon: {
     marginLeft: theme.spacing.unit
@@ -56,6 +57,15 @@ const styles = theme => ({
   greyIcon: {
     color: theme.palette.grey['300'],
     fontSize: 36
+  },
+
+  publishButtonLoading: {
+    display: 'inline-block',
+    minWidth: 24,
+    transform: 'translateY(2px)'
+  },
+  black: {
+    color: 'rgba(0, 0, 0, 0.87)!important'
   },
 
   textField: {
