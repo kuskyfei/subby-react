@@ -18,45 +18,10 @@ a {
 
 @keyframes fadeIn {
   0% {
-    opacity:0;
+    opacity: 0;
   }
   100% {
-    opacity:1;
+    opacity: 1;
   }
 }
 
-/* SOCIAL MEDIA EMBEDS */
-
-/* this is specifically needed to 
-   add white borders to the twitter
-   widget and center it */
-twitterwidget {
-  margin: auto!important;
-  position: relative!important;
-}
-
-twitterwidget::before {
-  content: " ";
-  display: block;
-  border: 1px solid white;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.card__white-border-1px {
-  position: relative;
-}
-
-.card__white-border-1px::before {
-  content: " ";
-  display: block;
-  border: 1px solid white;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  z-index: 1;
-  pointer-events: none;
-}

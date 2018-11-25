@@ -222,7 +222,7 @@ class Settings extends React.Component {
               }
               label='Vimeo Embeds'
             />
-{/* there's a bug with twitter and instagram
+
             <FormControlLabel
               control={
                 <Switch
@@ -248,7 +248,7 @@ class Settings extends React.Component {
               }
               label='Instagram Embeds'
             />
-*/}
+
             <Typography className={classes.message} variant='caption' gutterBottom>
               Links are embeded from sites using iframes or Javascript.
             </Typography>

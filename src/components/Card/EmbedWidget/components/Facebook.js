@@ -1,5 +1,5 @@
 import React from 'react'
-import {Loading} from './util'
+import {LoadingIframe} from './util'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 const responsiveEmbedStyles = {
@@ -43,7 +43,7 @@ const Facebook = (props) => {
   return (
     <div className={props.classes.whiteBorder}>
       <div className={props.classes.responsiveEmbed}>
-        <Loading />
+        <LoadingIframe />
         <iframe src={`https://www.facebook.com/plugins/${type}.php?href=${props.url}`} scrolling='no' frameBorder='0' allow='encrypted-media' allowFullScreen='true' />
       </div>
     </div>

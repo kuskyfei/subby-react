@@ -73,4 +73,14 @@ const getRouteFromUrlParams = (urlParams) => {
   }
 }
 
-export {isRouteChange, getRouteFromUrlParams, isUrlParamsChangeFromProps}
+const addScript = (url, cb) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  if (cb) { 
+    script.addEventListener('load', cb)
+  }
+  document.body.appendChild(script)
+}
+
+export {isRouteChange, getRouteFromUrlParams, isUrlParamsChangeFromProps, addScript}

@@ -1,5 +1,5 @@
 import React from 'react'
-import {Loading} from './util'
+import {LoadingIframe} from './util'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 const responsiveEmbedStyles = {
@@ -28,7 +28,7 @@ const Youtube = (props) => {
 
   return (
     <div className={props.classes.responsiveEmbed}>
-      <Loading />
+      <LoadingIframe />
       <iframe src={`https://www.youtube.com/embed/${id}`} frameBorder='0' allowFullScreen />
     </div>
   )

@@ -27,7 +27,7 @@ window.SUBBY_DEBUG_SERVICES = services
 
 // util
 const queryString = require('query-string')
-const {isRouteChange, getRouteFromUrlParams, isUrlParamsChangeFromProps} = require('./util')
+const {isRouteChange, getRouteFromUrlParams, isUrlParamsChangeFromProps, addScript} = require('./util')
 const debug = require('debug')('containers:App')
 
 const styles = theme => {
@@ -54,6 +54,7 @@ class App extends Component {
       this.handleRouteChange()
 
       await this.init()
+      this.initScripts()
 
       this.handleCustomHomepage()
 
@@ -88,6 +89,13 @@ class App extends Component {
     this.setState(state => ({isInitializing: false}))
 
     debug('init end', {address, profile})
+  }
+
+  initScripts = async () => {
+    const settings = await services.getSettings()
+    if (settings.REDDIT_EMBEDS) {
+      addScript('https://embed.redditmedia.com/widgets/platform.js')
+    }  
   }
 
   handleUpdateCache = (account) => {

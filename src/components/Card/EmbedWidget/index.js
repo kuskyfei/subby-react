@@ -75,25 +75,25 @@ const getWidgetFromUrl = (url, settings) => {
         return Link
       }
       return Facebook
-/* there's a bug with instagram
+
     case 'instagram':
       if (!settings.INSTAGRAM_EMBEDS) {
         return Link
       }
       return Instagram
-*/
+
     case 'reddit':
       if (!settings.REDDIT_EMBEDS) {
         return Link
       }
       return Reddit
-/* there's a bug with twitter
+
     case 'twitter':
       if (!settings.TWITTER_EMBEDS) {
         return Link
       }
       return Twitter
-*/
+
     case 'vimeo':
       if (!settings.VIMEO_EMBEDS) {
         return Link
