@@ -18,7 +18,7 @@ import {Modal} from '../../components'
 import {Post} from '../../containers'
 import styles from './styles'
 
-const {fileToTypedArray, clearDataTransfer, isMagnet, isIpfsHash} = require('./util')
+const {fileToTypedArray, clearDataTransfer, isMagnet, isIpfsHash, formatBytes} = require('./util')
 const debug = require('debug')('containers:Publish')
 const services = require('../../services')
 const {settings} = require('../../settings')
@@ -197,6 +197,13 @@ class Publish extends React.Component {
     this.setState(state => ({comment: '', link: null}))
   }
 
+  handlePostChange = (post) => {
+    debug('handlePostChange', {post})
+    if (post.link) {
+      this.setState(state => ({link: post.link}))
+    }
+  }
+
   render () {
     const {classes, address, profile} = this.props
     const {isDragging, isPreviewing, comment, link, errorMessage, settings, publishButtonIsLoading} = this.state
@@ -239,7 +246,7 @@ class Publish extends React.Component {
 
         {isPreviewing &&
           <Preview>
-            <Post post={post} settings={settings} preview onPreviewClose={this.cancelPostPreview.bind(this)} />
+            <Post post={post} settings={settings} preview onPostChange={this.handlePostChange} onPreviewClose={this.cancelPostPreview.bind(this)} />
           </Preview>
         }
 

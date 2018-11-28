@@ -1,6 +1,5 @@
 ##todo
 
-5. fix twitter and IG bug
 6. add video to IPFS and video to web torrent
 7. add update notification system
 fix bug when pasting something in other pop up it shows up in publish

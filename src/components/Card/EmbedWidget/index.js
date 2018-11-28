@@ -8,7 +8,7 @@ import {
   Ipfs, Torrent,
   Audio, Video,
   Loading, Magnet,
-  Download
+  Download, MediaSource
 } from './components'
 
 const {extractRootDomain, stripUrlQuery} = require('./util')
@@ -23,6 +23,10 @@ const EmbedWidget = (props) => {
 const getWidgetFromUrl = (url, settings) => {
   if (!url) {
     return () => <div />
+  }
+
+  if (isMediaSource(url)) {
+    return MediaSource
   }
 
   if (isDownload(url)) {
@@ -192,6 +196,10 @@ const isDownload = (url) => {
 
 const isReactElement = (url) => {
   return typeof url === 'object' && url.props
+}
+
+const isMediaSource = (url) => {
+  return typeof url === 'object' && url.src && url.src.match(/^blob:/)
 }
 
 export default EmbedWidget

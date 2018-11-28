@@ -231,32 +231,85 @@ const getStringFromStream = async (ipfsHash, {maxLength}) => {
   })
 }
 
-const getMediaSourceFromStream = async (ipfsHash, cb) => {
+const getMediaSourceFromStream = (ipfsHash, codecs) => {
+  /* list of valid codecs:
+    'video/webm; codecs="vp8"'
+    'video/webm; codecs="vorbis"'
+    'video/webm; codecs="vp8, vorbis"'
+    'video/webm; codecs="vorbis, vp8"'
+    'video/mp4; codecs="avc1.4d001e"'
+    'video/mp4; codecs="avc1.42001e"'
+    'video/mp4; codecs="mp4a.40.2"'
+    'video/mp4; codecs="avc1.4d001e, mp4a.40.2"'
+    'video/mp4; codecs="mp4a.40.2, avc1.4d001e"'
+    'video/mp4; codecs="avc1.4d001e, mp4a.40.5"'
+    'audio/webm; codecs="vorbis"'
+    'audio/mp4; codecs="mp4a.40.2"'
+    'audio/mp4; codecs="mp4a.40.5"'
+    'audio/mp4; codecs="mp4a.67"'
+  */
   debug('getMediaSourceFromStream', ipfsHash)
   if (!state.ipfs) noProvider()
 
-  return new Promise(async resolve => {
-    let entireBuffer
+  let stream
+  const onMediaSourceOpen = async () => {
+    const sourceBuffer = mediaSource.addSourceBuffer(codecs)
+    stream = await getReadableStream(ipfsHash)
 
-    const s = await getReadableStream(ipfsHash)
-
-    s.on('data', buffer => {
-      if (!entireBuffer) {
-        entireBuffer = buffer
+    let pendingBuffer
+    let counter = 0
+    stream.on('data', buffer => {
+      if (!pendingBuffer) {
+        pendingBuffer = buffer
       } else {
-        entireBuffer = concatTypedArrays(entireBuffer, buffer)
+        pendingBuffer = concatTypedArrays(pendingBuffer, buffer)
       }
-      cb(buffer)
+
+      // if the media source is ready, append buffer, otherwise wait
+      if (sourceBuffer.updating === false) {
+        const tempBuffer = pendingBuffer
+        pendingBuffer = null
+        sourceBuffer.appendBuffer(tempBuffer)
+        debug('getMediaSourceFromStream appendBuffer', tempBuffer)
+
+        // only fetch enough to get a thumbnail, after that pause util play is pressed
+        if (counter++ === 50) {
+          stream.pause()
+        }
+      } 
     })
 
-    s.on('end', () => {
-      const arrayBuffer = typedArrayToArrayBuffer(entireBuffer)
-
-      const blob = new window.Blob(arrayBuffer)
-
-      resolve(blob)
+    // sometimes the sourceBuffer is busy updating 
+    // when the stream ends, in this case we need to 
+    // listen for updateend and append the last pending
+    // buffer when done
+    stream.on('end', () => {
+      sourceBuffer.addEventListener('updateend', () => {
+        if (!pendingBuffer) {
+          return
+        }
+        if (sourceBuffer.updating !== false) {
+          return
+        }
+        const tempBuffer = pendingBuffer
+        pendingBuffer = null
+        sourceBuffer.appendBuffer(tempBuffer)
+        debug('getMediaSourceFromStream end appendBuffer', tempBuffer)
+      })
     })
-  })
+  }
+
+  const mediaSource = new MediaSource()
+  mediaSource.addEventListener('sourceopen', onMediaSourceOpen)
+  const mediaSourceStream = {
+    src: window.URL.createObjectURL(mediaSource),
+    // play and pause need to be set up like this
+    // because they are initalized later
+    play: () => stream && stream.resume(),
+    pause: () => stream && stream.pause()
+  }
+
+  return mediaSourceStream
 }
 
 export {

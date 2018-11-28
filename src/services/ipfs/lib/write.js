@@ -9,10 +9,12 @@ const {
   stringToIpfsBuffer
 } = require('./util')
 
-const uploadIpfsBuffer = async (ipfsBuffer) => {
+const uploadIpfsBuffer = async (ipfsBuffer, progressCb = () => {}) => {
   if (!state.ipfs) noProvider()
 
   // IPFS buffers are special types of buffers that need a conversion
+  // for some unkown reason progress is not available in infura
+  // const res = await state.ipfs.add(ipfsBuffer, {progress: progressCb})
   const res = await state.ipfs.add(ipfsBuffer)
   const ipfsHash = res[0].hash
   return ipfsHash
@@ -32,12 +34,12 @@ const uploadString = async (string) => {
   return uploadIpfsBuffer(buffer)
 }
 
-const uploadTypedArray = async (typedArray) => {
+const uploadTypedArray = async (typedArray, progressCb) => {
   debug('uploadTypedArray', typedArray)
   if (!state.ipfs) noProvider()
 
   const buffer = typedArrayToIpfsBuffer(typedArray)
-  return uploadIpfsBuffer(buffer)
+  return uploadIpfsBuffer(buffer, progressCb)
 }
 
 const uploadFilePath = (path) => {

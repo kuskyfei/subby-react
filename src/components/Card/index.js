@@ -308,6 +308,8 @@ class Card extends React.Component {
           </CardContent>
         </Collapse>
 
+      {this.props.children}
+
       </MaterialCard>
     )
   }

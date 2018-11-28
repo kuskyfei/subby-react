@@ -1,14 +1,17 @@
+/* eslint brace-style: 0 */
+
 // react
 import React from 'react'
 
 // components
 import {Card} from '../../components'
+import Codecs from './Codecs'
 
 // api
 const services = require('../../services')
 
 // util
-const {isIpfsContent, isTorrent, getHash, downloadBlob} = require('./util')
+const {isIpfsContent, isTorrent, linkToIpfsParams, ipfsParamsToLink, downloadBlob, getMediaSourceType} = require('./util')
 const debug = require('debug')('containers:Post')
 
 const IPFS_COMMENT_MAX_LENGTH = 10000 // arbitrary small number to prevent too big IPFS files
@@ -17,7 +20,8 @@ class Post extends React.Component {
   state = {
     link: null,
     content: null,
-    isDownloading: false
+    isDownloading: false,
+    codecsNeeded: false,
   }
 
   componentDidMount = () => {
@@ -57,7 +61,6 @@ class Post extends React.Component {
     const torrent = await services.getTorrent(post.link)
 
     this.setState({
-      ...this.state,
       link: torrent
     })
 
@@ -69,59 +72,92 @@ class Post extends React.Component {
     if (!post.comment) return
 
     if (isIpfsContent(post.comment)) {
-      this.setState({...this.state, comment: 'loading'})
+      this.setState({comment: 'loading'})
 
-      const ipfsHash = getHash(post.comment)
+      const ipfsHash = linkToIpfsParams(post.comment).hash
       const string = await services.ipfs.getStringFromStream(ipfsHash, {maxLength: IPFS_COMMENT_MAX_LENGTH})
 
-      this.setState({...this.state, comment: string})
+      this.setState({comment: string})
     }
 
     debug('handleIpfsComment end')
   }
 
+  handleCodecsChange = (codecs) => {
+    debug('handleCodecsChange', {codecs})
+
+    const {onPostChange, post} = this.props
+    const hash = linkToIpfsParams(post.link).hash
+    const link = ipfsParamsToLink({hash, codecs})
+    const newPost = {link}
+    onPostChange(newPost)
+
+    debug('handleCodecsChange', {newPost})
+  }
+
   handleIpfsLink = async () => {
     const {post} = this.props
-    if (!post.link) return
+    const {codecsString} = this.state
+    if (!isIpfsContent(post.link)) {
+      return
+    }
 
-    if (isIpfsContent(post.link)) {
-      this.setState({...this.state, link: 'loading'})
+    this.setState({link: 'loading'})
 
-      const ipfsHash = getHash(post.link)
-      const fileType = await services.ipfs.getFileTypeFromHash(ipfsHash)
-      const fileMimeType = fileType ? fileType.mime : 'unknown'
-      const fileExtension = fileType ? `.${fileType.ext}` : ''
+    const {hash: ipfsHash, codecs} = linkToIpfsParams(post.link)
+    const fileType = await services.ipfs.getFileTypeFromHash(ipfsHash)
+    const fileMimeType = fileType ? fileType.mime : 'unknown'
+    const fileExtension = fileType ? `.${fileType.ext}` : ''
 
-      if (fileMimeType.match(/image/)) {
-        const image = await services.ipfs.getBase64ImageFromStream(ipfsHash, (progressResponse) => {
-          const {progressInMbs, killStream} = progressResponse
-          this.killStream = killStream
+    if (fileMimeType.match(/image/)) {
+      const image = await services.ipfs.getBase64ImageFromStream(ipfsHash, (progressResponse) => {
+        const {progressInMbs, killStream} = progressResponse
+        this.killStream = killStream
 
-          this.setState({...this.state, link: 'loading'})
+        this.setState({link: 'loading'})
 
-          if (progressInMbs > 10) {
-            killStream()
-            this.setState({
-              ...this.state,
-              link: {
-                download: this.download.bind(this, {ipfsHash, fileExtension}),
-                message: `File type ${fileMimeType} too big to embed.`,
-                downloadMessage: 'Download'
-              }
-            })
-          }
-        })
-        this.setState({...this.state, link: image})
-      } else {
+        if (progressInMbs > 10) {
+          killStream()
+          this.setState({
+            link: {
+              download: this.download.bind(this, {ipfsHash, fileExtension}),
+              message: `File type ${fileMimeType} too big to embed.`,
+              downloadMessage: 'Download'
+            }
+          })
+        }
+      })
+      this.setState({link: image})
+    }
+
+    else if (fileMimeType.match(/video|audio/)) {
+      const type = getMediaSourceType(fileMimeType)
+      if (!codecs) {
         this.setState({
-          ...this.state,
+          codecsNeeded: type, 
           link: {
             download: this.download.bind(this, {ipfsHash, fileExtension}),
-            message: `Cannot embed file type ${fileMimeType}.`,
+            message: `Cannot embed ${type} files unless codecs are specified.`,
             downloadMessage: 'Download'
           }
         })
+        return
       }
+      else {
+        const mediaSource = services.ipfs.getMediaSourceFromStream(ipfsHash, codecs)
+        mediaSource.type = type
+        this.setState({link: mediaSource})
+      }
+    }
+
+    else {
+      this.setState({
+        link: {
+          download: this.download.bind(this, {ipfsHash, fileExtension}),
+          message: `Cannot embed file type ${fileMimeType}.`,
+          downloadMessage: 'Download'
+        }
+      })
     }
 
     debug('handleIpfsLink end')
@@ -129,7 +165,6 @@ class Post extends React.Component {
 
   getBlobFromStream = async ({ipfsHash, fileExtension}) => {
     this.setState({
-      ...this.state,
       link: {
         download: this.download.bind(this, {ipfsHash, fileExtension}),
         message: 'Connecting.',
@@ -141,7 +176,6 @@ class Post extends React.Component {
     const blob = await services.ipfs.getBlobFromStream(ipfsHash, (progress) => {
       this.killStream = progress.killStream
       this.setState({
-        ...this.state,
         link: {
           download: this.download.bind(this, {ipfsHash, fileExtension}),
           message: `${progress.progressInMbs} MB downloaded.`,
@@ -156,7 +190,6 @@ class Post extends React.Component {
 
   getBlobFromWebWorker = ({ipfsHash, fileExtension}) => new Promise(resolve => {
     this.setState({
-      ...this.state,
       link: {
         download: this.download.bind(this, {ipfsHash, fileExtension}),
         message: 'Connecting.',
@@ -174,7 +207,6 @@ class Post extends React.Component {
     getBlobFromStream.onmessage = ({data}) => {
       if (data.progressInMbs) {
         this.setState({
-          ...this.state,
           link: {
             download: this.download.bind(this, {ipfsHash, fileExtension}),
             message: `${data.progressInMbs} MB downloaded.`,
@@ -197,14 +229,13 @@ class Post extends React.Component {
     const postId = post.id
 
     if (!isDownloading) {
-      this.setState({...this.state, isDownloading: true})
+      this.setState({isDownloading: true})
 
       const blob = await this.getBlobFromStream({ipfsHash, fileExtension})
 
       downloadBlob({blob, fileName: `${username}-${postId}${fileExtension}`})
 
       this.setState({
-        ...this.state,
         link: {
           download: () => downloadBlob({blob, fileName: `${username}-${postId}${fileExtension}`}),
           message: 'Download complete.',
@@ -218,7 +249,6 @@ class Post extends React.Component {
       this.killStream()
 
       this.setState({
-        ...this.state,
         link: {
           download: this.download.bind(this, {ipfsHash, fileExtension}),
           message: 'Cancelled download.',
@@ -231,7 +261,7 @@ class Post extends React.Component {
 
   render () {
     const {isLoading, post, preview, onPreviewClose, settings} = this.props
-    const {link, comment} = this.state
+    const {link, comment, codecsNeeded} = this.state
 
     const newPost = {...post}
 
@@ -243,7 +273,11 @@ class Post extends React.Component {
     if (isIpfsContent(newPost.comment)) newPost.comment = 'loading'
 
     return (
-      <Card settings={settings} isLoading={isLoading} post={newPost} preview={preview} onPreviewClose={onPreviewClose} />
+      <Card settings={settings} isLoading={isLoading} post={newPost} preview={preview} onPreviewClose={onPreviewClose}>
+        {codecsNeeded &&
+          <Codecs codecsNeeded={codecsNeeded} onCodecsChange={this.handleCodecsChange}/>
+        }
+      </Card>
     )
   }
 }
