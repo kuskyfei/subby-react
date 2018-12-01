@@ -85,7 +85,8 @@ const {
 const {
   getTorrent,
   getMagnetFromTorrentFile,
-  prepareMagnetForEthereum
+  prepareMagnetForEthereum,
+  magnetToInfoHash
 } = require('./torrent')
 
 const ga = require('./ga')
@@ -129,6 +130,7 @@ export {
   getTorrent,
   getMagnetFromTorrentFile,
   prepareMagnetForEthereum,
+  magnetToInfoHash,
   // ga
   ga,
   // utils

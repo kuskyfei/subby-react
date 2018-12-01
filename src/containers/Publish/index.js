@@ -197,10 +197,12 @@ class Publish extends React.Component {
     this.setState(state => ({comment: '', link: null}))
   }
 
+  // this is not currently used but it might be useful
+  // if we need to change the link from a user's action
   handlePostChange = (post) => {
     debug('handlePostChange', {post})
     if (post.link) {
-      this.setState(state => ({link: post.link}))
+      this.setState(state => ({link: post.link,}))
     }
   }
 

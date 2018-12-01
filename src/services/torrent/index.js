@@ -1,5 +1,6 @@
 const parseTorrent = require('parse-torrent')
 const debug = require('debug')('services:torrent')
+const {getRoot, bytesToMbs, isWebSocket, getMediaIndexesFromTorrentFiles, concatTypedArrays} = require('./util')
 
 let WebTorrent = require('webtorrent')
 const mockWebTorrent = () => {
@@ -12,6 +13,7 @@ const mockWebTorrent = () => {
 let client
 const init = () => {
   client = new WebTorrent()
+  window.SUBBY_DEBUG_TORRENT = client
 }
 
 const getTorrent = (input) => {
@@ -40,28 +42,42 @@ const getTorrent = (input) => {
         files.push(file.path)
       }
 
+      const addToElement = (cssSelector, fileIndex) => addTorrentMediaToElement(torrent, cssSelector, fileIndex)
+      const mediaIndexes = getMediaIndexesFromTorrentFiles(torrent.files)
+
       const parsedTorrent = {
         name: getRoot(torrent.files[0].path),
         files,
         peerCount: numPeers,
         infoHash,
         magnet: magnetURI,
-        sizeInMbs: bytesToMbs(length)
+        sizeInMbs: bytesToMbs(length),
+        addToElement,
+        mediaIndexes
       }
 
+      // no need to destroy currently
+      // torrent.destroy()
       resolve(parsedTorrent)
-      torrent.destroy()
     }
   })
 }
 
-const getRoot = (path) => {
-  return path.match(/^[^/]+/)[0]
-}
+const addTorrentMediaToElement = (torrent, cssSelector, mediaIndex) => {
+  // input can be an info hash, torrent file buffer (blob in browser) or magnet uri
+  debug('appendTorrentMediaToElement', {torrent, cssSelector, mediaIndex})
 
-const bytesToMbs = (number) => {
-  const mb = 1048576
-  return (number / mb).toFixed(2)
+  return new Promise(resolve => {
+    const mediaIndexes = getMediaIndexesFromTorrentFiles(torrent.files)
+    if (mediaIndexes.length === 0) {
+      return
+    }
+    const torrentFile = torrent.files[mediaIndex]
+
+    torrentFile.renderTo(cssSelector, {autoplay: false}, (err, element) => {
+      resolve(element)
+    })
+  })
 }
 
 const getMagnetFromTorrentFile = (torrentId) => new Promise((resolve, reject) => {
@@ -85,8 +101,9 @@ const prepareMagnetForEthereum = (magnet) => {
   for (const tracker of torrent.announce) {
     if (isWebSocket(tracker)) {
       preparedMagnet += `&tr=${tracker}`
+      maxTrackers--
     }
-    if (!--maxTrackers) {
+    if (!maxTrackers) {
       break
     }
   }
@@ -94,8 +111,9 @@ const prepareMagnetForEthereum = (magnet) => {
   return preparedMagnet
 }
 
-const isWebSocket = (tracker) => {
-  return !!tracker.match(/^wss?:\/\//)
+const magnetToInfoHash = (magnet) => {
+  const torrent = parseTorrent(magnet)
+  return torrent.infoHash
 }
 
-export {getTorrent, getMagnetFromTorrentFile, prepareMagnetForEthereum, init, mockWebTorrent}
+export {getTorrent, getMagnetFromTorrentFile, prepareMagnetForEthereum, init, mockWebTorrent, magnetToInfoHash}

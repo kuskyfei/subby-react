@@ -83,28 +83,15 @@ class Post extends React.Component {
     debug('handleIpfsComment end')
   }
 
-  handleCodecsChange = (codecs) => {
-    debug('handleCodecsChange', {codecs})
-
-    const {onPostChange, post} = this.props
-    const hash = linkToIpfsParams(post.link).hash
-    const link = ipfsParamsToLink({hash, codecs})
-    const newPost = {link}
-    onPostChange(newPost)
-
-    debug('handleCodecsChange', {newPost})
-  }
-
   handleIpfsLink = async () => {
-    const {post} = this.props
-    const {codecsString} = this.state
+    const {post, settings} = this.props
     if (!isIpfsContent(post.link)) {
       return
     }
 
     this.setState({link: 'loading'})
 
-    const {hash: ipfsHash, codecs} = linkToIpfsParams(post.link)
+    const {hash: ipfsHash} = linkToIpfsParams(post.link)
     const fileType = await services.ipfs.getFileTypeFromHash(ipfsHash)
     const fileMimeType = fileType ? fileType.mime : 'unknown'
     const fileExtension = fileType ? `.${fileType.ext}` : ''
@@ -131,23 +118,13 @@ class Post extends React.Component {
     }
 
     else if (fileMimeType.match(/video|audio/)) {
+      const ipfsGateway = settings.IPFS_GATEWAY
       const type = getMediaSourceType(fileMimeType)
-      if (!codecs) {
-        this.setState({
-          codecsNeeded: type, 
-          link: {
-            download: this.download.bind(this, {ipfsHash, fileExtension}),
-            message: `Cannot embed ${type} files unless codecs are specified.`,
-            downloadMessage: 'Download'
-          }
-        })
-        return
+      const mediaSource = {
+        src: `${ipfsGateway}/${ipfsHash}`,
+        type
       }
-      else {
-        const mediaSource = services.ipfs.getMediaSourceFromStream(ipfsHash, codecs)
-        mediaSource.type = type
-        this.setState({link: mediaSource})
-      }
+      this.setState({link: mediaSource})
     }
 
     else {
@@ -189,6 +166,8 @@ class Post extends React.Component {
   }
 
   getBlobFromWebWorker = ({ipfsHash, fileExtension}) => new Promise(resolve => {
+    const {settings} = this.props
+
     this.setState({
       link: {
         download: this.download.bind(this, {ipfsHash, fileExtension}),
@@ -202,7 +181,7 @@ class Post extends React.Component {
     this.killStream = () => getBlobFromStream.postMessage({killStream: true})
     getBlobFromStream.postMessage({
       ipfsHash,
-      ipfsProvider: window.SUBBY_GLOBAL_SETTINGS.IPFS_PROVIDER
+      ipfsProvider: settings.IPFS_PROVIDER
     })
     getBlobFromStream.onmessage = ({data}) => {
       if (data.progressInMbs) {
@@ -274,9 +253,6 @@ class Post extends React.Component {
 
     return (
       <Card settings={settings} isLoading={isLoading} post={newPost} preview={preview} onPreviewClose={onPreviewClose}>
-        {codecsNeeded &&
-          <Codecs codecsNeeded={codecsNeeded} onCodecsChange={this.handleCodecsChange}/>
-        }
       </Card>
     )
   }

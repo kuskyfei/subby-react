@@ -244,6 +244,8 @@ class Card extends React.Component {
 
         <EmbedWidget settings={settings} url={post.link} />
 
+        {this.props.children}
+
         {post.comment !== 'loading' &&
           <CardContent>
             <Typography className={classes.comment} component='p'>
@@ -307,8 +309,6 @@ class Card extends React.Component {
             </Typography>
           </CardContent>
         </Collapse>
-
-      {this.props.children}
 
       </MaterialCard>
     )

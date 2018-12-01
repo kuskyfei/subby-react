@@ -32,6 +32,10 @@ const settingsMessage = `<script>
     // To use IPFS, you must connect to an IPFS node. Leave 
     // blank to use Infura default.
     IPFS_PROVIDER: '${settings.IPFS_PROVIDER}',
+
+    // Most features use your chosen IPFS provider, but video
+    // and audio streaming use an IPFS gateway.
+    IPFS_GATEWAY: '${settings.IPFS_GATEWAY}',
    
     // Links are embeded from sites using iframes 
     // or Javascript.

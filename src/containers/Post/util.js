@@ -45,6 +45,26 @@ const ipfsParamsToLink = (ipfsParams) => {
   return `ipfs:?h=${ipfsParams.hash}&c=${ipfsParams.codecs}`
 }
 
+const getCodecsFromMagnetLink = (magnetLink) => {
+  try {
+    const [, codecs] = /&c=([^&]+)/.exec(magnetLink)
+    return codecs
+  } 
+  catch (e) {}
+}
+
+const replaceCodecsFromMagnetLink = (magnetLink, newCodecs) => {
+  const oldCodecs = getCodecsFromMagnetLink(magnetLink)
+
+  if (!oldCodecs) {
+    magnetLink += `&c=${newCodecs}`
+    return magnetLink
+  }
+
+  magnetLink.replace(oldCodecs, newCodecs)
+  return magnetLink
+}
+
 const getMediaSourceType = (fileMimeType) => {
   const isAudio = fileMimeType.match(/audio/)
   const isVideo = fileMimeType.match(/video/)
@@ -68,4 +88,4 @@ const downloadBlob = ({blob, fileName}) => {
   window.URL.revokeObjectURL(url)
 }
 
-module.exports = {isIpfsContent, isTorrent, linkToIpfsParams, ipfsParamsToLink, downloadBlob, getMediaSourceType}
+module.exports = {isIpfsContent, isTorrent, linkToIpfsParams, ipfsParamsToLink, downloadBlob, getMediaSourceType, getCodecsFromMagnetLink, replaceCodecsFromMagnetLink}

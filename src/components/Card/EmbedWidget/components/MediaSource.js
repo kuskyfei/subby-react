@@ -15,20 +15,6 @@ const MediaSource = (props) => {
   const {url} = props
   const {src, play, pause, type} = url
 
-  if (type === 'video') {
-    return (
-      <video
-        className={props.classes.video}
-        controls
-        src={src}
-        onPlay={play}
-        onPause={pause}
-      >
-        Sorry, your browser doesn't support embedded videos.
-      </video>
-    )
-  }
-
   if (type === 'audio') {
     return (
       <audio
@@ -42,6 +28,18 @@ const MediaSource = (props) => {
       </audio>
     )
   }
+
+  return (
+    <video
+      className={props.classes.video}
+      controls
+      src={src}
+      onPlay={play}
+      onPause={pause}
+    >
+      Sorry, your browser doesn't support embedded videos.
+    </video>
+  )
 }
 
 export default withStyles(styles)(MediaSource)

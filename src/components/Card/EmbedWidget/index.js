@@ -199,7 +199,7 @@ const isReactElement = (url) => {
 }
 
 const isMediaSource = (url) => {
-  return typeof url === 'object' && url.src && url.src.match(/^blob:/)
+  return typeof url === 'object' && url.src && url.type
 }
 
 export default EmbedWidget

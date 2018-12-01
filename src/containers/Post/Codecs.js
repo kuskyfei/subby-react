@@ -1,3 +1,6 @@
+// This file is currently not being used, but might be useful later
+// It's a dropdown to choose a codec
+
 // react
 import React from 'react'
 import {withStyles} from '@material-ui/core/styles'
@@ -109,6 +112,9 @@ class Codecs extends React.Component {
     }
     if (codecsNeeded === 'video') {
       codecsStrings = videoCodecs
+    }
+    if (codecsNeeded === 'media') {
+      codecsStrings = videoCodecs.concat(audioCodecs)
     }
 
     const codecsMenu = []

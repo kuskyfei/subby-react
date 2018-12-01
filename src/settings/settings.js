@@ -8,6 +8,7 @@ const settings = {
 
   WEB3_PROVIDER: '',
   IPFS_PROVIDER: 'https://ipfs.infura.io:5001',
+  IPFS_GATEWAY: 'https://ipfs.infura.io/ipfs',
 
   REDDIT_EMBEDS: true,
   FACEBOOK_EMBEDS: true,

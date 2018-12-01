@@ -171,6 +171,21 @@ class Settings extends React.Component {
               To use IPFS, you must connect to an IPFS node. Leave blank to use Infura default.
             </Typography>
 
+            <TextField
+              fullWidth
+              placeholder='https://example.com/ipfs'
+              label='IPFS Gateway'
+              className={classes.textField}
+              value={this.state.IPFS_GATEWAY || ''}
+              onChange={this.handleValueChange('IPFS_GATEWAY')}
+              margin='normal'
+              disabled={this.state.USE_DEFAULT_SETTINGS}
+            />
+
+            <Typography className={classes.message} variant='caption' gutterBottom>
+              Most features use your chosen IPFS provider, but video and audio streaming use an IPFS gateway.
+            </Typography>
+
             <FormControlLabel
               control={
                 <Switch
