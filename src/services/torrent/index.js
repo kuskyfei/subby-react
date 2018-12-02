@@ -53,7 +53,9 @@ const getTorrent = (input) => {
         magnet: magnetURI,
         sizeInMbs: bytesToMbs(length),
         addToElement,
-        mediaIndexes
+        mediaIndexes,
+        client,
+        torrent
       }
 
       // no need to destroy currently

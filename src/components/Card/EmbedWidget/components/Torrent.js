@@ -12,6 +12,7 @@ import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 import LinearProgress from '@material-ui/core/LinearProgress'
 
+const prettierBytes = require('prettier-bytes')
 const debug = require('debug')('components:Card:EmbedWidget:Torrent')
 
 const styles = theme => ({
@@ -26,17 +27,23 @@ const styles = theme => ({
     '&:nth-of-type(odd)': {
       backgroundColor: theme.palette.background.default
     },
-    height: 34
+    height: 34,
   },
   filesRow: {
     maxHeight: 200,
-    overflow: 'scroll'
+    overflow: 'scroll',
+    wordBreak: 'break-all'
   },
   nameCell: {
     width: '30%'
   },
   table: {
-    animation: 'fadeIn ease 1.5s'
+    animation: 'fadeIn ease 1.5s',
+  },
+  nameValueCell: {
+    wordBreak: 'break-all',
+    paddingTop: 9,
+    paddingBottom: 9,
   },
   tableBottom: {
     transform: 'translateY(-3px)',
@@ -47,7 +54,8 @@ const styles = theme => ({
   torrent: {
     '& video': {
       width: '100%'
-    }
+    },
+    overflow: 'scroll'
   },
   torrentMedia: {
     width: '100%'
@@ -72,6 +80,16 @@ const styles = theme => ({
   linearBarColorPrimary: {
     backgroundColor: '#5d5d5d',
   },
+  statusWrapper: {
+    display: 'flex',
+    justifyContent: 'space-between'
+  },
+  helpTextWrapper: {
+    whiteSpace: 'nowrap',
+  },
+  statusItem: {
+    whiteSpace: 'nowrap',
+  }
 })
 
 class Torrent extends React.Component {
@@ -81,9 +99,10 @@ class Torrent extends React.Component {
   }
 
   state = {
-    filesOpen: false,
+    filesOpen: true,
     showVideo: false,
-    showLoading: true
+    showLoading: true,
+    status: {}
   }
 
   handleClick () {
@@ -105,9 +124,48 @@ class Torrent extends React.Component {
   addTorrentMedia = async (fileIndex) => {
     const {classes, url: torrent} = this.props
 
-    this.setState({showVideo: true, showLoading: true})
+    this.setState({showVideo: true, showLoading: true, activeTorrentFileIndex: fileIndex})
     torrent.addToElement(`.${classes.torrentMedia}`, fileIndex)
     this.handleTorrentElementRendered()
+    this.handleStatusInterval()
+  }
+
+  handleStatusInterval = () => {
+    let {url: torrent} = this.props
+    torrent = torrent.torrent
+
+    if (this.statusInterval && this.statusInterval.clearInterval) {
+      this.statusInterval.clearInterval()
+    }
+
+    this.statusInterval = setInterval(() => {
+      if (!torrent) {
+        return
+      }
+
+      let progress = torrent.progress
+      if (torrent.done) {
+        progress = 1
+      }
+      progress = (100 * progress).toFixed(1) + '%'
+
+      let remaining
+      if (torrent.done) {
+        remaining = '0s'
+      } else {
+        remaining = msToTime(torrent.timeRemaining)
+      }
+
+      this.setState({
+        status: {
+          peers: torrent._peersLength,
+          progress,
+          remaining,
+          downloadSpeed: prettierBytes(torrent.client.downloadSpeed) + '/s ',
+          uploadSpeed: prettierBytes(torrent.client.uploadSpeed) + '/s '
+        }
+      })
+    }, 1000)
   }
 
   handleTorrentElementRendered = () => {
@@ -128,7 +186,7 @@ class Torrent extends React.Component {
 
   render () {
     const {classes, url: torrent} = this.props
-    const {showVideo, showLoading} = this.state
+    const {showVideo, showLoading, status} = this.state
 
     debug('torrent', torrent)
 
@@ -159,7 +217,7 @@ class Torrent extends React.Component {
               <TableCell className={classes.nameCell} >
                 Name
               </TableCell>
-              <TableCell>
+              <TableCell className={classes.nameValueCell} >
                 {torrent.name}
               </TableCell>
             </TableRow>
@@ -189,7 +247,7 @@ class Torrent extends React.Component {
                 Peers
               </TableCell>
               <TableCell>
-                {torrent.peerCount}
+                {torrent.torrent._peersLength || torrent.peerCount}
               </TableCell>
             </TableRow>
 
@@ -231,17 +289,47 @@ class Torrent extends React.Component {
           <video controls ref={this.videoRef} className={classes.torrentMedia} />
 
           <Tooltip title={<HelpText />} placement='top-end'>
-            <Typography align="right" variant='caption' gutterBottom>
-              {showLoading && <CircularProgress className={classes.progress} size={10} />}
-              {` `}
-              <a href="https://subby.io/encode" target="_blank">Video not loading?</a>
-            </Typography>
+            <div className={classes.statusWrapper}>
+              <Typography align="left" variant='caption' gutterBottom>
+                <span className={classes.statusItem}>Progress: {status.progress}</span>
+                {` `}
+                <span className={classes.statusItem}>Download speed: {status.downloadSpeed}</span>
+                {` `}
+                <span className={classes.statusItem}>Upload speed: {status.uploadSpeed}</span>
+                {` `}
+                <span className={classes.statusItem}>ETA: {status.remaining}</span>
+              </Typography>
+              <Typography className={classes.helpTextWrapper} align="right" variant='caption' gutterBottom>
+                <a href="https://subby.io/encode" target="_blank">Video not loading?</a>
+              </Typography>
+            </div>
           </Tooltip>
         </div>
 
       </div>
     )
   }
+}
+
+const msToTime = (duration) => {
+  const milliseconds = parseInt((duration % 1000) / 100),
+    seconds = parseInt((duration / 1000) % 60),
+    minutes = parseInt((duration / (1000 * 60)) % 60),
+    hours = parseInt((duration / (1000 * 60 * 60)) % 24)
+
+  let time = ''
+
+  if (hours) {
+    time += hours + 'h'
+  }
+
+  if (minutes) {
+    time += minutes + 'm'
+  }
+
+  time += seconds + 's'
+
+  return time
 }
 
 const HelpText = () => 
@@ -257,7 +345,7 @@ const HelpText = () =>
         <li>mp4a.40.5</li>
         <li>mp4a.67</li>
       </ul>
-      Video may take a minute to start streaming <div style={{display: 'inline-block', transform: 'translate(2px, 2px)'}}><CircularProgress style={{color: 'white'}} size={10} /></div>
+      Video needs to download enough pieces to start streaming
     </p>
   </div>
 

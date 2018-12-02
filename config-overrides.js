@@ -64,12 +64,6 @@ module.exports = function override (config, env) {
       })
     )
 
-    // ignore faker module because it's only
-    // used for mocks and takes too much space
-    config.plugins.push(
-      new webpack.IgnorePlugin(/faker/)
-    )
-
     // uncomment below to debug
     // console.log(util.inspect(config, {depth: null}))
     // process.kill()
@@ -107,6 +101,12 @@ module.exports = function override (config, env) {
   //     options: {inline: true}
   //   }
   // })
+
+  // ignore faker module because it's only
+  // used for mocks and takes too much space
+  config.plugins.push(
+    new webpack.IgnorePlugin(/faker/)
+  )
 
   return config
 }
