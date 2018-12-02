@@ -8,9 +8,9 @@ import classnames from 'classnames'
 import IconButton from '@material-ui/core/IconButton'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import CircularProgress from '@material-ui/core/CircularProgress'
-import HelpIcon from '@material-ui/icons/Help'
 import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
+import LinearProgress from '@material-ui/core/LinearProgress'
 
 const debug = require('debug')('components:Card:EmbedWidget:Torrent')
 
@@ -65,7 +65,13 @@ const styles = theme => ({
   },
   displayNone: {
     display: 'none'
-  }
+  },
+  linearColorPrimary: {
+    backgroundColor: '#e1e1e1',
+  },
+  linearBarColorPrimary: {
+    backgroundColor: '#5d5d5d',
+  },
 })
 
 class Torrent extends React.Component {
@@ -214,11 +220,20 @@ class Torrent extends React.Component {
           </TableBody>
         </Table>
         <div className={classnames(classes.torrentMediaWrapper, !showVideo && classes.displayNone)}>
-          <video ref={this.videoRef} className={classes.torrentMedia} />
-          {showLoading && <Loading />}
+          {/* showLoading && // might use this later for when the video is loading
+            <LinearProgress
+              classes={{
+                colorPrimary: classes.linearColorPrimary,
+                barColorPrimary: classes.linearBarColorPrimary,
+              }}
+            />
+          */}
+          <video controls ref={this.videoRef} className={classes.torrentMedia} />
 
           <Tooltip title={<HelpText />} placement='top-end'>
             <Typography align="right" variant='caption' gutterBottom>
+              {showLoading && <CircularProgress className={classes.progress} size={10} />}
+              {` `}
               <a href="https://subby.io/encode" target="_blank">Video not loading?</a>
             </Typography>
           </Tooltip>
@@ -242,36 +257,8 @@ const HelpText = () =>
         <li>mp4a.40.5</li>
         <li>mp4a.67</li>
       </ul>
+      Video may take a minute to start streaming <div style={{display: 'inline-block', transform: 'translate(2px, 2px)'}}><CircularProgress style={{color: 'white'}} size={10} /></div>
     </p>
   </div>
-
-const loadingStyles = theme => ({
-  loading: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  loadingWrapper: {
-    position: 'absolute',
-    top: '38%',
-    left: '41%'
-  },
-  progress: {
-    margin: theme.spacing.unit * 2
-  }
-})
-
-let Loading = (props) => {
-  const {classes} = props
-
-  return (
-    <div className={classes.loadingWrapper}>
-      <div className={classes.loading}>
-        <CircularProgress className={classes.progress} size={50} />
-      </div>
-    </div>
-  )
-}
-Loading = withStyles(loadingStyles)(Loading)
 
 export default withStyles(styles)(Torrent) // eslint-disable-line
