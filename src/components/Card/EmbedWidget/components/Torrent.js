@@ -11,6 +11,7 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 import LinearProgress from '@material-ui/core/LinearProgress'
+import CloseIcon from '@material-ui/icons/Close'
 
 const prettierBytes = require('prettier-bytes')
 const debug = require('debug')('components:Card:EmbedWidget:Torrent')
@@ -65,7 +66,8 @@ const styles = theme => ({
   },
   playButton: {
     height: 'unset',
-    width: 'unset'
+    width: 'unset',
+    transform: 'translateY(-1px)'
   },
   playButtonInvisible: {
     opacity: 0,
@@ -89,6 +91,15 @@ const styles = theme => ({
   },
   statusItem: {
     whiteSpace: 'nowrap',
+  },
+  downloadFile: {
+    fontWeight: 600,
+    '& a:hover': {
+    }
+  },
+
+  tooltip: {
+    maxWidth: 300
   }
 })
 
@@ -102,7 +113,8 @@ class Torrent extends React.Component {
     filesOpen: true,
     showVideo: false,
     showLoading: true,
-    status: {}
+    status: {},
+    activeTorrentFileIndex: null
   }
 
   handleClick () {
@@ -110,11 +122,9 @@ class Torrent extends React.Component {
   }
 
   componentDidMount () {
-    debug('mounted')
   }
 
   componentDidUpdate (prevProps) {
-    debug('updated')
   }
 
   componentWillUnmount () {
@@ -123,49 +133,80 @@ class Torrent extends React.Component {
 
   addTorrentMedia = async (fileIndex) => {
     const {classes, url: torrent} = this.props
+    const torrentDestroyed = torrent.getStatus().paused
+
+    if (torrentDestroyed) {
+      torrent.restart()
+    }
 
     this.setState({showVideo: true, showLoading: true, activeTorrentFileIndex: fileIndex})
     torrent.addToElement(`.${classes.torrentMedia}`, fileIndex)
     this.handleTorrentElementRendered()
-    this.handleStatusInterval()
+    this.startStatusInterval()
   }
 
-  handleStatusInterval = () => {
-    let {url: torrent} = this.props
-    torrent = torrent.torrent
+  closeTorrentMedia = () => {
+    const {url: torrent} = this.props
 
-    if (this.statusInterval && this.statusInterval.clearInterval) {
-      this.statusInterval.clearInterval()
+    this.setState({activeTorrentFileIndex: null})
+
+    try {
+      torrent.pause()
+    }
+    catch (e) {
+      console.error(e)
+    }
+  }
+
+  startStatusInterval = async () => {
+    debug('startStatusInterval', {statusInterval: this.statusInterval})
+    if (this.statusInterval) {
+      clearInterval(this.statusInterval)
     }
 
     this.statusInterval = setInterval(() => {
-      if (!torrent) {
-        return
+      try {
+        this.updateStatus()
       }
-
-      let progress = torrent.progress
-      if (torrent.done) {
-        progress = 1
-      }
-      progress = (100 * progress).toFixed(1) + '%'
-
-      let remaining
-      if (torrent.done) {
-        remaining = '0s'
-      } else {
-        remaining = msToTime(torrent.timeRemaining)
-      }
-
-      this.setState({
-        status: {
-          peers: torrent._peersLength,
-          progress,
-          remaining,
-          downloadSpeed: prettierBytes(torrent.client.downloadSpeed) + '/s ',
-          uploadSpeed: prettierBytes(torrent.client.uploadSpeed) + '/s '
+      catch (e) {
+        console.error(e)
+        try {
+          clearInterval(this.statusInterval)
         }
-      })
+        catch (e) {
+          console.error(e)
+        }
+      }
     }, 1000)
+  }
+
+  updateStatus = () => {
+    const {url: torrent} = this.props
+    const status = torrent.getStatus()
+
+    let progress = status.progress
+    if (status.done) {
+      progress = 1
+    }
+    progress = (100 * progress).toFixed(1) + '%'
+
+    let remaining
+    if (status.done) {
+      remaining = '0s'
+    } else {
+      remaining = msToTime(status.timeRemaining)
+    }
+
+    this.setState({
+      status: {
+        done: status.done,
+        peers: status.peerCount,
+        progress,
+        remaining,
+        downloadSpeed: prettierBytes(status.downloadSpeed) + '/s ',
+        uploadSpeed: prettierBytes(status.uploadSpeed) + '/s '
+      }
+    })
   }
 
   handleTorrentElementRendered = () => {
@@ -186,28 +227,38 @@ class Torrent extends React.Component {
 
   render () {
     const {classes, url: torrent} = this.props
-    const {showVideo, showLoading, status} = this.state
+    const {showVideo, showLoading, status, activeTorrentFileIndex} = this.state
 
-    debug('torrent', torrent)
-
-    const files = []
+    let files = []
+    const mediaFiles = []
 
     let counter = 0
     for (const file of torrent.files) {
-      // if file is not a media, send invisible button
-      const invisiblePlayButton = <IconButton className={classnames(classes.playButton, classes.playButtonInvisible)}><PlayArrowIcon /></IconButton>
-      let playButton = invisiblePlayButton
+      const fileIndex = counter++
+      let playButton
+
+      if (activeTorrentFileIndex === fileIndex) {
+        const handleClose = () => this.closeTorrentMedia(fileIndex)
+        playButton = <IconButton onClick={handleClose} className={classes.playButton}><CloseIcon /></IconButton>
+        mediaFiles.push(<p key={file}>{file} {playButton}</p>)
+        break
+      }
 
       // send real play buttons for playable files
-      const fileIndex = counter
       if (torrent.mediaIndexes.includes(fileIndex)) {
         const handlePlay = () => this.addTorrentMedia(fileIndex)
         playButton = <IconButton onClick={handlePlay} className={classes.playButton}><PlayArrowIcon /></IconButton>
+        mediaFiles.push(<p key={file}>{file} {playButton}</p>)
+        break
       }
 
+      // if file is not a media, send invisible button
+      const invisiblePlayButton = <IconButton className={classnames(classes.playButton, classes.playButtonInvisible)}><PlayArrowIcon /></IconButton>
+      playButton = invisiblePlayButton
       files.push(<p key={file}>{file} {playButton}</p>)
-      counter++
     }
+
+    files = [...mediaFiles, ...files]
 
     return (
       <div className={classes.torrent}>
@@ -247,7 +298,7 @@ class Torrent extends React.Component {
                 Peers
               </TableCell>
               <TableCell>
-                {torrent.torrent._peersLength || torrent.peerCount}
+                {torrent.getStatus().peerCount}
               </TableCell>
             </TableRow>
 
@@ -288,7 +339,6 @@ class Torrent extends React.Component {
           */}
           <video controls ref={this.videoRef} className={classes.torrentMedia} />
 
-          <Tooltip title={<HelpText />} placement='top-end'>
             <div className={classes.statusWrapper}>
               <Typography align="left" variant='caption' gutterBottom>
                 <span className={classes.statusItem}>Progress: {status.progress}</span>
@@ -298,12 +348,19 @@ class Torrent extends React.Component {
                 <span className={classes.statusItem}>Upload speed: {status.uploadSpeed}</span>
                 {` `}
                 <span className={classes.statusItem}>ETA: {status.remaining}</span>
+                {` `}
+                {status.done && 
+                  <span className={classnames(classes.downloadFile, classes.statusItem)}>
+                    <a onClick={() => torrent.downloadFile(activeTorrentFileIndex)}>↪Download</a>
+                  </span>
+                }
               </Typography>
-              <Typography className={classes.helpTextWrapper} align="right" variant='caption' gutterBottom>
-                <a href="https://subby.io/encode" target="_blank">Video not loading?</a>
-              </Typography>
+              <Tooltip classes={{tooltip: classes.tooltip}} title={<HelpText />} placement='top-end'>
+                <Typography className={classes.helpTextWrapper} align="right" variant='caption' gutterBottom>
+                  <a href="https://subby.io/encode" target="_blank">Video not loading?</a>
+                </Typography>
+              </Tooltip>
             </div>
-          </Tooltip>
         </div>
 
       </div>
@@ -329,13 +386,18 @@ const msToTime = (duration) => {
 
   time += seconds + 's'
 
+  if (time === 'NaNs') {
+    time = '∞'
+  }
+
   return time
 }
 
 const HelpText = () => 
   <div>
     <p>
-      Only the following codecs can be streamed in the browser
+      Video needs to download enough pieces to start streaming.
+      Only the following codecs can be streamed in the browser:
       <ul>
         <li>vp8</li>
         <li>vorbis</li>
@@ -345,7 +407,6 @@ const HelpText = () =>
         <li>mp4a.40.5</li>
         <li>mp4a.67</li>
       </ul>
-      Video needs to download enough pieces to start streaming
     </p>
   </div>
 

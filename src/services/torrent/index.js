@@ -1,6 +1,6 @@
 const parseTorrent = require('parse-torrent')
 const debug = require('debug')('services:torrent')
-const {getRoot, bytesToMbs, isWebSocket, getMediaIndexesFromTorrentFiles, concatTypedArrays} = require('./util')
+const {getRoot, bytesToMbs, isWebSocket, getMediaIndexesFromTorrentFiles, concatTypedArrays, downloadBlob} = require('./util')
 
 let WebTorrent = require('webtorrent')
 const mockWebTorrent = () => {
@@ -16,54 +16,97 @@ const init = () => {
   window.SUBBY_DEBUG_TORRENT = client
 }
 
-const getTorrent = (input) => {
+const getTorrent = async (input) => {
   // input can be an info hash, torrent file buffer (blob in browser) or magnet uri
   debug('getTorrent', input)
 
-  return new Promise((resolve) => {
-    try {
-      client.add(input, (torrent) => {
-        handleTorrent(torrent)
-      })
-    } catch (e) {
-      debug(e)
-      client.get(input, (torrent) => {
-        handleTorrent(torrent)
-      })
-    }
+  // torrent is a global that gets replaced 
+  // when a torrent is restarted
+  let torrent
+  const torrentGetter = () => torrent
+  const fileGetter = (fileIndex) => torrent.files[fileIndex]
 
-    const handleTorrent = (torrent) => {
-      debug('torrent', torrent)
+  torrent = client.get(input, {path: input})
 
-      const {numPeers, infoHash, magnetURI, length} = torrent
+  if (!torrent) {
+    torrent = await addAsync(input)
+  }
+  if (torrent.destroyed) {
+    torrent = client.add(input, {path: input})
+  }
 
-      const files = []
-      for (const file of torrent.files) {
-        files.push(file.path)
-      }
+  // static
+  const {infoHash, magnetURI: magnet, length: size} = torrent
+  const files = []
+  for (const file of torrent.files) {
+    files.push(file.path)
+  }
+  const mediaIndexes = getMediaIndexesFromTorrentFiles(torrent.files)
 
-      const addToElement = (cssSelector, fileIndex) => addTorrentMediaToElement(torrent, cssSelector, fileIndex)
-      const mediaIndexes = getMediaIndexesFromTorrentFiles(torrent.files)
-
-      const parsedTorrent = {
-        name: getRoot(torrent.files[0].path),
-        files,
-        peerCount: numPeers,
-        infoHash,
-        magnet: magnetURI,
-        sizeInMbs: bytesToMbs(length),
-        addToElement,
-        mediaIndexes,
-        client,
-        torrent
-      }
-
-      // no need to destroy currently
-      // torrent.destroy()
-      resolve(parsedTorrent)
-    }
+  // dynamic
+  const pause = () => torrentGetter().destroy()
+  // restart (in conjunction with torrentGetter) allows the 
+  // original torrent object to change when restarted
+  // this is necessary for dynamic values like progress
+  const restart = () => {
+    torrent = client.add(input, {path: input})
+  }
+  const getStatus = () => ({
+    progress: torrentGetter().progress,
+    timeRemaining: torrentGetter().timeRemaining,
+    peerCount: torrentGetter()._peersLength,
+    downloadSpeed: getDownloadSpeed(torrentGetter()),
+    uploadSpeed: getUploadSpeed(torrentGetter()),
+    done: torrentGetter().done,
+    paused: torrentGetter().destroyed,
   })
+  const addToElement = (cssSelector, fileIndex) => addTorrentMediaToElement(torrentGetter(), cssSelector, fileIndex)
+  const downloadFile = async (fileIndex) => {
+    const fileName = fileGetter(fileIndex).name
+    console.log(fileName)
+    const blob = await new Promise(resolve => fileGetter(fileIndex).getBlob((err, blob) => resolve(blob)))
+    console.log(blob)
+    downloadBlob({blob, fileName})
+  }
+
+  const parsedTorrent = {
+    name: getRoot(torrent.files[0].path),
+    files,
+    infoHash,
+    magnet,
+    sizeInMbs: bytesToMbs(size),
+    mediaIndexes,
+    pause,
+    restart,
+    addToElement,
+    getStatus,
+    downloadFile,
+    _getTorrent: torrentGetter,
+    _client: client
+  }
+
+  return parsedTorrent
 }
+
+const getDownloadSpeed = (torrent) => {
+  try {
+    return torrent.client.downloadSpeed
+  }
+  catch (e) {
+    return 0
+  }
+}
+
+const getUploadSpeed = (torrent) => {
+  try {
+    return torrent.client.uploadSpeed
+  }
+  catch (e) {
+    return 0
+  }
+}
+
+const addAsync = (input) => new Promise(resolve => client.add(input, {path: input}, resolve))
 
 const addTorrentMediaToElement = (torrent, cssSelector, mediaIndex) => {
   // input can be an info hash, torrent file buffer (blob in browser) or magnet uri

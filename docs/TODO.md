@@ -1,6 +1,6 @@
 ##todo
 
-6. add video to IPFS and video to web torrent
+6. add loading when wss, add download when completed + loading, fix bug with pause/restart
 7. add update notification system
 fix bug when pasting something in other pop up it shows up in publish
 make sitemap generator
