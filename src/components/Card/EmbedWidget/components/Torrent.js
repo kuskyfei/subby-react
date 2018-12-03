@@ -257,13 +257,13 @@ class Torrent extends React.Component {
         const handlePlay = () => this.addTorrentMedia(fileIndex)
         playButton = <IconButton onClick={handlePlay} className={classes.playButton}><PlayArrowIcon /></IconButton>
 
-        let loading 
+        let loading
         if (loadingTorrentFileIndex === fileIndex) {
           loading = <CircularProgress size={10} />
         }
 
         mediaFiles.push(<p key={file}>{file} {playButton} {loading}</p>)
-        break
+        continue
       }
 
       // if file is not a media, send invisible button
