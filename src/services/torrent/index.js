@@ -38,8 +38,12 @@ const getTorrent = async (input) => {
   // static
   const {infoHash, magnetURI: magnet, length: size} = torrent
   const files = []
+  let hasStreamableFiles = false
   for (const file of torrent.files) {
     files.push(file.path)
+    if (isStreamableVideo(file.path)) {
+      hasStreamableFiles = true
+    }
   }
   const fileIsStreamable = (fileIndex) => {
     return isStreamableVideo(files[fileIndex])
@@ -88,6 +92,7 @@ const getTorrent = async (input) => {
     magnet,
     sizeInMbs: bytesToMbs(size),
     fileIsStreamable,
+    hasStreamableFiles,
     stop,
     restart,
     isRestarting: () => isRestarting,

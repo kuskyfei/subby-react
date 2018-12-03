@@ -1,6 +1,7 @@
 import React from 'react'
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 const styles = theme => ({
   link: {
@@ -19,17 +20,45 @@ const styles = theme => ({
   },
   margin: {
     marginTop: 16
+  },
+  loadingWrapper: {
+    marginLeft: 8,
+    transform: 'translateY(3px)',
+    display: 'inline-block'
   }
 })
 
-const Magnet = (props) => {
-  const {classes, url} = props
+class Magnet extends React.Component {
+  state = {
+    isLoading: hasWssTracker(this.props.url)
+  }
 
-  return (
-    <Typography className={classes.margin} variant='body2' component='div' gutterBottom>
-      <a className={classes.link} href={url}>{url}</a>
-    </Typography>
-  )
+  componentDidMount() {
+    const {isLoading} = this.state
+
+    // try loading web torrent for 5 seconds then give up
+    if (isLoading) {
+      setTimeout(() => this.setState({isLoading: false}), 10000)
+    }
+  }
+
+  render() {
+    const {classes, url} = this.props
+    const {isLoading} = this.state
+
+    return (
+      <Typography className={classes.margin} variant='body2' component='div' gutterBottom>
+        <a className={classes.link} href={url}>
+          {url}
+          {isLoading && <div className={classes.loadingWrapper}><CircularProgress className={classes.progress} size={15} /></div>}
+        </a>
+      </Typography>
+    )
+  }
+}
+
+const hasWssTracker = (magnet) => {
+  return !!magnet.match(/&tr=wss/)
 }
 
 export default withStyles(styles)(Magnet) // eslint-disable-line

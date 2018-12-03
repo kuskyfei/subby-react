@@ -10,7 +10,6 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
-import LinearProgress from '@material-ui/core/LinearProgress'
 import CloseIcon from '@material-ui/icons/Close'
 
 const prettierBytes = require('prettier-bytes')
@@ -121,11 +120,13 @@ class Torrent extends React.Component {
   }
 
   state = {
-    filesOpen: true,
+    // open the files by default if the torrent has streamable files
+    filesOpen: this.props.url.hasStreamableFiles,
     showVideo: false,
     showLoading: true,
     status: {},
     activeTorrentFileIndex: null,
+    loadingTorrentFileIndex: null,
     stopDisabled: false
   }
 
@@ -148,10 +149,11 @@ class Torrent extends React.Component {
     const torrentDestroyed = torrent.getStatus().stopped
 
     if (torrentDestroyed) {
+      this.setState({loadingTorrentFileIndex: fileIndex})
       await torrent.restart()
     }
 
-    this.setState({showVideo: true, showLoading: true, activeTorrentFileIndex: fileIndex, stopDisabled: false})
+    this.setState({showVideo: true, showLoading: true, activeTorrentFileIndex: fileIndex, stopDisabled: false, loadingTorrentFileIndex: null})
     torrent.addToElement(`.${classes.torrentMedia}`, fileIndex)
     this.handleTorrentElementRendered()
     this.startStatusInterval()
@@ -240,7 +242,7 @@ class Torrent extends React.Component {
 
   render () {
     const {classes, url: torrent} = this.props
-    const {showVideo, showLoading, status, activeTorrentFileIndex, stopDisabled} = this.state
+    const {showVideo, showLoading, status, activeTorrentFileIndex, loadingTorrentFileIndex, stopDisabled} = this.state
 
     let files = []
     const mediaFiles = []
@@ -254,7 +256,13 @@ class Torrent extends React.Component {
       if (torrent.fileIsStreamable(fileIndex)) {
         const handlePlay = () => this.addTorrentMedia(fileIndex)
         playButton = <IconButton onClick={handlePlay} className={classes.playButton}><PlayArrowIcon /></IconButton>
-        mediaFiles.push(<p key={file}>{file} {playButton}</p>)
+
+        let loading 
+        if (loadingTorrentFileIndex === fileIndex) {
+          loading = <CircularProgress size={10} />
+        }
+
+        mediaFiles.push(<p key={file}>{file} {playButton} {loading}</p>)
         break
       }
 
@@ -335,14 +343,6 @@ class Torrent extends React.Component {
           </TableBody>
         </Table>
         <div className={classnames(classes.torrentMediaWrapper, !showVideo && classes.displayNone)}>
-          {/* showLoading && // might use this later for when the video is loading
-            <LinearProgress
-              classes={{
-                colorPrimary: classes.linearColorPrimary,
-                barColorPrimary: classes.linearBarColorPrimary,
-              }}
-            />
-          */}
           <video controls ref={this.videoRef} className={classes.torrentMedia} />
 
             <div className={classes.statusWrapper}>
