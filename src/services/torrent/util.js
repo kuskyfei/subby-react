@@ -46,4 +46,4 @@ const downloadBlob = ({blob, fileName}) => {
   window.URL.revokeObjectURL(url)
 }
 
-export {getRoot, bytesToMbs, isWebSocket, getMediaIndexesFromTorrentFiles, concatTypedArrays, downloadBlob}
+export {getRoot, bytesToMbs, isWebSocket, getMediaIndexesFromTorrentFiles, concatTypedArrays, downloadBlob, isStreamableVideo}

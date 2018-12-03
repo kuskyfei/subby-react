@@ -69,6 +69,16 @@ const styles = theme => ({
     width: 'unset',
     transform: 'translateY(-1px)'
   },
+  closeIcon: {
+    fontSize: 20
+  },
+
+  stopButton: {
+    height: 'unset',
+    width: 'unset',
+    transform: 'translateY(-3px)'
+  },
+
   playButtonInvisible: {
     opacity: 0,
     pointerEvents: 'none'
@@ -84,10 +94,11 @@ const styles = theme => ({
   },
   statusWrapper: {
     display: 'flex',
-    justifyContent: 'space-between'
   },
   helpTextWrapper: {
     whiteSpace: 'nowrap',
+    marginLeft: 'auto',
+    paddingLeft: 8
   },
   statusItem: {
     whiteSpace: 'nowrap',
@@ -99,7 +110,7 @@ const styles = theme => ({
   },
 
   tooltip: {
-    maxWidth: 300
+    maxWidth: 200
   }
 })
 
@@ -114,7 +125,8 @@ class Torrent extends React.Component {
     showVideo: false,
     showLoading: true,
     status: {},
-    activeTorrentFileIndex: null
+    activeTorrentFileIndex: null,
+    stopDisabled: false
   }
 
   handleClick () {
@@ -133,25 +145,25 @@ class Torrent extends React.Component {
 
   addTorrentMedia = async (fileIndex) => {
     const {classes, url: torrent} = this.props
-    const torrentDestroyed = torrent.getStatus().paused
+    const torrentDestroyed = torrent.getStatus().stopped
 
     if (torrentDestroyed) {
-      torrent.restart()
+      await torrent.restart()
     }
 
-    this.setState({showVideo: true, showLoading: true, activeTorrentFileIndex: fileIndex})
+    this.setState({showVideo: true, showLoading: true, activeTorrentFileIndex: fileIndex, stopDisabled: false})
     torrent.addToElement(`.${classes.torrentMedia}`, fileIndex)
     this.handleTorrentElementRendered()
     this.startStatusInterval()
   }
 
-  closeTorrentMedia = () => {
+  stopTorrent = () => {
     const {url: torrent} = this.props
 
-    this.setState({activeTorrentFileIndex: null})
+    this.setState({activeTorrentFileIndex: null, stopDisabled: true})
 
     try {
-      torrent.pause()
+      torrent.stop()
     }
     catch (e) {
       console.error(e)
@@ -204,7 +216,8 @@ class Torrent extends React.Component {
         progress,
         remaining,
         downloadSpeed: prettierBytes(status.downloadSpeed) + '/s ',
-        uploadSpeed: prettierBytes(status.uploadSpeed) + '/s '
+        uploadSpeed: prettierBytes(status.uploadSpeed) + '/s ',
+        stopped: status.stopped
       }
     })
   }
@@ -227,7 +240,7 @@ class Torrent extends React.Component {
 
   render () {
     const {classes, url: torrent} = this.props
-    const {showVideo, showLoading, status, activeTorrentFileIndex} = this.state
+    const {showVideo, showLoading, status, activeTorrentFileIndex, stopDisabled} = this.state
 
     let files = []
     const mediaFiles = []
@@ -237,15 +250,8 @@ class Torrent extends React.Component {
       const fileIndex = counter++
       let playButton
 
-      if (activeTorrentFileIndex === fileIndex) {
-        const handleClose = () => this.closeTorrentMedia(fileIndex)
-        playButton = <IconButton onClick={handleClose} className={classes.playButton}><CloseIcon /></IconButton>
-        mediaFiles.push(<p key={file}>{file} {playButton}</p>)
-        break
-      }
-
       // send real play buttons for playable files
-      if (torrent.mediaIndexes.includes(fileIndex)) {
+      if (torrent.fileIsStreamable(fileIndex)) {
         const handlePlay = () => this.addTorrentMedia(fileIndex)
         playButton = <IconButton onClick={handlePlay} className={classes.playButton}><PlayArrowIcon /></IconButton>
         mediaFiles.push(<p key={file}>{file} {playButton}</p>)
@@ -340,6 +346,9 @@ class Torrent extends React.Component {
           <video controls ref={this.videoRef} className={classes.torrentMedia} />
 
             <div className={classes.statusWrapper}>
+              {!status.done &&
+                <IconButton disabled={stopDisabled || status.stopped} onClick={this.stopTorrent} className={classes.stopButton}><CloseIcon className={classes.closeIcon}/></IconButton>
+              }
               <Typography align="left" variant='caption' gutterBottom>
                 <span className={classes.statusItem}>Progress: {status.progress}</span>
                 {` `}
@@ -396,18 +405,20 @@ const msToTime = (duration) => {
 const HelpText = () => 
   <div>
     <p>
-      Video needs to download enough pieces to start streaming.
-      Only the following codecs can be streamed in the browser:
-      <ul>
-        <li>vp8</li>
-        <li>vorbis</li>
-        <li>avc1.4d001e</li>
-        <li>avc1.42001e</li>
-        <li>mp4a.40.2</li>
-        <li>mp4a.40.5</li>
-        <li>mp4a.67</li>
-      </ul>
+      Videos need to download enough pieces to start streaming.
     </p>
+    <p>
+      Only the following codecs can be streamed in the browser:
+    </p>
+    <ul>
+      <li>vp8</li>
+      <li>vorbis</li>
+      <li>avc1.4d001e</li>
+      <li>avc1.42001e</li>
+      <li>mp4a.40.2</li>
+      <li>mp4a.40.5</li>
+      <li>mp4a.67</li>
+    </ul>
   </div>
 
 export default withStyles(styles)(Torrent) // eslint-disable-line

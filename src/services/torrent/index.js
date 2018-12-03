@@ -1,6 +1,6 @@
 const parseTorrent = require('parse-torrent')
 const debug = require('debug')('services:torrent')
-const {getRoot, bytesToMbs, isWebSocket, getMediaIndexesFromTorrentFiles, concatTypedArrays, downloadBlob} = require('./util')
+const {getRoot, bytesToMbs, isWebSocket, getMediaIndexesFromTorrentFiles, concatTypedArrays, downloadBlob, isStreamableVideo} = require('./util')
 
 let WebTorrent = require('webtorrent')
 const mockWebTorrent = () => {
@@ -41,16 +41,28 @@ const getTorrent = async (input) => {
   for (const file of torrent.files) {
     files.push(file.path)
   }
-  const mediaIndexes = getMediaIndexesFromTorrentFiles(torrent.files)
+  const fileIsStreamable = (fileIndex) => {
+    return isStreamableVideo(files[fileIndex])
+  }
 
   // dynamic
-  const pause = () => torrentGetter().destroy()
+  const stop = () => torrentGetter().destroy()
   // restart (in conjunction with torrentGetter) allows the 
   // original torrent object to change when restarted
   // this is necessary for dynamic values like progress
-  const restart = () => {
+  let isRestarting
+  const restart = () => new Promise(resolve => {
+    if (isRestarting) {
+      console.error('torrent already restarting')
+      return
+    }
+    isRestarting = true
     torrent = client.add(input, {path: input})
-  }
+    torrent.on('ready', () => {
+      isRestarting = false
+      resolve()
+    })
+  })
   const getStatus = () => ({
     progress: torrentGetter().progress,
     timeRemaining: torrentGetter().timeRemaining,
@@ -58,7 +70,7 @@ const getTorrent = async (input) => {
     downloadSpeed: getDownloadSpeed(torrentGetter()),
     uploadSpeed: getUploadSpeed(torrentGetter()),
     done: torrentGetter().done,
-    paused: torrentGetter().destroyed,
+    stopped: torrentGetter().destroyed,
   })
   const addToElement = (cssSelector, fileIndex) => addTorrentMediaToElement(torrentGetter(), cssSelector, fileIndex)
   const downloadFile = async (fileIndex) => {
@@ -75,9 +87,10 @@ const getTorrent = async (input) => {
     infoHash,
     magnet,
     sizeInMbs: bytesToMbs(size),
-    mediaIndexes,
-    pause,
+    fileIsStreamable,
+    stop,
     restart,
+    isRestarting: () => isRestarting,
     addToElement,
     getStatus,
     downloadFile,
