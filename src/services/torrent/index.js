@@ -48,6 +48,7 @@ const getTorrent = async (input) => {
   const fileIsStreamable = (fileIndex) => {
     return isStreamableVideo(files[fileIndex])
   }
+  const mediaIndexes = getMediaIndexesFromTorrentFiles(torrent.files)
 
   // dynamic
   const stop = () => torrentGetter().destroy()
@@ -90,6 +91,7 @@ const getTorrent = async (input) => {
     files,
     infoHash,
     magnet,
+    mediaIndexes,
     sizeInMbs: bytesToMbs(size),
     fileIsStreamable,
     hasStreamableFiles,

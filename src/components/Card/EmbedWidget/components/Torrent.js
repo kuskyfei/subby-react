@@ -110,6 +110,9 @@ const styles = theme => ({
 
   tooltip: {
     maxWidth: 200
+  },
+  activeFile: {
+    fontWeight: 500
   }
 })
 
@@ -262,7 +265,12 @@ class Torrent extends React.Component {
           loading = <CircularProgress size={10} />
         }
 
-        mediaFiles.push(<p key={file}>{file} {playButton} {loading}</p>)
+        let fileClassname
+        if (activeTorrentFileIndex === fileIndex) {
+          fileClassname = classes.activeFile
+        }
+
+        mediaFiles.push(<p className={fileClassname} key={file}>{file} {playButton} {loading}</p>)
         continue
       }
 
@@ -405,7 +413,7 @@ const msToTime = (duration) => {
 const HelpText = () => 
   <div>
     <p>
-      Videos need to download enough pieces to start streaming.
+      Files need to download enough pieces to start streaming.
     </p>
     <p>
       Only the following codecs can be streamed in the browser:
