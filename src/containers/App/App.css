@@ -1,5 +1,7 @@
 /* GLOBAL */
 
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,400italic,500,700');
+
 main {
   min-height: 60vh;
 }
@@ -24,4 +26,3 @@ a {
     opacity: 1;
   }
 }
-

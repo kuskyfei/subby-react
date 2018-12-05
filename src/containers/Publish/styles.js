@@ -101,10 +101,10 @@ const styles = theme => ({
       }
     },
     '& a': {
-      fontWeight: 600
+      fontWeight: 700
     },
     '& strong': {
-      fontWeight: 600
+      fontWeight: 700
     },
     '& p': {
       color: 'rgb(255, 0, 0)'

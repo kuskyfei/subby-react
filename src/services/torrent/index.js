@@ -56,6 +56,13 @@ const getTorrent = async (input) => {
     torrent = client.add(input, {path: input})
   }
 
+  // if the torrent has no file, there's
+  // a problem with the connection and should 
+  // return null
+  if (!torrent.files.length) {
+    return
+  }
+
   // we need to pause right after starting otherwise 
   // it starts downloading and wasting bandwidth
   pause()
@@ -95,6 +102,7 @@ const getTorrent = async (input) => {
   const getStatus = () => ({
     progress: torrent.progress,
     filesProgress: getFilesProgress(torrent),
+    filesTimeRemaining: getFilesTimeRemaining(torrent),
     filesDone: getFilesDone(torrent),
     timeRemaining: torrent.timeRemaining,
     peerCount: torrent._peersLength,
@@ -136,6 +144,20 @@ const getTorrent = async (input) => {
   }
 
   return parsedTorrent
+}
+
+const getFilesTimeRemaining = (torrent) => {
+  const filesTimeRemaining = []
+
+  for (const file of torrent.files) {
+    const percentOfFile = file.length - (file.length * file.progress)
+    const percentOfTorrent = percentOfFile / torrent.length
+    const percentOfTimeRemaining = percentOfTorrent * torrent.timeRemaining
+    const fileTimeRemaining = percentOfTimeRemaining.toFixed()
+    filesTimeRemaining.push(fileTimeRemaining)
+  }
+
+  return filesTimeRemaining
 }
 
 const getFilesProgress = (torrent) => {

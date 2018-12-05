@@ -21,7 +21,11 @@ const init = async () => {
 
   const localUserSettings = await getSettings()
 
-  await subbyJs.init({provider: localUserSettings.WEB3_PROVIDER, mnemonic: 'radar blur cabbage chef fix engine embark joy scheme fiction master release'})
+  await subbyJs.init({
+    provider: localUserSettings.WEB3_PROVIDER, 
+    mnemonic: 'radar blur cabbage chef fix engine embark joy scheme fiction master release', 
+    network: settings.ETHEREUM_NETWORK
+  })
   torrent.init()
 
   let ipfsProvider = localUserSettings.IPFS_PROVIDER

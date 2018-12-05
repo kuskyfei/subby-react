@@ -105,7 +105,7 @@ const styles = theme => ({
     whiteSpace: 'nowrap',
   },
   downloadFile: {
-    fontWeight: 600,
+    fontWeight: 700,
   },
   downloadFileName: {
     whiteSpace: 'normal',
@@ -137,7 +137,7 @@ class Torrent extends React.Component {
     // open the files by default if the torrent has streamable files
     filesOpen: this.props.url.hasStreamableFiles,
     showVideo: false,
-    status: {filesProgress: [], filesDone: []},
+    status: {filesProgress: [], filesDone: [], filesRemaining: []},
     activeTorrentFileIndex: null,
     // this is not used right now but could be useful later
     loadingTorrentFileIndex: null,
@@ -235,6 +235,11 @@ class Torrent extends React.Component {
       remaining = msToTime(status.timeRemaining)
     }
 
+    const filesRemaining = status.filesTimeRemaining
+    for (const i in filesRemaining) {
+      filesRemaining[i] = msToTime(filesRemaining[i])
+    }
+
     this.setState({
       status: {
         done: status.done,
@@ -242,6 +247,7 @@ class Torrent extends React.Component {
         progress,
         filesProgress,
         filesDone: status.filesDone,
+        filesRemaining,
         remaining,
         downloadSpeed: prettierBytes(status.downloadSpeed) + '/s ',
         uploadSpeed: prettierBytes(status.uploadSpeed) + '/s ',
@@ -254,7 +260,6 @@ class Torrent extends React.Component {
 
     // first listen to the wrapper being changed
     const videoObserver = new MutationObserver(([mutation]) => {
-      console.log(mutation)
       videoObserver.disconnect()
 
       // do something
@@ -386,13 +391,13 @@ class Torrent extends React.Component {
                     {paused && <PlayArrowIcon className={classes.PauseIcon}/>}
                   </IconButton>
                 }
-                <span className={classes.statusItem}>Progress: {status.progress}</span>
+                <span className={classes.statusItem}>Progress: {status.filesProgress[activeTorrentFileIndex]}</span>
                 {` `}
                 <span className={classes.statusItem}>Download speed: {status.downloadSpeed}</span>
                 {` `}
                 <span className={classes.statusItem}>Upload speed: {status.uploadSpeed}</span>
                 {` `}
-                <span className={classes.statusItem}>ETA: {status.remaining}</span>
+                <span className={classes.statusItem}>ETA: {status.filesRemaining[activeTorrentFileIndex]}</span>
                 {` `}
                 {status.filesDone[activeTorrentFileIndex] && 
                   <div className={classnames(classes.downloadFile)}>
@@ -429,6 +434,10 @@ const msToTime = (duration) => {
 
   if (minutes) {
     time += minutes + 'm'
+  }
+
+  if (hours && minutes) {
+    return time
   }
 
   time += seconds + 's'

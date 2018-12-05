@@ -60,6 +60,10 @@ class Post extends React.Component {
 
     const torrent = await services.getTorrent(post.link)
 
+    if (!torrent) {
+      return
+    }
+
     this.setState({
       link: torrent
     })

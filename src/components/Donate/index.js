@@ -110,10 +110,10 @@ const styles = theme => ({
     paddingRight: 8,
     paddingLeft: 8,
     '& a': {
-      fontWeight: 600
+      fontWeight: 700
     },
     '& strong': {
-      fontWeight: 600
+      fontWeight: 700
     },
     '& p': {
       color: 'rgb(255, 0, 0)'

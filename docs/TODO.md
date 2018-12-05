@@ -1,6 +1,7 @@
 ##todo
 
-6. add loading when wss, add download when completed + loading, fix bug with pause/restart
+fix feed error
+
 7. add update notification system
 fix bug when pasting something in other pop up it shows up in publish
 make sitemap generator
