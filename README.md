@@ -33,6 +33,8 @@ npm run build
 ```
 The compiled build can be found in /build
 
+Note: there is currently a bug with webtorrent module v0.102.2. Line 46 of lib/file.js must replace - this.offset with - (this.offset % pieceLength)
+
 ## How to debug
 
 Subby has a few global variables attached to the window object that start with SUBBY_ or SUBBYJS_

@@ -10,7 +10,7 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
-import CloseIcon from '@material-ui/icons/Close'
+import PauseIcon from '@material-ui/icons/Pause'
 
 const prettierBytes = require('prettier-bytes')
 const debug = require('debug')('components:Card:EmbedWidget:Torrent')
@@ -68,14 +68,16 @@ const styles = theme => ({
     width: 'unset',
     transform: 'translateY(-1px)'
   },
-  closeIcon: {
+  PauseIcon: {
     fontSize: 20
   },
 
-  stopButton: {
+  pauseButton: {
     height: 'unset',
     width: 'unset',
-    transform: 'translateY(-3px)'
+    transform: 'translateY(-3px)',
+    position: 'absolute',
+    marginLeft: -20
   },
 
   playButtonInvisible: {
@@ -104,8 +106,10 @@ const styles = theme => ({
   },
   downloadFile: {
     fontWeight: 600,
-    '& a:hover': {
-    }
+  },
+  downloadFileName: {
+    whiteSpace: 'normal',
+    wordBreak: 'break-all'
   },
 
   tooltip: {
@@ -113,7 +117,14 @@ const styles = theme => ({
   },
   activeFile: {
     fontWeight: 500
-  }
+  },
+
+  fileProgress: {
+    fontSize: 9,
+    color: '#757575',
+    whiteSpace: 'nowrap'
+  },
+
 })
 
 class Torrent extends React.Component {
@@ -126,15 +137,15 @@ class Torrent extends React.Component {
     // open the files by default if the torrent has streamable files
     filesOpen: this.props.url.hasStreamableFiles,
     showVideo: false,
-    showLoading: true,
-    status: {},
+    status: {filesProgress: [], filesDone: []},
     activeTorrentFileIndex: null,
+    // this is not used right now but could be useful later
     loadingTorrentFileIndex: null,
-    stopDisabled: false
+    paused: false,
   }
 
   handleClick () {
-    this.setState({...this.state, filesOpen: !this.state.filesOpen})
+    this.setState({filesOpen: !this.state.filesOpen})
   }
 
   componentDidMount () {
@@ -149,26 +160,31 @@ class Torrent extends React.Component {
 
   addTorrentMedia = async (fileIndex) => {
     const {classes, url: torrent} = this.props
-    const torrentDestroyed = torrent.getStatus().stopped
+    const {showVideo} = this.state
 
-    if (torrentDestroyed) {
-      this.setState({loadingTorrentFileIndex: fileIndex})
-      await torrent.restart()
+    this.setState({showVideo: true, activeTorrentFileIndex: fileIndex, loadingTorrentFileIndex: null})
+    
+    if (!showVideo) {
+      torrent.unpause()
     }
-
-    this.setState({showVideo: true, showLoading: true, activeTorrentFileIndex: fileIndex, stopDisabled: false, loadingTorrentFileIndex: null})
     torrent.addToElement(`.${classes.torrentMedia}`, fileIndex)
     this.handleTorrentElementRendered()
     this.startStatusInterval()
   }
 
-  stopTorrent = () => {
+  pauseTorrent = () => {
     const {url: torrent} = this.props
+    const {activeTorrentFileIndex, paused} = this.state
 
-    this.setState({activeTorrentFileIndex: null, stopDisabled: true})
+    this.setState({paused: !paused})
+
+    if (paused) {
+      torrent.unpause(activeTorrentFileIndex)
+      return
+    }
 
     try {
-      torrent.stop()
+      torrent.pause()
     }
     catch (e) {
       console.error(e)
@@ -205,7 +221,12 @@ class Torrent extends React.Component {
     if (status.done) {
       progress = 1
     }
-    progress = (100 * progress).toFixed(1) + '%'
+    progress = progressToPercent(progress)
+
+    const filesProgress = status.filesProgress
+    for (const i in filesProgress) {
+      filesProgress[i] = progressToPercent(filesProgress[i])
+    }
 
     let remaining
     if (status.done) {
@@ -219,10 +240,11 @@ class Torrent extends React.Component {
         done: status.done,
         peers: status.peerCount,
         progress,
+        filesProgress,
+        filesDone: status.filesDone,
         remaining,
         downloadSpeed: prettierBytes(status.downloadSpeed) + '/s ',
         uploadSpeed: prettierBytes(status.uploadSpeed) + '/s ',
-        stopped: status.stopped
       }
     })
   }
@@ -235,7 +257,8 @@ class Torrent extends React.Component {
       console.log(mutation)
       videoObserver.disconnect()
 
-      this.setState({showLoading: false})
+      // do something
+      // this is not used right now but could be useful later
     })
 
     // start listening
@@ -245,7 +268,7 @@ class Torrent extends React.Component {
 
   render () {
     const {classes, url: torrent} = this.props
-    const {showVideo, showLoading, status, activeTorrentFileIndex, loadingTorrentFileIndex, stopDisabled} = this.state
+    const {showVideo, status, activeTorrentFileIndex, loadingTorrentFileIndex, filesOpen, paused} = this.state
 
     let files = []
     const mediaFiles = []
@@ -254,6 +277,8 @@ class Torrent extends React.Component {
     for (const file of torrent.files) {
       const fileIndex = counter++
       let playButton
+      
+      let fileProgress = <span className={classes.fileProgress}>{status.filesProgress[fileIndex]}</span>
 
       // send real play buttons for playable files
       if (torrent.fileIsStreamable(fileIndex)) {
@@ -270,14 +295,14 @@ class Torrent extends React.Component {
           fileClassname = classes.activeFile
         }
 
-        mediaFiles.push(<p className={fileClassname} key={file}>{file} {playButton} {loading}</p>)
+        mediaFiles.push(<p className={fileClassname} key={file}>{file} {playButton} {loading} {fileProgress}</p>)
         continue
       }
 
       // if file is not a media, send invisible button
       const invisiblePlayButton = <IconButton className={classnames(classes.playButton, classes.playButtonInvisible)}><PlayArrowIcon /></IconButton>
       playButton = invisiblePlayButton
-      files.push(<p key={file}>{file} {playButton}</p>)
+      files.push(<p key={file}>{file} {playButton} {fileProgress}</p>)
     }
 
     files = [...mediaFiles, ...files]
@@ -331,13 +356,13 @@ class Torrent extends React.Component {
               <TableCell>
                 {torrent.files.length}{` `}
                 <a onClick={this.handleClick.bind(this)}>
-                  {(this.state.filesOpen) ? '[ - ]' : '[ + ]'}
+                  {(filesOpen) ? '[ - ]' : '[ + ]'}
                 </a>
 
               </TableCell>
             </TableRow>
 
-            {this.state.filesOpen &&
+            {filesOpen &&
               <TableRow className={classes.row}>
                 <TableCell className={classes.nameCell} />
                 <TableCell>
@@ -354,10 +379,13 @@ class Torrent extends React.Component {
           <video controls ref={this.videoRef} className={classes.torrentMedia} />
 
             <div className={classes.statusWrapper}>
-              {!status.done &&
-                <IconButton disabled={stopDisabled || status.stopped} onClick={this.stopTorrent} className={classes.stopButton}><CloseIcon className={classes.closeIcon}/></IconButton>
-              }
-              <Typography align="left" variant='caption' gutterBottom>
+              <Typography style={{marginLeft: !status.done && 20}} align="left" variant='caption' gutterBottom>
+                {!status.done &&
+                  <IconButton onClick={this.pauseTorrent} className={classes.pauseButton}>
+                    {!paused && <PauseIcon className={classes.PauseIcon}/>}
+                    {paused && <PlayArrowIcon className={classes.PauseIcon}/>}
+                  </IconButton>
+                }
                 <span className={classes.statusItem}>Progress: {status.progress}</span>
                 {` `}
                 <span className={classes.statusItem}>Download speed: {status.downloadSpeed}</span>
@@ -366,10 +394,10 @@ class Torrent extends React.Component {
                 {` `}
                 <span className={classes.statusItem}>ETA: {status.remaining}</span>
                 {` `}
-                {status.done && 
-                  <span className={classnames(classes.downloadFile, classes.statusItem)}>
-                    <a onClick={() => torrent.downloadFile(activeTorrentFileIndex)}>↪Download</a>
-                  </span>
+                {status.filesDone[activeTorrentFileIndex] && 
+                  <div className={classnames(classes.downloadFile)}>
+                    <a onClick={() => torrent.downloadFile(activeTorrentFileIndex)}>↪Download <span className={classes.downloadFileName}>{torrent.fileNames[activeTorrentFileIndex]}</span></a>
+                  </div>
                 }
               </Typography>
               <Tooltip classes={{tooltip: classes.tooltip}} title={<HelpText />} placement='top-end'>
@@ -384,6 +412,8 @@ class Torrent extends React.Component {
     )
   }
 }
+
+const progressToPercent = (progress) => (100 * progress).toFixed(1) + '%'
 
 const msToTime = (duration) => {
   const milliseconds = parseInt((duration % 1000) / 100),

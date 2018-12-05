@@ -23,8 +23,29 @@ const getTorrent = async (input) => {
   // torrent is a global that gets replaced 
   // when a torrent is restarted
   let torrent
-  const torrentGetter = () => torrent
-  const fileGetter = (fileIndex) => torrent.files[fileIndex]
+  let temporaryWires, isPaused
+
+  const pause = () => {
+    isPaused = true
+    temporaryWires = torrent.wires
+    torrent.wires = []
+  }
+
+  const unpause = (fileIndex = 0) => {
+    isPaused = false
+    if (!temporaryWires) {
+      return
+    }
+    if (torrent.wires.length > 0) {
+      return
+    }
+    torrent.wires = temporaryWires
+    temporaryWires = null
+
+    // creating a stream gives priority to this file
+    // when unpausing
+    torrent.files[fileIndex].createReadStream()
+  }
 
   torrent = client.get(input, {path: input})
 
@@ -35,32 +56,34 @@ const getTorrent = async (input) => {
     torrent = client.add(input, {path: input})
   }
 
-  // static
+  // we need to pause right after starting otherwise 
+  // it starts downloading and wasting bandwidth
+  pause()
+
   const {infoHash, magnetURI: magnet, length: size} = torrent
+
   const files = []
+  const fileNames = []
   let hasStreamableFiles = false
   for (const file of torrent.files) {
     files.push(file.path)
+    fileNames.push(file.name)
     if (isStreamableVideo(file.path)) {
       hasStreamableFiles = true
     }
   }
+
   const fileIsStreamable = (fileIndex) => {
     return isStreamableVideo(files[fileIndex])
   }
+
   const mediaIndexes = getMediaIndexesFromTorrentFiles(torrent.files)
 
-  // dynamic
-  const stop = () => torrentGetter().destroy()
-  // restart (in conjunction with torrentGetter) allows the 
-  // original torrent object to change when restarted
-  // this is necessary for dynamic values like progress
+  const stop = () => torrent.destroy()
+
   let isRestarting
   const restart = () => new Promise(resolve => {
-    if (isRestarting) {
-      console.error('torrent already restarting')
-      return
-    }
+    debug('restart')
     isRestarting = true
     torrent = client.add(input, {path: input})
     torrent.on('ready', () => {
@@ -68,44 +91,78 @@ const getTorrent = async (input) => {
       resolve()
     })
   })
+
   const getStatus = () => ({
-    progress: torrentGetter().progress,
-    timeRemaining: torrentGetter().timeRemaining,
-    peerCount: torrentGetter()._peersLength,
-    downloadSpeed: getDownloadSpeed(torrentGetter()),
-    uploadSpeed: getUploadSpeed(torrentGetter()),
-    done: torrentGetter().done,
-    stopped: torrentGetter().destroyed,
+    progress: torrent.progress,
+    filesProgress: getFilesProgress(torrent),
+    filesDone: getFilesDone(torrent),
+    timeRemaining: torrent.timeRemaining,
+    peerCount: torrent._peersLength,
+    downloadSpeed: getDownloadSpeed(torrent),
+    uploadSpeed: getUploadSpeed(torrent),
+    done: torrent.done,
+    stopped: torrent.destroyed,
+    paused: isPaused
   })
-  const addToElement = (cssSelector, fileIndex) => addTorrentMediaToElement(torrentGetter(), cssSelector, fileIndex)
+
+  const addToElement = (cssSelector, fileIndex) => addTorrentMediaToElement(torrent, cssSelector, fileIndex)
+
   const downloadFile = async (fileIndex) => {
-    const fileName = fileGetter(fileIndex).name
-    console.log(fileName)
-    const blob = await new Promise(resolve => fileGetter(fileIndex).getBlob((err, blob) => resolve(blob)))
-    console.log(blob)
+    const fileName = torrent.files[fileIndex].name
+    const blob = await new Promise(resolve => torrent.files[fileIndex].getBlob((err, blob) => resolve(blob)))
     downloadBlob({blob, fileName})
   }
 
   const parsedTorrent = {
     name: getRoot(torrent.files[0].path),
     files,
+    fileNames,
     infoHash,
     magnet,
     mediaIndexes,
     sizeInMbs: bytesToMbs(size),
     fileIsStreamable,
     hasStreamableFiles,
+    pause,
+    unpause,
     stop,
     restart,
     isRestarting: () => isRestarting,
     addToElement,
     getStatus,
     downloadFile,
-    _getTorrent: torrentGetter,
+    _getTorrent: () => torrent,
     _client: client
   }
 
   return parsedTorrent
+}
+
+const getFilesProgress = (torrent) => {
+  const filesProgress = []
+
+  if (!torrent || !torrent.files) {
+    return filesProgress
+  }
+
+  for (const file of torrent.files) {
+    filesProgress.push(file.progress)
+  }
+  return filesProgress
+}
+
+const getFilesDone = (torrent) => {
+  const filesDone = []
+
+  if (!torrent || !torrent.files) {
+    return filesDone
+  }
+
+  for (const file of torrent.files) {
+    const isDone = file.progress === 1
+    filesDone.push(isDone)
+  }
+  return filesDone
 }
 
 const getDownloadSpeed = (torrent) => {

@@ -1,5 +1,6 @@
 import React from 'react'
 import {withStyles} from '@material-ui/core/styles'
+import {Link} from 'react-router-dom'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import classNames from 'classnames'
@@ -113,7 +114,7 @@ class Profile extends React.Component {
         </Avatar>
 
         <Typography className={classes.username} variant='title' noWrap gutterBottom>
-          {username}
+          <Link to={`?u=${username}`}>{username}</Link>
         </Typography>
 
         {!editable && 
