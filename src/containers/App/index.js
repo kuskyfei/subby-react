@@ -61,6 +61,8 @@ class App extends Component {
       // services.mockSmartContracts({explicit: true})
       // services.mockSmartContracts()
 
+      this.handleGetUpdate()
+
       debug('mounted')
     })()
   }
@@ -104,6 +106,23 @@ class App extends Component {
     }
     this.updateCacheLoop = new services.UpdateCacheLoop(account)
     this.updateCacheLoop.start()
+  }
+
+  handleGetUpdate = async () => {
+    const settings = await services.getSettings()
+    if (!settings.UPDATE_NOTIFICATIONS) {
+      return
+    }
+    const update = await services.getUpdate()
+    if (update) {
+      window.dispatchEvent(new CustomEvent('snackbar', {
+        detail: {
+          type: 'post', 
+          link: update.link, 
+          comment: update.comment
+        }
+      }))
+    }
   }
 
   componentDidUpdate(prevProps) {

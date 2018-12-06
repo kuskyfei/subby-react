@@ -6,7 +6,6 @@ const cache = require('./cache')
 const {
   arrayToObjectWithItemsAsProps,
   mergeEthereumSubscriptionsCache,
-  getActiveSubscriptionsFromSubscriptions,
   formatSubscriptionsForGetFeed,
   filterRequestedPosts
 } = require('./util')
@@ -201,9 +200,26 @@ const getFeedFromActiveFeedCache = async ({subscriptions, startAt, limit}, cb) =
   return posts
 }
 
+const getUpdate = async () => {
+  debug('getUpdate')
+
+  const res = await subbyJs.getPostsFromPublisher('subby_updates', {limit: 1})
+  const update = res.posts[0]
+
+  if (!update) {
+    return
+  }
+  if (update.comment === 'ignore') {
+    return
+  }
+
+  return update
+}
+
 export {
   getProfile,
   getSubscriptions,
+  getUpdate,
   isSubscribed,
   getSettings,
   getFeed

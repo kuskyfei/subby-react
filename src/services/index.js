@@ -75,10 +75,10 @@ const {
 
   getProfile,
   getSubscriptions,
-  getActiveSubscriptions,
+  getUpdate,
+  isSubscribed,
   getSettings,
   getFeed,
-  isSubscribed,
 
   updateCache,
   UpdateCacheLoop,
@@ -111,7 +111,7 @@ export {
   // cache read
   getProfile,
   getSubscriptions,
-  getActiveSubscriptions,
+  getUpdate,
   isSubscribed,
   getSettings,
   getFeed,

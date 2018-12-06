@@ -7,13 +7,12 @@ const {
 } = require('./write')
 
 const {
-  getAddress,
   getProfile,
   getSubscriptions,
-  getActiveSubscriptions,
+  getUpdate,
+  isSubscribed,
   getSettings,
-  getFeed,
-  isSubscribed
+  getFeed
 } = require('./read')
 
 const {
@@ -30,10 +29,9 @@ export {
   subscribe,
   unsubscribe,
 
-  getAddress,
   getProfile,
   getSubscriptions,
-  getActiveSubscriptions,
+  getUpdate,
   isSubscribed,
   getSettings,
   getFeed,

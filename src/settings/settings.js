@@ -34,7 +34,7 @@ const settings = {
   // uses to cache posts as well as store your subscriptions.
   INDEXEDDB_VERSION: 1,
   // 'main' or 'rinkeby'
-  ETHEREUM_NETWORK: 'rinkeby',
+  ETHEREUM_NETWORK: 'main',
 }
 
 module.exports = settings

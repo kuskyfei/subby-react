@@ -7,6 +7,7 @@ import IconButton from '@material-ui/core/IconButton'
 import CloseIcon from '@material-ui/icons/Close'
 
 const debug = require('debug')('components:Snackbar')
+const services = require('../../services')
 
 const styles = theme => ({
   close: {
@@ -34,7 +35,7 @@ class Snackbars extends React.Component {
 
     if (!window.chrome) {
       this.newSnackbar({message: 'Subby might not work properly in non-Chrome based browsers.', autoHideDuration: 15000})
-    }    
+    }
   }
 
   componentWillUnmount = (prevProps) => {
@@ -42,9 +43,17 @@ class Snackbars extends React.Component {
   }
 
   handleSnackbarEvent = (event) => {
-    const {type} = event.detail
+    const {type, link, comment} = event.detail
 
     debug('snackbar event', event.detail)
+
+    if (type === 'post') {
+      this.newSnackbar({
+        message: comment, 
+        button: <a href={link} target="_blank" >Learn More</a>,
+        autoHideDuration: 15000
+      })
+    }
 
     if (type === 'somePostsUnavailable') {
       this.newSnackbar({
