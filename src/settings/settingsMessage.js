@@ -13,7 +13,7 @@ const prettyPrint = (string, startIndent = 0) => {
 }
 
 const settingsMessage = `<script>
-  
+
   /* Welcome to Subby v${version}. Change your global settings below. */
 
   window.SUBBY_GLOBAL_SETTINGS = {
