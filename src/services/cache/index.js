@@ -1,6 +1,7 @@
 const {
   editProfile,
   setSettings,
+  resetSettings,
   setSubscriptions,
   subscribe,
   unsubscribe
@@ -25,6 +26,7 @@ const {
 export {
   editProfile,
   setSettings,
+  resetSettings,
   setSubscriptions,
   subscribe,
   unsubscribe,

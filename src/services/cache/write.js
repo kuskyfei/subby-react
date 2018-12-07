@@ -54,9 +54,16 @@ const setSettings = async (settings) => {
   await indexedDb.setSettings(settings)
 }
 
+const resetSettings = async () => {
+  debug('resetSettings')
+
+  await indexedDb.setSettings({}, {ignorePrevious: true})
+}
+
 export {
   editProfile,
   setSettings,
+  resetSettings,
   setSubscriptions,
   subscribe,
   unsubscribe

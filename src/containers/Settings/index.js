@@ -86,6 +86,12 @@ class Settings extends React.Component {
     await services.terminateAccount()
   }
 
+  handleReset = async () => {
+    await services.resetSettings()
+    const settings = await services.getSettings()
+    this.setState(settings)
+  }
+
   render () {
     const {isTerminated} = this.state
     const {classes} = this.props
@@ -334,6 +340,21 @@ class Settings extends React.Component {
 
             <Typography className={classes.message} variant='caption' gutterBottom>
               Get notified when updates and security fixes are released. This is done through Subby and does not require a connection to a centralized server.
+            </Typography>
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={false}
+                  onChange={this.handleReset}
+                  color='primary'
+                />
+              }
+              label='Restore Settings'
+            />
+
+            <Typography className={classes.message} variant='caption' gutterBottom>
+              Restore to default settings defined at the top of subby.html.
             </Typography>
 
             <FormControlLabel

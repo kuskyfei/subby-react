@@ -15,7 +15,6 @@ const init = async () => {
   }
   catch (e) {
     delete indexedDb.init
-    console.log(indexedDb)
     console.error(`couldn't init indexedDb, all methods have been proxied`)
   }
 
@@ -68,6 +67,7 @@ const getNetwork = getSignerNetwork
 
 const {
   setSettings,
+  resetSettings,
   setSubscriptions,
   subscribe,
   unsubscribe,
@@ -104,6 +104,7 @@ export {
   mockIpfsApi,
   // cache write
   setSettings,
+  resetSettings,
   setSubscriptions,
   subscribe,
   unsubscribe,

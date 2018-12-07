@@ -89,6 +89,9 @@ class Post extends React.Component {
 
   handleIpfsLink = async () => {
     const {post, settings} = this.props
+    if (!settings.IPFS_EMBEDS) {
+      return
+    }
     if (!isIpfsContent(post.link)) {
       return
     }
@@ -252,7 +255,7 @@ class Post extends React.Component {
     if (comment) newPost.comment = comment
 
     // catch loading IPFS content on first render
-    if (isIpfsContent(newPost.link)) newPost.link = 'loading'
+    if (settings && settings.IPFS_EMBEDS && isIpfsContent(newPost.link)) newPost.link = 'loading'
     if (isIpfsContent(newPost.comment)) newPost.comment = 'loading'
 
     return (

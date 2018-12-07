@@ -108,12 +108,16 @@ const removeFromLocalSubscriptions = async (publisher) => {
   await setLocalSubscriptions(subscriptions)
 }
 
-const setSettings = async (newSettings) => {
+const setSettings = async (newSettings, {ignorePrevious} = {}) => {
   debug('setSettings', newSettings)
 
   const oldSettings = await getSettings()
 
-  const settings = {...oldSettings, ...newSettings}
+  let settings = {...oldSettings, ...newSettings}
+
+  if (ignorePrevious) {
+    settings = newSettings
+  }
 
   const tx = await db
     .db

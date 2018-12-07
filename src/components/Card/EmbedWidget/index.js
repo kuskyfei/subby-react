@@ -5,7 +5,7 @@ import {
   Reddit, Twitter,
   Vimeo, Youtube,
   Image, Link,
-  Ipfs, Torrent,
+  Torrent,
   Audio, Video,
   Loading, Magnet,
   Download, MediaSource
@@ -17,7 +17,7 @@ const EmbedWidget = (props) => {
   const settings = props.settings
   const Widget = getWidgetFromUrl(props.url, settings)
 
-  return <Widget url={props.url} />
+  return <Widget settings={settings} url={props.url} />
 }
 
 const getWidgetFromUrl = (url, settings) => {
@@ -46,13 +46,6 @@ const getWidgetFromUrl = (url, settings) => {
 
   if (isLoading(url)) {
     return Loading
-  }
-
-  if (isIpfs(url)) {
-    if (!settings.IPFS_EMBEDS) {
-      return Download
-    }
-    return Ipfs
   }
 
   if (isMagnet(url)) {

@@ -29,8 +29,17 @@ const styles = theme => ({
 })
 
 class Magnet extends React.Component {
+  hasWssTracker = (magnet) => {
+    const {settings} = this.props
+
+    if (settings && !settings.WEB_TORRENT_EMBEDS) {
+      return false
+    }
+    return !!magnet.match(/&tr=wss/)
+  }
+
   state = {
-    isLoading: hasWssTracker(this.props.url)
+    isLoading: this.hasWssTracker(this.props.url)
   }
 
   componentDidMount() {
@@ -55,10 +64,6 @@ class Magnet extends React.Component {
       </Typography>
     )
   }
-}
-
-const hasWssTracker = (magnet) => {
-  return !!magnet.match(/&tr=wss/)
-}
+} 
 
 export default withStyles(styles)(Magnet) // eslint-disable-line
